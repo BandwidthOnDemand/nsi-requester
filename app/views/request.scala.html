@@ -1,0 +1,26 @@
+@(requestForm: Form[Reservation])
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+
+@main("Do a NSI Reserve Request") {
+    <section>
+        <h1>Make a NSI Reserve Request</h1>
+        <div class="content">
+            @helper.form(action = routes.Application.request, 'class -> "form-horizontal") {
+
+                @inputText(requestForm("description"))
+                @inputText(requestForm("startDate"))
+                @inputText(requestForm("endDate"))
+                @inputText(requestForm("source"))
+                @inputText(requestForm("destination"))
+                @inputText(requestForm("connectionId"))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Request</button>
+                </div>
+            }
+        </div>
+    </section>
+}
