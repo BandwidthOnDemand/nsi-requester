@@ -44,6 +44,7 @@ object Application extends Controller {
               "startDate" -> date("yyyy-MM-dd hh:mm"),
               "endDate" -> date("yyyy-MM-dd hh:mm"),
               "connectionId" -> nonEmptyText,
+              "correlationId" -> nonEmptyText,
               "source" -> nonEmptyText,
               "destination" -> nonEmptyText
             ){ Reservation.apply } { Reservation.unapply }
@@ -57,7 +58,10 @@ object Application extends Controller {
   def requestForm = Action {
     val defaultForm = form.fill((
             Provider(defaultProviderUrl, credentials._1, credentials._2, "http://localhost:9000"),
-            Reservation(description = "test", startDate = new Date, endDate = new Date, connectionId = generateConnectionId, source = "First port", destination = "Second port")
+            Reservation(
+                description = "A NSI reserve test", startDate = new Date, endDate = new Date,
+                connectionId = generateConnectionId, correlationId = generateCorrelationId,
+                source = "First port", destination = "Second port")
     ))
 
     Ok(views.html.request(defaultForm))
@@ -115,7 +119,7 @@ object Application extends Controller {
     val replyTo = replyToHost + routes.Application.reply
     putInEnveloppe(
       <int:reserveRequest>
-        <int:correlationId>{ generateCorrelationId }</int:correlationId>
+        <int:correlationId>{ reservation.correlationId }</int:correlationId>
         <int:replyTo>{ replyTo }</int:replyTo>
         <type:reserve>
           <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
