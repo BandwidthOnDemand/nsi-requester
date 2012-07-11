@@ -1,0 +1,29 @@
+@(response: String)
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+
+@main("Do a NSI Reserve Request") {
+    <section>
+        <h1>The NSI Response, waiting for confirm or fail</h1>
+        <h3>The direct response</h3>
+        <pre class="prettyprint">@response</pre>
+        <h3>Other responses</h3>
+        <div id="responses">
+        </div>
+    </section>
+    <script>
+      $(function() {
+          var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+          var socket = new WS("ws://localhost:9000@routes.Application.wsRequest");
+
+          socket.onmessage = function(event) {
+              $("#responses").append($("<pre/>", {text: event.data, 'class': 'prettyprint'}));
+              prettyPrint();
+          }
+          socket.onopen = function(event) { console.log("socket is open"); }
+          socket.onclose = function(event) { console.log("socket closed..") }
+      })
+    </script>
+}
