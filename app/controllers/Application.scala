@@ -2,24 +2,17 @@ package controllers
 
 import java.util.Date
 import java.util.UUID
-
 import scala.annotation.implicitNotFound
 import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq
 import scala.xml.PrettyPrinter
-
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-
 import com.ning.http.client.Realm.AuthScheme
-
 import models.Reservation
 import play.api.data.Form
-import play.api.data.Forms.date
-import play.api.data.Forms.mapping
-import play.api.data.Forms.nonEmptyText
-import play.api.data.Forms.text
+import play.api.data.Forms._
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.iteratee.PushEnumerator
@@ -27,22 +20,34 @@ import play.api.libs.ws.WS
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
+import models.Provider
+import play.api.Configuration
+import play.api.Play
 
 object Application extends Controller {
 
-  val providerUrl = "http://localhost:8082/bod/nsi/v1_sc/provider"
+  val defaultProviderUrl = "http://localhost:8082/bod/nsi/v1_sc/provider"
   val credentials = "nsi" -> "nsi123"
   val dateTimeFormat = ISODateTimeFormat.dateTime()
 
-  val form: Form[Reservation] = Form(
-      mapping(
-          "description" -> text,
-          "startDate" -> date("yyyy-MM-dd hh:mm"),
-          "endDate" -> date("yyyy-MM-dd hh:mm"),
-          "connectionId" -> nonEmptyText,
-          "source" -> nonEmptyText,
-          "destination" -> nonEmptyText
-      ){ Reservation.apply } { Reservation.unapply }
+  val form: Form[(Provider, Reservation)] = Form(
+      tuple(
+          "provider" ->
+            mapping(
+                "providerUrl" -> nonEmptyText,
+                "username" -> text,
+                "password" -> text,
+                "replyToHost" -> nonEmptyText) { Provider.apply } { Provider.unapply},
+          "reservation" ->
+            mapping(
+              "description" -> text,
+              "startDate" -> date("yyyy-MM-dd hh:mm"),
+              "endDate" -> date("yyyy-MM-dd hh:mm"),
+              "connectionId" -> nonEmptyText,
+              "source" -> nonEmptyText,
+              "destination" -> nonEmptyText
+            ){ Reservation.apply } { Reservation.unapply }
+      )
   )
 
   def index = Action {
@@ -50,9 +55,10 @@ object Application extends Controller {
   }
 
   def requestForm = Action {
-    val defaultForm = form.fill(
-        Reservation(description = "test", startDate = new Date, endDate = new Date, connectionId = generateConnectionId, source = "First port", destination = "Second port")
-    )
+    val defaultForm = form.fill((
+            Provider(defaultProviderUrl, credentials._1, credentials._2, "http://localhost:9000"),
+            Reservation(description = "test", startDate = new Date, endDate = new Date, connectionId = generateConnectionId, source = "First port", destination = "Second port")
+    ))
 
     Ok(views.html.request(defaultForm))
   }
@@ -60,13 +66,14 @@ object Application extends Controller {
   def request = Action { implicit request =>
     form.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.request(formWithErrors)),
-        reservation => Async {
-          val reserveRequest = reserve(reservation)
-          WS.url(providerUrl)
-            .withAuth(credentials._1, credentials._2, AuthScheme.BASIC)
-            .post(reserveRequest).map { response =>
-              Ok(views.html.response(prettify(response.xml)))
-          }
+        {
+          case (provider, reservation) => Async {
+            val reserveRequest = reserve(reservation, provider.replyToHost)
+            WS.url(provider.providerUrl)
+              .withAuth(provider.username, provider.password, AuthScheme.BASIC)
+              .post(reserveRequest).map { response =>
+                Ok(views.html.response(prettify(response.xml)))
+          } }
         }
     )
   }
@@ -102,12 +109,13 @@ object Application extends Controller {
   }
 
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
+  private def generateCorrelationId = generateConnectionId
 
-  private def reserve(reservation: Reservation) = {
-    val replyTo = "http://localhost:9000" + routes.Application.reply
+  private def reserve(reservation: Reservation, replyToHost: String) = {
+    val replyTo = replyToHost + routes.Application.reply
     putInEnveloppe(
       <int:reserveRequest>
-        <int:correlationId>urn:uuid:correlationId</int:correlationId>
+        <int:correlationId>{ generateCorrelationId }</int:correlationId>
         <int:replyTo>{ replyTo }</int:replyTo>
         <type:reserve>
           <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>

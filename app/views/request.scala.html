@@ -1,4 +1,4 @@
-@(requestForm: Form[Reservation])
+@(requestForm: Form[(Provider, Reservation)])
 
 @import helper._
 
@@ -8,14 +8,26 @@
     <section>
         <h1>Make a NSI Reserve Request</h1>
         <div class="content">
-            @helper.form(action = routes.Application.request, 'class -> "form-horizontal") {
+            @helper.form(action = routes.Application.request, 'class -> "form form-horizontal") {
 
-                @inputText(requestForm("description"))
-                @inputText(requestForm("startDate"))
-                @inputText(requestForm("endDate"))
-                @inputText(requestForm("source"))
-                @inputText(requestForm("destination"))
-                @inputText(requestForm("connectionId"), 'class -> "input-xlarge")
+                <div class="message"><h3>Reservation</h3></div>
+                @inputText(requestForm("reservation.description"), '_label -> "Description")
+                @inputText(requestForm("reservation.startDate"), '_label -> "Start")
+                @inputText(requestForm("reservation.endDate"), '_label -> "End")
+                @inputText(requestForm("reservation.source"), '_label -> "Source")
+                @inputText(requestForm("reservation.destination"), '_label -> "Destination")
+                @inputText(requestForm("reservation.connectionId"), '_label -> "ConnectionId", 'class -> "input-xlarge")
+
+                <div class="message extra-fields">
+                    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> Provider fields</h3>
+                </div>
+
+                <fieldset class="extra-fields">
+                    @inputText(requestForm("provider.providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
+                    @inputText(requestForm("provider.replyToHost"), '_label -> "Reply to Host", 'class -> "input-xlarge")
+                    @inputText(requestForm("provider.username"), '_label -> "Username", 'class -> "input-medium")
+                    @inputText(requestForm("provider.password"), '_label -> "Password", 'class -> "input-medium")
+                </fieldset>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Request</button>
@@ -23,4 +35,17 @@
             }
         </div>
     </section>
+    <script>
+      $(function() {
+          var extraFields = $("fieldset.extra-fields");
+
+          $(".message").on('click', function(event) {
+              extraFields.toggle();
+              $(this).toggleClass('expanded');
+          });
+
+          extraFields.toggle();
+
+      })
+    </script>
 }

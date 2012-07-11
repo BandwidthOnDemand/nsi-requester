@@ -1,0 +1,11 @@
+.form .message.expanded .icon-plus-sign,
+.form .message .icon-minus-sign {
+    display: none;
+}
+.form .message.expanded .icon-minus-sign {
+    display: inline;
+}
+
+.message.extra-fields {
+    cursor: pointer;
+}
