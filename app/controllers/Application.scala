@@ -37,8 +37,8 @@ object Application extends Controller {
   val form: Form[Reservation] = Form(
       mapping(
           "description" -> text,
-          "startDate" -> date,
-          "endDate" -> date,
+          "startDate" -> date("yyyy-MM-dd hh:mm"),
+          "endDate" -> date("yyyy-MM-dd hh:mm"),
           "connectionId" -> nonEmptyText,
           "source" -> nonEmptyText,
           "destination" -> nonEmptyText
