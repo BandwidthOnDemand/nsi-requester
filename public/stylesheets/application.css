@@ -2,8 +2,11 @@
 .form .message .icon-minus-sign {
     display: none;
 }
+.form .message .icon-plus-sign,
 .form .message.expanded .icon-minus-sign {
     display: inline;
+    position: absolute;
+    left: 35px;
 }
 
 .message.extra-fields {
