@@ -1,4 +1,4 @@
-@(response: String)
+@(request: String, response: String)
 
 @import helper._
 
@@ -8,11 +8,13 @@
     <section>
         <h1>The NSI Response, waiting for confirm or fail</h1>
         <div class="content">
-            <h3>The direct response</h3>
-            <pre class="prettyprint">@response</pre>
             <h3>Other responses</h3>
             <div id="responses">
             </div>
+            <h3>The response</h3>
+            <pre class="prettyprint">@response</pre>
+            <h3>The Request</h3>
+            <pre class="prettyprint">@request</pre>
         </div>
     </section>
     <script>

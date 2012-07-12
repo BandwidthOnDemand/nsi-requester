@@ -84,8 +84,9 @@ object Application extends Controller {
             WS.url(provider.providerUrl)
               .withAuth(provider.username, provider.password, AuthScheme.BASIC)
               .post(reserveRequest).map { response =>
-                Ok(views.html.response(prettify(response.xml)))
-          } }
+                Ok(views.html.response(prettify(reserveRequest), prettify(response.xml)))
+              }
+          }
         }
     )
   }
