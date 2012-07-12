@@ -52,10 +52,10 @@ object Application extends Controller {
   )
 
   def index = Action {
-    Redirect(routes.Application.request)
+    Redirect(routes.Application.reserve)
   }
 
-  def requestForm = Action {
+  def reserveForm = Action {
     val defaultForm = form.fill((
             Provider(defaultProviderUrl, credentials._1, credentials._2, "http://localhost:9000"),
             Reservation(
@@ -64,15 +64,23 @@ object Application extends Controller {
                 source = "First port", destination = "Second port")
     ))
 
-    Ok(views.html.request(defaultForm))
+    Ok(views.html.reserve(defaultForm))
   }
 
-  def request = Action { implicit request =>
+  def provisionForm = Action {
+    Ok(views.html.provision())
+  }
+
+  def terminateForm = Action {
+    Ok(views.html.terminate())
+  }
+
+  def reserve = Action { implicit request =>
     form.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.request(formWithErrors)),
+        formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
         {
           case (provider, reservation) => Async {
-            val reserveRequest = reserve(reservation, provider.replyToHost)
+            val reserveRequest = reserveSoapRequest(reservation, provider.replyToHost)
             WS.url(provider.providerUrl)
               .withAuth(provider.username, provider.password, AuthScheme.BASIC)
               .post(reserveRequest).map { response =>
@@ -115,7 +123,7 @@ object Application extends Controller {
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
   private def generateCorrelationId = generateConnectionId
 
-  private def reserve(reservation: Reservation, replyToHost: String) = {
+  private def reserveSoapRequest(reservation: Reservation, replyToHost: String) = {
     val replyTo = replyToHost + routes.Application.reply
     putInEnveloppe(
       <int:reserveRequest>

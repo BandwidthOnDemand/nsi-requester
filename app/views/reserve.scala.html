@@ -4,11 +4,11 @@
 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
-@main("Do a NSI Reserve Request") {
+@main("Make a NSI Reserve Request", "reserve") {
     <section>
         <h1>Make a NSI Reserve Request</h1>
         <div class="content">
-            @helper.form(action = routes.Application.request, 'class -> "form form-horizontal") {
+            @helper.form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reservation</h3></div>
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
