@@ -41,8 +41,8 @@ object Application extends Controller {
           "reservation" ->
             mapping(
               "description" -> text,
-              "startDate" -> date("yyyy-MM-dd hh:mm"),
-              "endDate" -> date("yyyy-MM-dd hh:mm"),
+              "startDate" -> date("yyyy-MM-dd HH:mm"),
+              "endDate" -> date("yyyy-MM-dd HH:mm"),
               "connectionId" -> nonEmptyText,
               "correlationId" -> nonEmptyText,
               "source" -> nonEmptyText,
