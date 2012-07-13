@@ -4,13 +4,15 @@
 
 # Home page
 GET     /                           controllers.Application.index
-POST    /reserve                    controllers.Application.reserve
 GET     /reserve                    controllers.Application.reserveForm
-POST    /reply                      controllers.Application.reply
-GET     /wsrequest                  controllers.Application.wsRequest
+POST    /reserve                    controllers.Application.reserve
 GET     /provision                  controllers.Application.provisionForm
 POST    /provision                  controllers.Application.provision
 GET     /terminate                  controllers.Application.terminateForm
+GET     /release                    controllers.Application.releaseForm
+GET     /query                      controllers.Application.queryForm
+GET     /wsrequest                  controllers.Application.wsRequest
+POST    /reply                      controllers.Application.reply
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

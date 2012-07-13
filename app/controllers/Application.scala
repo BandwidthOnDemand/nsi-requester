@@ -79,10 +79,6 @@ object Application extends Controller {
     Ok(views.html.reserve(defaultForm))
   }
 
-  def terminateForm = Action {
-    Ok(views.html.terminate())
-  }
-
   def reserve = Action { implicit request =>
     reserveF.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
@@ -121,6 +117,18 @@ object Application extends Controller {
         }
       }
     )
+  }
+
+  def terminateForm = Action {
+    Ok(views.html.terminate())
+  }
+
+  def releaseForm = Action {
+    Ok(views.html.release())
+  }
+
+  def queryForm = Action {
+    Ok(views.html.query())
   }
 
   private def prettify(xml: Node): String = {
