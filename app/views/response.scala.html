@@ -4,17 +4,15 @@
 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
-@main("Do a NSI Reserve Request", "response") {
+@main("NSI Responses", "response") {
     <section>
-        <h1>The NSI Response, waiting for confirm or fail</h1>
+        <h1>NSI Responses</h1>
         <div class="content">
-            <h3>Other responses</h3>
-            <div id="responses">
-            </div>
-            <h3>The response</h3>
-            <pre class="prettyprint">@response</pre>
-            <h3>The Request</h3>
-            <pre class="prettyprint">@request</pre>
+            @xmlBlock("The Response", response)
+            @xmlBlock("The Request", request)
+        </div>
+        <div id="template" style="display: none">
+            @xmlBlock("Callback Response", "")
         </div>
     </section>
     <script>
@@ -23,11 +21,20 @@
           var socket = new WS("ws://localhost:9000@routes.Application.wsRequest");
 
           socket.onmessage = function(event) {
-              $("#responses").append($("<pre/>", {text: event.data, 'class': 'prettyprint'}));
+              xmlBlock = $("#template > div").clone();
+              xmlBlock.find(".prettyprint").text(event.data);
+              xmlBlock.prependTo("section .content");
               prettyPrint();
           }
           socket.onopen = function(event) { console.log("socket is open"); }
           socket.onclose = function(event) { console.log("socket closed..") }
       })
     </script>
+}
+
+@xmlBlock(title: String, content: String) = {
+    <div class="xml-content">
+        <div class="message"><h3>@title</h3></div>
+        <pre class="prettyprint">@content</pre>
+    </div>
 }
