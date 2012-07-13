@@ -1,0 +1,16 @@
+@(formField: String => Field)
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+
+<div class="message extra-fields">
+    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> Provider fields</h3>
+</div>
+
+<fieldset class="extra-fields">
+    @inputText(formField("providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
+    @inputText(formField("replyToHost"), '_label -> "Reply to Host", 'class -> "input-xlarge")
+    @inputText(formField("username"), '_label -> "Username", 'class -> "input-medium")
+    @inputText(formField("password"), '_label -> "Password", 'class -> "input-medium")
+</fieldset>

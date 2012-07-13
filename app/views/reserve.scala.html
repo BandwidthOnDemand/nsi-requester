@@ -7,6 +7,7 @@
 @main("Make a NSI Reserve Request", "reserve") {
     <section>
         <h1>Make a NSI Reserve Request</h1>
+
         <div class="content">
             @helper.form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
@@ -21,16 +22,7 @@
                 @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")
 
-                <div class="message extra-fields">
-                    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> Provider fields</h3>
-                </div>
-
-                <fieldset class="extra-fields">
-                    @inputText(requestForm("provider.providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
-                    @inputText(requestForm("provider.replyToHost"), '_label -> "Reply to Host", 'class -> "input-xlarge")
-                    @inputText(requestForm("provider.username"), '_label -> "Username", 'class -> "input-medium")
-                    @inputText(requestForm("provider.password"), '_label -> "Password", 'class -> "input-medium")
-                </fieldset>
+                @fragments.providerFields(name => requestForm("provider." + name))
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Request</button>
@@ -38,17 +30,4 @@
             }
         </div>
     </section>
-    <script>
-      $(function() {
-          var extraFields = $("fieldset.extra-fields");
-
-          $(".message").on('click', function(event) {
-              extraFields.toggle();
-              $(this).toggleClass('expanded');
-          });
-
-          extraFields.toggle();
-
-      })
-    </script>
 }
