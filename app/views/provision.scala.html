@@ -1,4 +1,4 @@
-@()
+@(provisionForm: Form[(Provider, Provision)])
 
 @import helper._
 
@@ -8,7 +8,40 @@
     <section>
         <h1>Make a NSI Provision Request</h1>
         <div class="content">
-            Not implemented yet.
+             @helper.form(action = routes.Application.provision, 'class -> "form form-horizontal") {
+
+                <div class="message"><h3>Provision</h3></div>
+                @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id")
+                @inputText(provisionForm("provision.correlationId"), '_label -> "Correlation Id")
+
+                <div class="message extra-fields">
+                    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> Provider fields</h3>
+                </div>
+
+                <fieldset class="extra-fields">
+                    @inputText(provisionForm("provider.providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
+                    @inputText(provisionForm("provider.replyToHost"), '_label -> "Reply to Host", 'class -> "input-xlarge")
+                    @inputText(provisionForm("provider.username"), '_label -> "Username", 'class -> "input-medium")
+                    @inputText(provisionForm("provider.password"), '_label -> "Password", 'class -> "input-medium")
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Request</button>
+                </div>
+            }
         </div>
     </section>
+    <script>
+      $(function() {
+          var extraFields = $("fieldset.extra-fields");
+
+          $(".message").on('click', function(event) {
+              extraFields.toggle();
+              $(this).toggleClass('expanded');
+          });
+
+          extraFields.toggle();
+
+      })
+    </script>
 }

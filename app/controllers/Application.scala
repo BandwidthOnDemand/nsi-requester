@@ -12,6 +12,7 @@ import org.joda.time.format.ISODateTimeFormat
 import com.ning.http.client.Realm.AuthScheme
 import models.Reservation
 import play.api.data.Form
+import play.api.data.Mapping
 import play.api.data.Forms._
 import play.api.libs.iteratee.Enumerator
 import play.api.libs.iteratee.Iteratee
@@ -23,21 +24,23 @@ import play.api.mvc.WebSocket
 import models.Provider
 import play.api.Configuration
 import play.api.Play
+import models.Provision
 
 object Application extends Controller {
 
   val defaultProviderUrl = "http://localhost:8082/bod/nsi/v1_sc/provider"
-  val credentials = "nsi" -> "nsi123"
   val dateTimeFormat = ISODateTimeFormat.dateTime()
+  val defaultProvider = Provider(defaultProviderUrl, "nsi", "nsi123", "http://localhost:9000")
 
-  val form: Form[(Provider, Reservation)] = Form(
+  val providerMapping: Mapping[Provider] = mapping(
+    "providerUrl" -> nonEmptyText,
+    "username" -> text,
+    "password" -> text,
+    "replyToHost" -> nonEmptyText) { Provider.apply } { Provider.unapply }
+
+  val reserveF: Form[(Provider, Reservation)] = Form(
       tuple(
-          "provider" ->
-            mapping(
-                "providerUrl" -> nonEmptyText,
-                "username" -> text,
-                "password" -> text,
-                "replyToHost" -> nonEmptyText) { Provider.apply } { Provider.unapply},
+          "provider" -> providerMapping,
           "reservation" ->
             mapping(
               "description" -> text,
@@ -51,13 +54,24 @@ object Application extends Controller {
       )
   )
 
+  val provisionF: Form[(Provider, Provision)] = Form(
+      tuple(
+        "provider" -> providerMapping,
+        "provision" ->
+          mapping(
+            "connectionId" -> nonEmptyText,
+            "correlationId" -> nonEmptyText
+          ){ Provision.apply }{ Provision.unapply }
+      )
+  )
+
   def index = Action {
     Redirect(routes.Application.reserve)
   }
 
   def reserveForm = Action {
-    val defaultForm = form.fill((
-            Provider(defaultProviderUrl, credentials._1, credentials._2, "http://localhost:9000"),
+    val defaultForm = reserveF.fill((
+            defaultProvider,
             Reservation(
                 description = "A NSI reserve test", startDate = new Date, endDate = new Date,
                 connectionId = generateConnectionId, correlationId = generateCorrelationId,
@@ -67,16 +81,12 @@ object Application extends Controller {
     Ok(views.html.reserve(defaultForm))
   }
 
-  def provisionForm = Action {
-    Ok(views.html.provision())
-  }
-
   def terminateForm = Action {
     Ok(views.html.terminate())
   }
 
   def reserve = Action { implicit request =>
-    form.bindFromRequest.fold(
+    reserveF.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
         {
           case (provider, reservation) => Async {
@@ -88,6 +98,30 @@ object Application extends Controller {
               }
           }
         }
+    )
+  }
+
+  def provisionForm = Action {
+    val defaultForm = provisionF.fill((
+      defaultProvider,
+      Provision(connectionId = "", correlationId = generateCorrelationId)
+    ))
+    Ok(views.html.provision(defaultForm))
+  }
+
+  def provision = Action { implicit request =>
+    provisionF.bindFromRequest.fold(
+      formWithErrors => BadRequest(views.html.provision(formWithErrors)),
+      {
+        case (provider, provision) => Async {
+          val provisionRequest = provisionSoapRequest(provision, provider.replyToHost)
+          WS.url(provider.providerUrl)
+            .withAuth(provider.username, provider.password, AuthScheme.BASIC)
+            .post(provisionRequest).map { response =>
+              Ok(views.html.response(prettify(provisionRequest), prettify(response.xml)))
+            }
+        }
+      }
     )
   }
 
@@ -131,8 +165,7 @@ object Application extends Controller {
         <int:correlationId>{ reservation.correlationId }</int:correlationId>
         <int:replyTo>{ replyTo }</int:replyTo>
         <type:reserve>
-          <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
-          <providerNSA>urn:ogf:network:nsa:netherlight</providerNSA>
+          { nsas }
           <reservation>
             <connectionId>{ reservation.connectionId }</connectionId>
             <description>{ reservation.description }</description>
@@ -160,6 +193,26 @@ object Application extends Controller {
         </type:reserve>
       </int:reserveRequest>
     )
+  }
+
+  private def provisionSoapRequest(provision: Provision, replyToHost: String) = {
+    val replyTo = replyToHost + routes.Application.reply
+
+    putInEnveloppe(
+      <int:provisionRequest>
+         <int:correlationId>{ provision.correlationId }</int:correlationId>
+         <int:replyTo>{ replyTo }</int:replyTo>
+         <type:provision>
+            { nsas }
+            <connectionId>{ provision.connectionId }</connectionId>
+         </type:provision>
+      </int:provisionRequest>
+    )
+  }
+
+  private def nsas = {
+    <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
+    <providerNSA>urn:ogf:network:nsa:netherlight</providerNSA>
   }
 
   private def putInEnveloppe(xml: Elem) = {
