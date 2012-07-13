@@ -7,8 +7,6 @@ import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq
 import scala.xml.PrettyPrinter
-import org.joda.time.DateTime
-import org.joda.time.format.ISODateTimeFormat
 import com.ning.http.client.Realm.AuthScheme
 import models.Reservation
 import play.api.data.Form
@@ -29,14 +27,13 @@ import models.Provision
 object Application extends Controller {
 
   val defaultProviderUrl = "http://localhost:8082/bod/nsi/v1_sc/provider"
-  val dateTimeFormat = ISODateTimeFormat.dateTime()
   val defaultProvider = Provider(defaultProviderUrl, "nsi", "nsi123", "http://localhost:9000")
 
   val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
     "username" -> text,
     "password" -> text,
-    "replyToHost" -> nonEmptyText) { Provider.apply } { Provider.unapply }
+    "replyToHost" -> nonEmptyText){ Provider.apply } { Provider.unapply }
 
   val reserveF: Form[(Provider, Reservation)] = Form(
       tuple(
@@ -90,7 +87,7 @@ object Application extends Controller {
         formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
         {
           case (provider, reservation) => Async {
-            val reserveRequest = reserveSoapRequest(reservation, provider.replyToHost)
+            val reserveRequest = reservation.toEnvelope(provider.replyToHost + routes.Application.reply)
             WS.url(provider.providerUrl)
               .withAuth(provider.username, provider.password, AuthScheme.BASIC)
               .post(reserveRequest).map { response =>
@@ -114,7 +111,7 @@ object Application extends Controller {
       formWithErrors => BadRequest(views.html.provision(formWithErrors)),
       {
         case (provider, provision) => Async {
-          val provisionRequest = provisionSoapRequest(provision, provider.replyToHost)
+          val provisionRequest = provision.toEnvelope(provider.replyToHost + routes.Application.reply)
           WS.url(provider.providerUrl)
             .withAuth(provider.username, provider.password, AuthScheme.BASIC)
             .post(provisionRequest).map { response =>
@@ -157,73 +154,5 @@ object Application extends Controller {
 
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
   private def generateCorrelationId = generateConnectionId
-
-  private def reserveSoapRequest(reservation: Reservation, replyToHost: String) = {
-    val replyTo = replyToHost + routes.Application.reply
-    putInEnveloppe(
-      <int:reserveRequest>
-        <int:correlationId>{ reservation.correlationId }</int:correlationId>
-        <int:replyTo>{ replyTo }</int:replyTo>
-        <type:reserve>
-          { nsas }
-          <reservation>
-            <connectionId>{ reservation.connectionId }</connectionId>
-            <description>{ reservation.description }</description>
-            <serviceParameters>
-              <schedule>
-                <startTime>{ dateTimeFormat.print(new DateTime(reservation.startDate)) }</startTime>
-                <endTime>{ dateTimeFormat.print(new DateTime(reservation.endDate)) }</endTime>
-              </schedule>
-              <bandwidth>
-                <desired>1000</desired>
-                <minimum>750</minimum>
-                <maximum>1000</maximum>
-              </bandwidth>
-            </serviceParameters>
-            <path>
-              <directionality>Bidirectional</directionality>
-              <sourceSTP>
-                <stpId>{ reservation.source }</stpId>
-              </sourceSTP>
-              <destSTP>
-                <stpId>{ reservation.destination }</stpId>
-              </destSTP>
-            </path>
-          </reservation>
-        </type:reserve>
-      </int:reserveRequest>
-    )
-  }
-
-  private def provisionSoapRequest(provision: Provision, replyToHost: String) = {
-    val replyTo = replyToHost + routes.Application.reply
-
-    putInEnveloppe(
-      <int:provisionRequest>
-         <int:correlationId>{ provision.correlationId }</int:correlationId>
-         <int:replyTo>{ replyTo }</int:replyTo>
-         <type:provision>
-            { nsas }
-            <connectionId>{ provision.connectionId }</connectionId>
-         </type:provision>
-      </int:provisionRequest>
-    )
-  }
-
-  private def nsas = {
-    <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
-    <providerNSA>urn:ogf:network:nsa:netherlight</providerNSA>
-  }
-
-  private def putInEnveloppe(xml: Elem) = {
-    <soapenv:Envelope
-      xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:type="http://schemas.ogf.org/nsi/2011/10/connection/types"
-      xmlns:int="http://schemas.ogf.org/nsi/2011/10/connection/interface">
-      <soapenv:Body>
-        { xml }
-      </soapenv:Body>
-    </soapenv:Envelope>
-  }
 
 }
