@@ -12,7 +12,8 @@ case class Reservation(
     connectionId: String,
     correlationId: String,
     source: String = "",
-    destination: String = "") {
+    destination: String = "",
+    bandwidth: Int) {
 
 
   def toEnvelope(replyTo: String) = {
@@ -34,9 +35,7 @@ case class Reservation(
                 <endTime>{ dateTimeFormat.print(new DateTime(endDate)) }</endTime>
               </schedule>
               <bandwidth>
-                <desired>1000</desired>
-                <minimum>750</minimum>
-                <maximum>1000</maximum>
+                <desired>{ bandwidth }</desired>
               </bandwidth>
             </serviceParameters>
             <path>

@@ -46,7 +46,8 @@ object Application extends Controller {
               "connectionId" -> nonEmptyText,
               "correlationId" -> nonEmptyText,
               "source" -> nonEmptyText,
-              "destination" -> nonEmptyText
+              "destination" -> nonEmptyText,
+              "bandwidth" -> number(0, 100000)
             ){ Reservation.apply } { Reservation.unapply }
       )
   )
@@ -72,7 +73,7 @@ object Application extends Controller {
             Reservation(
                 description = "A NSI reserve test", startDate = new Date, endDate = new Date,
                 connectionId = generateConnectionId, correlationId = generateCorrelationId,
-                source = "First port", destination = "Second port")
+                source = "First port", destination = "Second port", bandwidth = 1000)
     ))
 
     Ok(views.html.reserve(defaultForm))
