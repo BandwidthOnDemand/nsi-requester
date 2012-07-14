@@ -17,10 +17,7 @@ import play.api.libs.ws.WS
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
-import models.Reservation
-import models.Provider
-import models.Provision
-import models.Terminate
+import models._
 
 object Application extends Controller {
 
@@ -90,16 +87,7 @@ object Application extends Controller {
   def reserve = Action { implicit request =>
     reserveF.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
-        {
-          case (provider, reservation) => Async {
-            val reserveRequest = reservation.toEnvelope(provider.replyToHost + routes.Application.reply)
-            WS.url(provider.providerUrl)
-              .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-              .post(reserveRequest).map { response =>
-                Ok(views.html.response(prettify(reserveRequest), prettify(response.xml)))
-              }
-          }
-        }
+        { case (provider, reservation) => sendEnvelope(provider, reservation) }
     )
   }
 
@@ -113,17 +101,8 @@ object Application extends Controller {
 
   def provision = Action { implicit request =>
     provisionF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.provision(formWithErrors)),
-      {
-        case (provider, provision) => Async {
-          val provisionRequest = provision.toEnvelope(provider.replyToHost + routes.Application.reply)
-          WS.url(provider.providerUrl)
-            .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-            .post(provisionRequest).map { response =>
-              Ok(views.html.response(prettify(provisionRequest), prettify(response.xml)))
-            }
-        }
-      }
+        formWithErrors => BadRequest(views.html.provision(formWithErrors)),
+        { case (provider, provision) => sendEnvelope(provider, provision) }
     )
   }
 
@@ -138,16 +117,8 @@ object Application extends Controller {
   def terminate = Action { implicit request =>
     terminateF.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.terminate(formWithErrors)),
-        {
-          case(provider, terminate) => Async {
-            val terminateRequest = terminate.toEnvelope(provider.replyToHost + routes.Application.reply)
-            WS.url(provider.providerUrl)
-                .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-                .post(terminateRequest).map { response =>
-                    Ok(views.html.response(prettify(terminateRequest), prettify(response.xml)))
-                }
-          }
-        })
+        { case(provider, terminate) => sendEnvelope(provider, terminate) }
+    )
   }
 
   def releaseForm = Action {
@@ -156,6 +127,15 @@ object Application extends Controller {
 
   def queryForm = Action {
     Ok(views.html.query())
+  }
+
+  private def sendEnvelope(provider: Provider, request: Soapable) = Async {
+    val soapRequest = request.toEnvelope(provider.replyToHost + routes.Application.reply)
+    WS.url(provider.providerUrl)
+        .withAuth(provider.username, provider.password, AuthScheme.BASIC)
+        .post(soapRequest).map { response =>
+            Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
+        }
   }
 
   private def prettify(xml: Node): String = {
