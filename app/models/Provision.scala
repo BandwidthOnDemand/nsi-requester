@@ -2,7 +2,7 @@ package models
 
 case class Provision(connectionId: String, correlationId: String) extends Soapable {
 
-  def toEnvelope(replyTo: String) = { inEnvelope(
+  def toEnvelope(replyTo: String) = inEnvelope(
     <int:provisionRequest>
        <int:correlationId>{ correlationId }</int:correlationId>
        <int:replyTo>{ replyTo }</int:replyTo>
@@ -10,7 +10,7 @@ case class Provision(connectionId: String, correlationId: String) extends Soapab
           { nsas }
           <connectionId>{ connectionId }</connectionId>
        </type:provision>
-    </int:provisionRequest>)
-  }
+    </int:provisionRequest>
+  )
 
 }
