@@ -3,7 +3,6 @@ package models
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import SoapHelper._
 
 case class Reservation(
     description: String,
@@ -13,14 +12,13 @@ case class Reservation(
     correlationId: String,
     source: String = "",
     destination: String = "",
-    bandwidth: Int) {
-
+    bandwidth: Int) extends Soapable {
 
   def toEnvelope(replyTo: String) = {
 
     val dateTimeFormat = ISODateTimeFormat.dateTime()
 
-    inEnveloppe(
+    inEnvelope(
       <int:reserveRequest>
         <int:correlationId>{ correlationId }</int:correlationId>
         <int:replyTo>{ replyTo }</int:replyTo>

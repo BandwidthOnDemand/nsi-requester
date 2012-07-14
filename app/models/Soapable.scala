@@ -1,10 +1,12 @@
 package models
 
+import scala.xml.Node
 import scala.xml.Elem
 
-object SoapHelper {
+trait Soapable {
+  def toEnvelope(replyTo: String): Node
 
-  def inEnveloppe(xml: Elem) = {
+  def inEnvelope(xml: Elem) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:type="http://schemas.ogf.org/nsi/2011/10/connection/types"
