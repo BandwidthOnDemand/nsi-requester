@@ -9,6 +9,7 @@ POST    /reserve                    controllers.Application.reserve
 GET     /provision                  controllers.Application.provisionForm
 POST    /provision                  controllers.Application.provision
 GET     /terminate                  controllers.Application.terminateForm
+POST    /terminate                  controllers.Application.terminate
 GET     /release                    controllers.Application.releaseForm
 GET     /query                      controllers.Application.queryForm
 GET     /wsrequest                  controllers.Application.wsRequest

@@ -2,13 +2,11 @@ package controllers
 
 import java.util.Date
 import java.util.UUID
-import scala.annotation.implicitNotFound
 import scala.xml.Elem
 import scala.xml.Node
 import scala.xml.NodeSeq
 import scala.xml.PrettyPrinter
 import com.ning.http.client.Realm.AuthScheme
-import models.Reservation
 import play.api.data.Form
 import play.api.data.Mapping
 import play.api.data.Forms._
@@ -19,10 +17,10 @@ import play.api.libs.ws.WS
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
+import models.Reservation
 import models.Provider
-import play.api.Configuration
-import play.api.Play
 import models.Provision
+import models.Terminate
 
 object Application extends Controller {
 
@@ -63,6 +61,16 @@ object Application extends Controller {
       )
   )
 
+  val terminateF: Form[(Provider, Terminate)] = Form(
+    tuple(
+        "provider" -> providerMapping,
+        "terminate" -> mapping(
+            "connectionId" -> nonEmptyText,
+            "correlationId" -> nonEmptyText
+        ){ Terminate.apply }{ Terminate.unapply }
+    )
+  )
+
   def index = Action {
     Redirect(routes.Application.reserve)
   }
@@ -96,10 +104,10 @@ object Application extends Controller {
   }
 
   def provisionForm = Action {
-    val defaultForm = provisionF.fill((
+    val defaultForm = provisionF.fill(
       defaultProvider,
       Provision(connectionId = "", correlationId = generateCorrelationId)
-    ))
+    )
     Ok(views.html.provision(defaultForm))
   }
 
@@ -120,7 +128,26 @@ object Application extends Controller {
   }
 
   def terminateForm = Action {
-    Ok(views.html.terminate())
+    val defaultForm = terminateF.fill(
+        defaultProvider,
+        Terminate(connectionId = "", correlationId = generateCorrelationId)
+    )
+    Ok(views.html.terminate(defaultForm))
+  }
+
+  def terminate = Action { implicit request =>
+    terminateF.bindFromRequest.fold(
+        formWithErrors => BadRequest(views.html.terminate(formWithErrors)),
+        {
+          case(provider, terminate) => Async {
+            val terminateRequest = terminate.toEnvelope(provider.replyToHost + routes.Application.reply)
+            WS.url(provider.providerUrl)
+                .withAuth(provider.username, provider.password, AuthScheme.BASIC)
+                .post(terminateRequest).map { response =>
+                    Ok(views.html.response(prettify(terminateRequest), prettify(response.xml)))
+                }
+          }
+        })
   }
 
   def releaseForm = Action {

@@ -1,3 +1,5 @@
+@(terminateForm: Form[(Provider, Terminate)])
+
 @import helper._
 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
@@ -6,7 +8,18 @@
     <section>
         <h1>Make a NSI Terminate Request</h1>
         <div class="content">
-            Not implemented yet.
+             @helper.form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
+
+                <div class="message"><h3>Terminate</h3></div>
+                @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id")
+                @inputText(terminateForm("terminate.correlationId"), '_label -> "Correlation Id")
+
+                @fragments.providerFields(name => terminateForm("provider." + name))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Request</button>
+                </div>
+            }
         </div>
     </section>
 }
