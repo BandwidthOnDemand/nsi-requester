@@ -21,64 +21,17 @@ import models._
 
 object Application extends Controller {
 
-  val defaultProviderUrl = "http://localhost:8082/bod/nsi/v1_sc/provider"
-  val defaultProvider = Provider(defaultProviderUrl, "nsi", "nsi123", "http://localhost:9000")
-
-  val providerMapping: Mapping[Provider] = mapping(
-    "providerUrl" -> nonEmptyText,
-    "username" -> text,
-    "password" -> text,
-    "replyToHost" -> nonEmptyText){ Provider.apply } { Provider.unapply }
-
-  val reserveF: Form[(Provider, Reservation)] = Form(
-      tuple(
-          "provider" -> providerMapping,
-          "reservation" ->
-            mapping(
-              "description" -> text,
-              "startDate" -> date("yyyy-MM-dd HH:mm"),
-              "endDate" -> date("yyyy-MM-dd HH:mm"),
-              "connectionId" -> nonEmptyText,
-              "correlationId" -> nonEmptyText,
-              "source" -> nonEmptyText,
-              "destination" -> nonEmptyText,
-              "bandwidth" -> number(0, 100000)
-            ){ Reservation.apply } { Reservation.unapply }
-      )
-  )
-
-  val provisionF: Form[(Provider, Provision)] = Form(
-      tuple(
-        "provider" -> providerMapping,
-        "provision" ->
-          mapping(
-            "connectionId" -> nonEmptyText,
-            "correlationId" -> nonEmptyText
-          ){ Provision.apply }{ Provision.unapply }
-      )
-  )
-
-  val terminateF: Form[(Provider, Terminate)] = Form(
-    tuple(
-        "provider" -> providerMapping,
-        "terminate" -> mapping(
-            "connectionId" -> nonEmptyText,
-            "correlationId" -> nonEmptyText
-        ){ Terminate.apply }{ Terminate.unapply }
-    )
-  )
-
   def index = Action {
     Redirect(routes.Application.reserve)
   }
 
   def reserveForm = Action {
     val defaultForm = reserveF.fill((
-            defaultProvider,
-            Reservation(
-                description = "A NSI reserve test", startDate = new Date, endDate = new Date,
-                connectionId = generateConnectionId, correlationId = generateCorrelationId,
-                source = "First port", destination = "Second port", bandwidth = 1000)
+      defaultProvider,
+      Reservation(
+        description = "A NSI reserve test", startDate = new Date, endDate = new Date,
+        connectionId = generateConnectionId, correlationId = generateCorrelationId,
+        source = "First port", destination = "Second port", bandwidth = 1000)
     ))
 
     Ok(views.html.reserve(defaultForm))
@@ -86,8 +39,8 @@ object Application extends Controller {
 
   def reserve = Action { implicit request =>
     reserveF.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
-        { case (provider, reservation) => sendEnvelope(provider, reservation) }
+      formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
+      { case (provider, reservation) => sendEnvelope(provider, reservation) }
     )
   }
 
@@ -101,23 +54,23 @@ object Application extends Controller {
 
   def provision = Action { implicit request =>
     provisionF.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.provision(formWithErrors)),
-        { case (provider, provision) => sendEnvelope(provider, provision) }
+      formWithErrors => BadRequest(views.html.provision(formWithErrors)),
+      { case (provider, provision) => sendEnvelope(provider, provision) }
     )
   }
 
   def terminateForm = Action {
     val defaultForm = terminateF.fill(
-        defaultProvider,
-        Terminate(connectionId = "", correlationId = generateCorrelationId)
+      defaultProvider,
+      Terminate(connectionId = "", correlationId = generateCorrelationId)
     )
     Ok(views.html.terminate(defaultForm))
   }
 
   def terminate = Action { implicit request =>
     terminateF.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.terminate(formWithErrors)),
-        { case(provider, terminate) => sendEnvelope(provider, terminate) }
+      formWithErrors => BadRequest(views.html.terminate(formWithErrors)),
+      { case(provider, terminate) => sendEnvelope(provider, terminate) }
     )
   }
 
@@ -132,10 +85,10 @@ object Application extends Controller {
   private def sendEnvelope(provider: Provider, request: Soapable) = Async {
     val soapRequest = request.toEnvelope(provider.replyToHost + routes.Application.reply)
     WS.url(provider.providerUrl)
-        .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-        .post(soapRequest).map { response =>
-            Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
-        }
+      .withAuth(provider.username, provider.password, AuthScheme.BASIC)
+      .post(soapRequest).map { response =>
+         Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
+    }
   }
 
   private def prettify(xml: Node): String = {
@@ -147,7 +100,7 @@ object Application extends Controller {
     xml.foldLeft("")((a, b) => a + prettify(b))
   }
 
-  var clients: List[PushEnumerator[String]] = List()
+  private var clients: List[PushEnumerator[String]] = List()
 
   def reply = Action { request =>
     clients.foreach { client =>
@@ -169,6 +122,50 @@ object Application extends Controller {
   }
 
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
+
   private def generateCorrelationId = generateConnectionId
 
+  private val defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123", "http://localhost:9000")
+
+  private val providerMapping: Mapping[Provider] = mapping(
+    "providerUrl" -> nonEmptyText,
+    "username" -> text,
+    "password" -> text,
+    "replyToHost" -> nonEmptyText){ Provider.apply } { Provider.unapply }
+
+  private val reserveF: Form[(Provider, Reservation)] = Form(
+    tuple(
+      "provider" -> providerMapping,
+      "reservation" -> mapping(
+        "description" -> text,
+        "startDate" -> date("yyyy-MM-dd HH:mm"),
+        "endDate" -> date("yyyy-MM-dd HH:mm"),
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText,
+        "source" -> nonEmptyText,
+        "destination" -> nonEmptyText,
+        "bandwidth" -> number(0, 100000)
+      ){ Reservation.apply } { Reservation.unapply }
+    )
+  )
+
+  private val provisionF: Form[(Provider, Provision)] = Form(
+    tuple(
+      "provider" -> providerMapping,
+      "provision" -> mapping(
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText
+      ){ Provision.apply }{ Provision.unapply }
+    )
+  )
+
+  private val terminateF: Form[(Provider, Terminate)] = Form(
+    tuple(
+      "provider" -> providerMapping,
+      "terminate" -> mapping(
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText
+      ){ Terminate.apply }{ Terminate.unapply }
+    )
+  )
 }

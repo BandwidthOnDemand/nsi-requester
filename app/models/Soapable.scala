@@ -6,7 +6,7 @@ import scala.xml.Elem
 trait Soapable {
   def toEnvelope(replyTo: String): Node
 
-  def inEnvelope(xml: Elem) = {
+  protected def inEnvelope(xml: Elem) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:type="http://schemas.ogf.org/nsi/2011/10/connection/types"
@@ -18,7 +18,7 @@ trait Soapable {
     </soapenv:Envelope>
   }
 
-  def nsas = {
+  protected def nsas = {
     <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
     <providerNSA>urn:ogf:network:nsa:netherlight</providerNSA>
   }
