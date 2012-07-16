@@ -18,6 +18,7 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
 import models._
+import org.joda.time.Period
 
 object Application extends Controller {
 
@@ -29,7 +30,7 @@ object Application extends Controller {
     val defaultForm = reserveF.fill((
       defaultProvider,
       Reservation(
-        description = "A NSI reserve test", startDate = new Date, endDate = new Date,
+        description = "A NSI reserve test", startDate = new Date, end = Left(new Date),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
         source = "First port", destination = "Second port", bandwidth = 1000)
     ))
@@ -139,7 +140,7 @@ object Application extends Controller {
       "reservation" -> mapping(
         "description" -> text,
         "startDate" -> date("yyyy-MM-dd HH:mm"),
-        "endDate" -> date("yyyy-MM-dd HH:mm"),
+        "endDate" -> date("yyyy-MM-dd HH:mm").transform[Either[Date, Period]](d => Left(d), e => e.left.get),
         "connectionId" -> nonEmptyText,
         "correlationId" -> nonEmptyText,
         "source" -> nonEmptyText,

@@ -3,11 +3,12 @@ package models
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.Period
 
 case class Reservation(
     description: String,
     startDate: Date,
-    endDate: Date,
+    end: Either[Date, Period],
     connectionId: String,
     correlationId: String,
     source: String = "",
@@ -30,7 +31,7 @@ case class Reservation(
             <serviceParameters>
               <schedule>
                 <startTime>{ dateTimeFormat.print(new DateTime(startDate)) }</startTime>
-                <endTime>{ dateTimeFormat.print(new DateTime(endDate)) }</endTime>
+                { endDateOrDuration }
               </schedule>
               <bandwidth>
                 <desired>{ bandwidth }</desired>
@@ -49,6 +50,14 @@ case class Reservation(
         </type:reserve>
       </int:reserveRequest>
     )
+  }
+
+  private def endDateOrDuration() = {
+    val dateTimeFormat = ISODateTimeFormat.dateTime()
+
+    end.fold(
+      date => <endTime>{ dateTimeFormat.print(new DateTime(date)) }</endTime>,
+      duration => <duration>{ duration }</duration>)
   }
 
 }
