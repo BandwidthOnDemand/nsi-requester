@@ -20,6 +20,6 @@ trait Soapable {
 
   protected def nsas = {
     <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
-    <providerNSA>urn:ogf:network:nsa:netherlight</providerNSA>
+    <providerNSA>urn:ogf:network:nsa:surfnet.nl</providerNSA>
   }
 }
