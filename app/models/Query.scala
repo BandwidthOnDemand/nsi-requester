@@ -6,13 +6,13 @@ case class Query(correlationId: String, connectionIds: List[String], globalReser
     <int:queryRequest>
       <int:correlationId>{ correlationId }</int:correlationId>
       <int:replyTo>{ replyTo }</int:replyTo>
-      <typ:query>
+      <type:query>
         { nsas }
         <operation>Summary</operation>
         <queryFilter>
           { eitherConnectionIdsOrGlobalReservationIds }
         </queryFilter>
-      </typ:query>
+      </type:query>
     </int:queryRequest>
   )
 

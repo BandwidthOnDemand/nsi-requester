@@ -12,6 +12,7 @@ GET     /terminate                  controllers.Application.terminateForm
 POST    /terminate                  controllers.Application.terminate
 GET     /release                    controllers.Application.releaseForm
 GET     /query                      controllers.Application.queryForm
+POST    /query                      controllers.Application.query
 GET     /wsrequest                  controllers.Application.wsRequest
 POST    /reply                      controllers.Application.reply
 

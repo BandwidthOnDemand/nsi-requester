@@ -1,10 +1,33 @@
+@(queryForm: Form[(Provider, Query)])
+
 @import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
 @main("Make a NSI Query Request", "query") {
     <section>
         <h1>Make a NSI Query Request</h1>
         <div class="content">
-            Not implemented yet.
+             @helper.form(action = routes.Application.query, 'class -> "form form-horizontal") {
+                <div class="message"><h3>Query</h3></div>
+
+                @inputText(queryForm("query.correlationId"), '_label -> "Correlation Id")
+
+                @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
+                    @inputText(connectionId, '_label -> "Connection Id")
+                }
+
+                @repeat(queryForm("query.globalReservationIds"), min = 1) { globalReservationId =>
+                    @inputText(globalReservationId, '_label -> "Global Reservation Id")
+                }
+
+                @fragments.providerFields(name => queryForm("provider." + name))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Query</button>
+                </div>
+            }
+        </div>
         </div>
     </section>
 }

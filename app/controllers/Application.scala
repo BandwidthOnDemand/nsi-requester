@@ -80,7 +80,15 @@ object Application extends Controller {
   }
 
   def queryForm = Action {
-    Ok(views.html.query())
+    val defaultForm = queryF.fill(defaultProvider, Query(generateCorrelationId, Nil, Nil))
+    Ok(views.html.query(defaultForm))
+  }
+
+  def query = Action { implicit request =>
+    queryF.bindFromRequest.fold(
+      formWithErrors => BadRequest(views.html.query(formWithErrors)),
+      { case(provider, query) => sendEnvelope(provider, query) }
+    )
   }
 
   private def sendEnvelope(provider: Provider, request: Soapable) = Async {
@@ -167,6 +175,17 @@ object Application extends Controller {
         "connectionId" -> nonEmptyText,
         "correlationId" -> nonEmptyText
       ){ Terminate.apply }{ Terminate.unapply }
+    )
+  )
+
+  private val queryF: Form[(Provider, Query)] = Form(
+    tuple(
+      "provider" -> providerMapping,
+      "query" -> mapping(
+        "correlationId" -> nonEmptyText,
+        "connectionIds" -> list(text),
+        "globalReservationIds" -> list(text)
+      ){ Query.apply }{ Query.unapply }
     )
   )
 }
