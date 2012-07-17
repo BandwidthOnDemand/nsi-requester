@@ -1,4 +1,4 @@
-@(request: String, response: String)
+@(request: String, response: String)(implicit httpRequest: Request[AnyContent])
 
 @import helper._
 
@@ -18,7 +18,7 @@
     <script>
       $(function() {
           var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-          var socket = new WS("ws://localhost:9000@routes.Application.wsRequest");
+          var socket = new WS("ws://@{httpRequest.host + routes.Application.wsRequest}");
 
           socket.onmessage = function(event) {
               xmlBlock = $("#template > div").clone();

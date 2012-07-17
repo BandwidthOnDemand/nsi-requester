@@ -17,9 +17,11 @@ import play.api.libs.ws.WS
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
+import play.api.mvc.Request
 import models._
 import org.joda.time.Period
 import org.joda.time.DateTime
+import play.api.mvc.AnyContent
 
 object Application extends Controller {
 
@@ -27,7 +29,7 @@ object Application extends Controller {
     Redirect(routes.Application.reserve)
   }
 
-  def reserveForm = Action {
+  def reserveForm = Action { implicit request =>
     val startDate = DateTime.now.plusMinutes(5)
     val endDate = startDate.plusMinutes(10)
 
@@ -49,7 +51,7 @@ object Application extends Controller {
     )
   }
 
-  def provisionForm = Action {
+  def provisionForm = Action { implicit request =>
     val defaultForm = provisionF.fill(
       defaultProvider,
       Provision(connectionId = "", correlationId = generateCorrelationId)
@@ -64,7 +66,7 @@ object Application extends Controller {
     )
   }
 
-  def terminateForm = Action {
+  def terminateForm = Action { implicit request =>
     val defaultForm = terminateF.fill(
       defaultProvider,
       Terminate(connectionId = "", correlationId = generateCorrelationId)
@@ -83,7 +85,7 @@ object Application extends Controller {
     Ok(views.html.release())
   }
 
-  def queryForm = Action {
+  def queryForm = Action { implicit request =>
     val defaultForm = queryF.fill(defaultProvider, Query(generateCorrelationId, Nil, Nil))
     Ok(views.html.query(defaultForm))
   }
@@ -95,12 +97,12 @@ object Application extends Controller {
     )
   }
 
-  private def sendEnvelope(provider: Provider, request: Soapable) = Async {
-    val soapRequest = request.toEnvelope(provider.replyToHost + routes.Application.reply)
+  private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
+    val soapRequest = nsiRequest.toEnvelope(provider.replyToHost + routes.Application.reply)
     WS.url(provider.providerUrl)
       .withAuth(provider.username, provider.password, AuthScheme.BASIC)
       .post(soapRequest).map { response =>
-         Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
+        Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
     }
   }
 
@@ -116,8 +118,9 @@ object Application extends Controller {
   private var clients: List[PushEnumerator[String]] = List()
 
   def reply = Action { request =>
+    val soapResponse = prettify(request.body.asXml.get)
     clients.foreach { client =>
-      client.push(prettify(request.body.asXml.get))
+      client.push(soapResponse)
     }
     Ok
   }
@@ -138,7 +141,7 @@ object Application extends Controller {
 
   private def generateCorrelationId = generateConnectionId
 
-  private val defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123", "http://localhost:9000")
+  private def defaultProvider(implicit request: Request[AnyContent]) = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123", "http://" + request.host)
 
   private val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
