@@ -6,8 +6,10 @@ $(function() {
       if (extraFields.length) {
 
           $(".message.extra-fields").on('click', function(event) {
-              extraFields.toggle();
-              $(this).toggleClass('expanded');
+              $self = $(this)
+              var fieldset = $self.next();
+              $(fieldset).toggle();
+              $self.toggleClass('expanded');
           });
 
           extraFields.toggle();

@@ -1,15 +1,15 @@
 package models
 
-case class Terminate(connectionId: String, correlationId: String) extends Soapable {
+case class Terminate(connectionId: String, correlationId: String, replyTo: String, providerNsa: String)
+    extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope(replyTo: String) = inEnvelope(
+  def toEnvelope = inEnvelope(
     <int:terminateRequest>
-       <int:correlationId>{ correlationId }</int:correlationId>
-       <int:replyTo>{ replyTo }</int:replyTo>
-       <type:terminate>
-         { nsas }
-         <connectionId>{ connectionId }</connectionId>
-       </type:terminate>
+      { nsiRequestFields }
+      <type:terminate>
+        { nsas }
+        <connectionId>{ connectionId }</connectionId>
+      </type:terminate>
     </int:terminateRequest>
   )
 }

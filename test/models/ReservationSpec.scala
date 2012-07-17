@@ -12,15 +12,16 @@ object ReservationSpec extends Specification {
 
     "have an envelope with endTime when the endTime is specified" in {
       val endDate = new DateTime(2015, 1, 1, 12, 10).toDate
-      val res = Reservation("some", new Date, Left(endDate), "con", "cor", "source", "dest", 10)
+      val res = Reservation("some", new Date, Left(endDate), "con", "source", "dest", 10, "cor", "http://localhost", "nsa:surfnet.nl")
 
-      res.toEnvelope("http://localhost") must \\("endTime") \> "2015-01-01T12:10:00.000+01:00"
+      res.toEnvelope must \\("endTime") \> "2015-01-01T12:10:00.000+01:00"
     }
 
     "have an envelope with duration when the duration is specified" in {
-      val res = Reservation("some", new Date, Right(new Period(2, 10, 0, 0)), "con", "cor", "source", "dest", 10)
+      val res = Reservation("some", new Date, Right(new Period(2, 10, 0, 0)), "con", "source", "dest", 10, "corr", "http://localhost",
+        "nsa:surfnet.nl")
 
-      res.toEnvelope("http://localhost") must \\("duration") \> "PT2H10M"
+      res.toEnvelope must \\("duration") \> "PT2H10M"
     }
   }
 }

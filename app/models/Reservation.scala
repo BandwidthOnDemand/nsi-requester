@@ -10,19 +10,20 @@ case class Reservation(
     startDate: Date,
     end: Either[Date, Period],
     connectionId: String,
-    correlationId: String,
     source: String = "",
     destination: String = "",
-    bandwidth: Int) extends Soapable {
+    bandwidth: Int,
+    correlationId: String,
+    replyTo: String,
+    providerNsa: String) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope(replyTo: String) = {
+  def toEnvelope = {
 
     val dateTimeFormat = ISODateTimeFormat.dateTime()
 
     inEnvelope(
       <int:reserveRequest>
-        <int:correlationId>{ correlationId }</int:correlationId>
-        <int:replyTo>{ replyTo }</int:replyTo>
+        { nsiRequestFields }
         <type:reserve>
           { nsas }
           <reservation>

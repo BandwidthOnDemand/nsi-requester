@@ -38,7 +38,7 @@ object Application extends Controller {
       Reservation(
         description = "A NSI reserve test", startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = "First port", destination = "Second port", bandwidth = 1000)
+        source = "First port", destination = "Second port", bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     ))
 
     Ok(views.html.reserve(defaultForm))
@@ -54,7 +54,7 @@ object Application extends Controller {
   def provisionForm = Action { implicit request =>
     val defaultForm = provisionF.fill(
       defaultProvider,
-      Provision(connectionId = "", correlationId = generateCorrelationId)
+      Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
     Ok(views.html.provision(defaultForm))
   }
@@ -69,7 +69,7 @@ object Application extends Controller {
   def terminateForm = Action { implicit request =>
     val defaultForm = terminateF.fill(
       defaultProvider,
-      Terminate(connectionId = "", correlationId = generateCorrelationId)
+      Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
     Ok(views.html.terminate(defaultForm))
   }
@@ -86,7 +86,7 @@ object Application extends Controller {
   }
 
   def queryForm = Action { implicit request =>
-    val defaultForm = queryF.fill(defaultProvider, Query(generateCorrelationId, Nil, Nil))
+    val defaultForm = queryF.fill(defaultProvider, Query(Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
     Ok(views.html.query(defaultForm))
   }
 
@@ -98,7 +98,7 @@ object Application extends Controller {
   }
 
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
-    val soapRequest = nsiRequest.toEnvelope(provider.replyToHost + routes.Application.reply)
+    val soapRequest = nsiRequest.toEnvelope
     WS.url(provider.providerUrl)
       .withAuth(provider.username, provider.password, AuthScheme.BASIC)
       .post(soapRequest).map { response =>
@@ -141,13 +141,16 @@ object Application extends Controller {
 
   private def generateCorrelationId = generateConnectionId
 
-  private def defaultProvider(implicit request: Request[AnyContent]) = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123", "http://" + request.host)
+  private def defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123")
+
+  private def defaultProviderNsa = "urn:ogf:network:nsa:surfnet.nl"
+
+  private def defaultReplyToUrl(implicit request: Request[AnyContent]) = "http://" + request.host + routes.Application.reply
 
   private val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
     "username" -> text,
-    "password" -> text,
-    "replyToHost" -> nonEmptyText){ Provider.apply } { Provider.unapply }
+    "password" -> text){ Provider.apply } { Provider.unapply }
 
   private val reserveF: Form[(Provider, Reservation)] = Form(
     tuple(
@@ -157,10 +160,12 @@ object Application extends Controller {
         "startDate" -> date("yyyy-MM-dd HH:mm"),
         "endDate" -> date("yyyy-MM-dd HH:mm").transform[Either[Date, Period]](d => Left(d), e => e.left.get),
         "connectionId" -> nonEmptyText,
-        "correlationId" -> nonEmptyText,
         "source" -> nonEmptyText,
         "destination" -> nonEmptyText,
-        "bandwidth" -> number(0, 100000)
+        "bandwidth" -> number(0, 100000),
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
       ){ Reservation.apply } { Reservation.unapply }
     )
   )
@@ -170,7 +175,9 @@ object Application extends Controller {
       "provider" -> providerMapping,
       "provision" -> mapping(
         "connectionId" -> nonEmptyText,
-        "correlationId" -> nonEmptyText
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
       ){ Provision.apply }{ Provision.unapply }
     )
   )
@@ -180,7 +187,9 @@ object Application extends Controller {
       "provider" -> providerMapping,
       "terminate" -> mapping(
         "connectionId" -> nonEmptyText,
-        "correlationId" -> nonEmptyText
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
       ){ Terminate.apply }{ Terminate.unapply }
     )
   )
@@ -189,9 +198,11 @@ object Application extends Controller {
     tuple(
       "provider" -> providerMapping,
       "query" -> mapping(
-        "correlationId" -> nonEmptyText,
         "connectionIds" -> list(text),
-        "globalReservationIds" -> list(text)
+        "globalReservationIds" -> list(text),
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
       ){ Query.apply }{ Query.unapply }
     )
   )

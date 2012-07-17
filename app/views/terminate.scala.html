@@ -12,8 +12,8 @@
 
                 <div class="message"><h3>Terminate</h3></div>
                 @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id")
-                @inputText(terminateForm("terminate.correlationId"), '_label -> "Correlation Id")
 
+                @fragments.nsiCommonFields(name => terminateForm("terminate." + name))
                 @fragments.providerFields(name => terminateForm("provider." + name))
 
                 <div class="form-actions">

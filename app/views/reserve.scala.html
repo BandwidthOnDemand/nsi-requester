@@ -11,17 +11,16 @@
         <div class="content">
             @helper.form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
-                <div class="message"><h3>Reservation</h3></div>
+                <div class="message"><h3>Reserve attributes</h3></div>
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start")
                 @inputText(requestForm("reservation.endDate"), '_label -> "End")
                 @inputText(requestForm("reservation.source"), '_label -> "Source")
                 @inputText(requestForm("reservation.destination"), '_label -> "Destination")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
-
                 @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")
 
+                @fragments.nsiCommonFields(name => requestForm("reservation." + name))
                 @fragments.providerFields(name => requestForm("provider." + name))
 
                 <div class="form-actions">

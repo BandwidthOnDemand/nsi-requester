@@ -12,8 +12,8 @@
 
                 <div class="message"><h3>Provision</h3></div>
                 @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id")
-                @inputText(provisionForm("provision.correlationId"), '_label -> "Correlation Id")
 
+                @fragments.nsiCommonFields(name => provisionForm("provision." + name))
                 @fragments.providerFields(name => provisionForm("provider." + name))
 
                 <div class="form-actions">

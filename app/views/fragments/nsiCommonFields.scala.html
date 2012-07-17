@@ -1,0 +1,15 @@
+
+@(formField: String => Field)
+
+@import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+
+<div class="message extra-fields">
+    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> NSI common attributes</h3>
+</div>
+<fieldset class="extra-fields">
+    @inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")
+    @inputText(formField("replyTo"), '_label -> "Reply To", 'class -> "input-xlarge")
+    @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
+</fieldset>

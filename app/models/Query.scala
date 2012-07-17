@@ -1,11 +1,12 @@
 package models
 
-case class Query(correlationId: String, connectionIds: List[String], globalReservationIds: List[String]) extends Soapable {
+case class Query(connectionIds: List[String], globalReservationIds: List[String], correlationId: String, replyTo: String, nsaProvider:
+  String)
+    extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
-  def toEnvelope(replyTo: String) = inEnvelope(
+  def toEnvelope = inEnvelope(
     <int:queryRequest>
-      <int:correlationId>{ correlationId }</int:correlationId>
-      <int:replyTo>{ replyTo }</int:replyTo>
+      { nsiRequestFields }
       <type:query>
         { nsas }
         <operation>Summary</operation>

@@ -1,11 +1,11 @@
 package models
 
-case class Provision(connectionId: String, correlationId: String) extends Soapable {
+case class Provision(connectionId: String, correlationId: String, replyTo: String, providerNsa: String)
+    extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope(replyTo: String) = inEnvelope(
+  def toEnvelope = inEnvelope(
     <int:provisionRequest>
-       <int:correlationId>{ correlationId }</int:correlationId>
-       <int:replyTo>{ replyTo }</int:replyTo>
+       { nsiRequestFields }
        <type:provision>
           { nsas }
           <connectionId>{ connectionId }</connectionId>

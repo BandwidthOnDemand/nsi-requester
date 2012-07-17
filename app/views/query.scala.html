@@ -11,8 +11,6 @@
              @helper.form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query</h3></div>
 
-                @inputText(queryForm("query.correlationId"), '_label -> "Correlation Id")
-
                 @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
                     @inputText(connectionId, '_label -> "Connection Id")
                 }
@@ -21,6 +19,7 @@
                     @inputText(globalReservationId, '_label -> "Global Reservation Id")
                 }
 
+                @fragments.nsiCommonFields(name => queryForm("query." + name))
                 @fragments.providerFields(name => queryForm("provider." + name))
 
                 <div class="form-actions">
