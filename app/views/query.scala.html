@@ -12,11 +12,11 @@
                 <div class="message"><h3>Query</h3></div>
 
                 @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
-                    @inputText(connectionId, '_label -> "Connection Id")
+                    @inputText(connectionId, '_label -> "Connection Id", 'class -> "input-xlarge")
                 }
 
                 @repeat(queryForm("query.globalReservationIds"), min = 1) { globalReservationId =>
-                    @inputText(globalReservationId, '_label -> "Global Reservation Id")
+                    @inputText(globalReservationId, '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 }
 
                 @fragments.nsiCommonFields(name => queryForm("query." + name))
