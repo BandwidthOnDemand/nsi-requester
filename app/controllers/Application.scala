@@ -19,6 +19,7 @@ import play.api.mvc.Controller
 import play.api.mvc.WebSocket
 import models._
 import org.joda.time.Period
+import org.joda.time.DateTime
 
 object Application extends Controller {
 
@@ -27,10 +28,13 @@ object Application extends Controller {
   }
 
   def reserveForm = Action {
+    val startDate = DateTime.now.plusMinutes(5)
+    val endDate = startDate.plusMinutes(10)
+
     val defaultForm = reserveF.fill((
       defaultProvider,
       Reservation(
-        description = "A NSI reserve test", startDate = new Date, end = Left(new Date),
+        description = "A NSI reserve test", startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
         source = "First port", destination = "Second port", bandwidth = 1000)
     ))
