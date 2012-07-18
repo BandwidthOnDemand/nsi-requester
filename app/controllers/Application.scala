@@ -36,7 +36,7 @@ object Application extends Controller {
     val defaultForm = reserveF.fill((
       defaultProvider,
       Reservation(
-        description = "A NSI reserve test", startDate = startDate.toDate, end = Left(endDate.toDate),
+        description = Some("A NSI reserve test"), startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
         source = "First port", destination = "Second port", bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     ))
@@ -167,7 +167,7 @@ object Application extends Controller {
     tuple(
       "provider" -> providerMapping,
       "reservation" -> mapping(
-        "description" -> text,
+        "description" -> optional(text),
         "startDate" -> date("yyyy-MM-dd HH:mm"),
         "endDate" -> date("yyyy-MM-dd HH:mm").transform[Either[Date, Period]](d => Left(d), e => e.left.get),
         "connectionId" -> nonEmptyText,

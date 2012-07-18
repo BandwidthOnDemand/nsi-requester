@@ -4,9 +4,10 @@ import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.Period
+import scala.xml.Null
 
 case class Reservation(
-    description: String,
+    description: Option[String],
     startDate: Date,
     end: Either[Date, Period],
     connectionId: String,
@@ -28,7 +29,7 @@ case class Reservation(
           { nsas }
           <reservation>
             <connectionId>{ connectionId }</connectionId>
-            <description>{ description }</description>
+            { descriptionField }
             <serviceParameters>
               <schedule>
                 <startTime>{ dateTimeFormat.print(new DateTime(startDate)) }</startTime>
@@ -51,6 +52,11 @@ case class Reservation(
         </type:reserve>
       </int:reserveRequest>
     )
+  }
+
+  private def descriptionField = description match {
+    case Some(d) => <description>{ d }</description>
+    case None => Null
   }
 
   private def endDateOrDuration() = {
