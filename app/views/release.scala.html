@@ -1,10 +1,25 @@
+@(releaseForm: Form[(Provider, Release)])
+
 @import helper._
+
+@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
 @main("Make a NSI Release Request", "release") {
     <section>
         <h1>Make a NSI Release Request</h1>
         <div class="content">
-            Not implemented yet.
+             @helper.form(action = routes.Application.release, 'class -> "form form-horizontal") {
+
+                <div class="message"><h3>Release attributes</h3></div>
+                @inputText(releaseForm("release.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+
+                @fragments.nsiCommonFields(name => releaseForm("release." + name))
+                @fragments.providerFields(name => releaseForm("provider." + name))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Release</button>
+                </div>
+            }
         </div>
     </section>
 }

@@ -81,8 +81,19 @@ object Application extends Controller {
     )
   }
 
-  def releaseForm = Action {
-    Ok(views.html.release())
+  def releaseForm = Action { implicit request =>
+    val defaultForm = releaseF.fill(
+      defaultProvider,
+      Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+    )
+    Ok(views.html.release(defaultForm))
+  }
+
+  def release = Action { implicit request =>
+    releaseF.bindFromRequest.fold(
+      formWithErrors => BadRequest(views.html.release(formWithErrors)),
+      { case(provider, release) => sendEnvelope(provider, release) }
+    )
   }
 
   def queryForm = Action { implicit request =>
@@ -191,6 +202,18 @@ object Application extends Controller {
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText
       ){ Terminate.apply }{ Terminate.unapply }
+    )
+  )
+
+  private val releaseF: Form[(Provider, Release)] = Form(
+    tuple(
+      "provider" -> providerMapping,
+      "release" -> mapping(
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
+      ){ Release.apply }{ Release.unapply }
     )
   )
 

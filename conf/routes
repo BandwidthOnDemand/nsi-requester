@@ -11,6 +11,7 @@ POST    /provision                  controllers.Application.provision
 GET     /terminate                  controllers.Application.terminateForm
 POST    /terminate                  controllers.Application.terminate
 GET     /release                    controllers.Application.releaseForm
+POST    /release                    controllers.Application.release
 GET     /query                      controllers.Application.queryForm
 POST    /query                      controllers.Application.query
 GET     /wsrequest                  controllers.Application.wsRequest
