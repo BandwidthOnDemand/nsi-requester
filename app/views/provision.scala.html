@@ -10,7 +10,7 @@
         <div class="content">
              @helper.form(action = routes.Application.provision, 'class -> "form form-horizontal") {
 
-                <div class="message"><h3>Provision</h3></div>
+                <div class="message"><h3>Provision attributes</h3></div>
                 @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => provisionForm("provision." + name))

@@ -10,7 +10,7 @@
         <div class="content">
              @helper.form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
 
-                <div class="message"><h3>Terminate</h3></div>
+                <div class="message"><h3>Terminate attributes</h3></div>
                 @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => terminateForm("terminate." + name))
