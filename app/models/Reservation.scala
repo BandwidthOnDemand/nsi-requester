@@ -16,7 +16,8 @@ case class Reservation(
     bandwidth: Int,
     correlationId: String,
     replyTo: String,
-    providerNsa: String) extends NsiRequest(correlationId, replyTo, providerNsa) {
+    providerNsa: String,
+    globalReservationId: Option[String] = None) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   def toEnvelope = {
 
@@ -29,6 +30,7 @@ case class Reservation(
           { nsas }
           <reservation>
             <connectionId>{ connectionId }</connectionId>
+            { globalReservationIdField }
             { descriptionField }
             <serviceParameters>
               <schedule>
@@ -52,6 +54,11 @@ case class Reservation(
         </type:reserve>
       </int:reserveRequest>
     )
+  }
+
+  private def globalReservationIdField = globalReservationId match {
+    case Some(id) => <globalReservationId>{ id }</globalReservationId>
+    case None => Null
   }
 
   private def descriptionField = description match {

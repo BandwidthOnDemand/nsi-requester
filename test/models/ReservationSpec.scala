@@ -24,16 +24,24 @@ object ReservationSpec extends Specification {
       res.toEnvelope must \\("duration") \> "PT2H10M"
     }
 
-    "have an evelope with a description" in {
+    "have an envelope with a description" in {
       val res = Reservation(Some("My new reservation"), new Date, Left(new Date), "con", "source", "dest", 10, "cor", "http://localhost", "nsa:surfnet.nl")
 
       res.toEnvelope must \\("description") \> "My new reservation"
     }
 
-    "have an evelope without a description" in {
+    "have an envelope without a description" in {
       val res = Reservation(None, new Date, Left(new Date), "con", "source", "dest", 10, "cor", "http://localhost", "nsa:surfnet.nl")
 
       res.toEnvelope must not \\("description")
     }
+
+    "have an envelope with a globalReservationId" in {
+      val res = Reservation(None, new Date, Left(new Date), "con", "source", "dest", 10, "cor", "http://localhost", "nsa:surfnet.nl",
+        Some("urn:surfnet:123456"))
+
+      res.toEnvelope must \\("globalReservationId") \> "urn:surfnet:123456"
+    }
   }
+
 }

@@ -176,7 +176,8 @@ object Application extends Controller {
         "bandwidth" -> number(0, 100000),
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText
+        "providerNsa" -> nonEmptyText,
+        "globalReservationId" -> optional(text)
       ){ Reservation.apply } { Reservation.unapply }
     )
   )
