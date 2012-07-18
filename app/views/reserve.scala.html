@@ -17,8 +17,8 @@
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start")
                 @inputText(requestForm("reservation.endDate"), '_label -> "End")
-                @inputText(requestForm("reservation.source"), '_label -> "Source")
-                @inputText(requestForm("reservation.destination"), '_label -> "Destination")
+                @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))

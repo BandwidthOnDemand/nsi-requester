@@ -38,7 +38,7 @@ object Application extends Controller {
       Reservation(
         description = Some("A NSI reserve test"), startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = "First port", destination = "Second port", bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+        source = "urn:ogf:network:nsnetwork:surfnet.nl:10", destination = "urn:ogf:network:nsnetwork:surfnet.nl:11", bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     ))
 
     Ok(views.html.reserve(defaultForm))
