@@ -38,7 +38,7 @@ object Application extends Controller {
       Reservation(
         description = Some("A NSI reserve test"), startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = "urn:ogf:network:nsnetwork:surfnet.nl:10", destination = "urn:ogf:network:nsnetwork:surfnet.nl:11", bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+        source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     ))
 
     Ok(views.html.reserve(defaultForm))
@@ -147,6 +147,8 @@ object Application extends Controller {
 
     (in, out)
   }
+
+  private def defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
 
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
 
