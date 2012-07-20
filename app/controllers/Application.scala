@@ -231,8 +231,10 @@ object Application extends Controller {
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText
-      ){ Query.apply }{ Query.unapply }
+      ){ Query.apply }{ Query.unapply }.verifying(
+        "Either 'Connecion Ids' or 'Global Reservation Ids' should be given.",
+        q => if (q.connectionIds.isEmpty) !q.globalReservationIds.isEmpty else q.globalReservationIds.isEmpty
     )
-  )
+  ))
 
 }
