@@ -220,16 +220,19 @@ object Application extends Controller {
     )
   )
 
+  private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(l => l.filterNot(_.isEmpty), identity)
+
   private val queryF: Form[(Provider, Query)] = Form(
     tuple(
       "provider" -> providerMapping,
       "query" -> mapping(
-        "connectionIds" -> list(text),
-        "globalReservationIds" -> list(text),
+        "connectionIds" -> listWithoutEmptyStrings,
+        "globalReservationIds" -> listWithoutEmptyStrings,
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText
       ){ Query.apply }{ Query.unapply }
     )
   )
+
 }

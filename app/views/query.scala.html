@@ -11,13 +11,20 @@
              @helper.form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
-                @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
-                    @inputText(connectionId, '_label -> "Connection Id", 'class -> "input-xlarge")
-                }
 
-                @repeat(queryForm("query.globalReservationIds"), min = 1) { globalReservationId =>
-                    @inputText(globalReservationId, '_label -> "Global Reservation Id", 'class -> "input-xlarge")
-                }
+                <fieldset id="connectionIds" style="position: relative">
+                    <a href="#" id="plus-connection" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
+                    @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
+                        @inputText(connectionId, '_label -> "Connection Id", 'class -> "input-xlarge")
+                    }
+                </fieldset>
+
+                <fieldset id="globalReservationIds" style="position: relative">
+                    <a href="#" id="plus-reservation" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
+                    @repeat(queryForm("query.globalReservationIds"), min = 1) { globalReservationId =>
+                        @inputText(globalReservationId, '_label -> "Global Reservation Id", 'class -> "input-xlarge")
+                    }
+                </fieldset>
 
                 @fragments.nsiCommonFields(name => queryForm("query." + name))
                 @fragments.providerFields(name => queryForm("provider." + name))
@@ -27,6 +34,32 @@
                 </div>
             }
         </div>
+
+        <div id="template-connection" class="template">
+            @inputText(queryForm("query.connectionIds[x]"), '_label -> "", 'class -> "input-xlarge")
         </div>
+        <div id="template-reservation" class="template">
+            @inputText(queryForm("query.globalReservationIds[x]"), '_label -> "", 'class -> "input-xlarge")
+        </div>
+        <script>
+            $(function() {
+                $("#plus-connection").click(function(event) {
+                    $("#template-connection").children().clone().appendTo("#connectionIds");
+                    reNumber($("#connectionIds input"));
+                });
+
+                $("#plus-reservation").click(function(event) {
+                    $("#template-reservation").children().clone().appendTo("#globalReservationIds");
+                    reNumber($("#globalReservationIds input"));
+                });
+
+                function reNumber(elements) {
+                    elements.each(function(i, input) {
+                        var target = $(input);
+                        target.attr('name', target.attr('name').replace(/\[.+\]/, '['+i+']'))
+                    });
+                }
+            })
+        </script>
     </section>
 }

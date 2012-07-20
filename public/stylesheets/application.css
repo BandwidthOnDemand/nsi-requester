@@ -8,7 +8,12 @@
     position: absolute;
     left: 35px;
 }
-
 .message.extra-fields {
     cursor: pointer;
+}
+.template {
+    display: none;
+}
+a i[class^="icon-"] {
+    text-decoration: none;
 }
