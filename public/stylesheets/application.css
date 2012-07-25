@@ -17,3 +17,9 @@
 a i[class^="icon-"] {
     text-decoration: none;
 }
+.message .time {
+    float: right;
+    font-weight: normal;
+    color: #DC322F;
+    font-size: 0.8em;
+}

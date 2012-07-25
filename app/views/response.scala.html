@@ -15,19 +15,29 @@
             @xmlBlock("Callback Response", "")
         </div>
     </section>
+
     <script>
       $(function() {
           var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
           var socket = new WS("ws://@{httpRequest.host + routes.Application.wsRequest}");
 
+          var appendTime = function(xmlBlock) {
+            var now = new Date();
+            var nowString = now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+            xmlBlock.find("h3").append($("<span/>", {"class": "time", text: nowString}));
+          }
+
           socket.onmessage = function(event) {
-              xmlBlock = $("#template > div").clone();
-              xmlBlock.find(".prettyprint").text(event.data);
-              xmlBlock.prependTo("section .content");
-              prettyPrint();
+            xmlBlock = $("#template > div").clone();
+            xmlBlock.find(".prettyprint").text(event.data);
+            appendTime(xmlBlock);
+            xmlBlock.prependTo("section .content");
+            prettyPrint();
           }
           socket.onopen = function(event) { console.log("socket is open"); }
           socket.onclose = function(event) { console.log("socket closed..") }
+
+          appendTime($(".content > .xml-content"))
       })
     </script>
 }
