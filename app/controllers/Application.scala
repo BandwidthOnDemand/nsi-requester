@@ -197,7 +197,7 @@ object Application extends Controller {
     tuple(
       "provider" -> providerMapping,
       "query" -> mapping(
-        "operation" -> nonEmptyText,
+        "operation" -> text,
         "connectionIds" -> listWithoutEmptyStrings,
         "globalReservationIds" -> listWithoutEmptyStrings,
         "correlationId" -> nonEmptyText,
