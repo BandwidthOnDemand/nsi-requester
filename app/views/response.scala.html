@@ -21,7 +21,9 @@
 
           var appendTime = function(xmlBlock) {
             var now = new Date();
-            var nowString = now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+            var minutes = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+            var seconds = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
+            var nowString = now.getHours() + ':' + minutes + ':' + seconds;
             xmlBlock.find("h3").append($("<span/>", {"class": "time", text: nowString}));
           }
 
