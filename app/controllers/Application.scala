@@ -109,43 +109,14 @@ object Application extends Controller {
   }
 
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
+    import support.PrettyXml._
+
     val soapRequest = nsiRequest.toEnvelope
     WS.url(provider.providerUrl)
       .withAuth(provider.username, provider.password, AuthScheme.BASIC)
       .post(soapRequest).map { response =>
-        Ok(views.html.response(prettify(soapRequest), prettify(response.xml)))
+        Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify)))
     }
-  }
-
-  private def prettify(xml: Node): String = {
-    val printer = new PrettyPrinter(80, 4)
-    printer.format(xml)
-  }
-
-  private def prettify(xml: NodeSeq): String = {
-    xml.foldLeft("")((a, b) => a + prettify(b))
-  }
-
-  private var clients: List[PushEnumerator[String]] = List()
-
-  def reply = Action { request =>
-    val soapResponse = prettify(request.body.asXml.get)
-    clients.foreach { client =>
-      client.push(soapResponse)
-    }
-    Ok
-  }
-
-  def wsRequest = WebSocket.using[String] { request =>
-    val in = Iteratee.foreach[String](println).mapDone { _ =>
-      println("Disconnected")
-    }
-
-    lazy val out: PushEnumerator[String] = Enumerator.imperative[String]()
-
-    clients = out :: clients
-
-    (in, out)
   }
 
   private def defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
@@ -158,7 +129,7 @@ object Application extends Controller {
 
   private def defaultProviderNsa = "urn:ogf:network:nsa:surfnet.nl"
 
-  private def defaultReplyToUrl(implicit request: Request[AnyContent]) = "http://" + request.host + routes.Application.reply
+  private def defaultReplyToUrl(implicit request: Request[AnyContent]) = "http://" + request.host + routes.ResponseController.reply
 
   private val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,

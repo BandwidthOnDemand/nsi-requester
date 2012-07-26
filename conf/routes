@@ -14,8 +14,10 @@ GET     /release                    controllers.Application.releaseForm
 POST    /release                    controllers.Application.release
 GET     /query                      controllers.Application.queryForm
 POST    /query                      controllers.Application.query
-GET     /wsrequest                  controllers.Application.wsRequest
-POST    /reply                      controllers.Application.reply
+
+GET     /response                   controllers.ResponseController.response
+GET     /wsrequest                  controllers.ResponseController.wsRequest
+POST    /reply                      controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -1,4 +1,4 @@
-@(request: String, response: String)(implicit httpRequest: Request[AnyContent])
+@(request: Option[String], response: Option[String])(implicit httpRequest: Request[AnyContent])
 
 @import helper._
 
@@ -6,8 +6,8 @@
     <section>
         <h1>NSI Responses</h1>
         <div class="content">
-            @xmlBlock("The Response", response)
-            @xmlBlock("The Request", request)
+            @response.map(response => xmlBlock("The Response", response))
+            @request.map(request => xmlBlock("The Request", request))
         </div>
         <div id="template" class="template">
             @xmlBlock("Callback Response", "")
@@ -17,7 +17,7 @@
     <script>
       $(function() {
           var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-          var socket = new WS("ws://@{httpRequest.host + routes.Application.wsRequest}");
+          var socket = new WS("ws://@{httpRequest.host + routes.ResponseController.wsRequest}");
 
           var appendTime = function(xmlBlock) {
             var now = new Date();
