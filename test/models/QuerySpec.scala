@@ -3,7 +3,7 @@ package models
 import org.specs2.mutable.Specification
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-object QuerySpec extends Specification {
+class QuerySpec extends Specification {
 
   "queries" should {
 

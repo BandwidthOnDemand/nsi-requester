@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import org.joda.time.Period
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-object ReservationSpec extends Specification {
+class ReservationSpec extends Specification {
 
   "resevations" should {
 
