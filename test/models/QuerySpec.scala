@@ -7,7 +7,7 @@ object QuerySpec extends Specification {
   "queries" should {
 
     "contain an envelope with connectionIds" in {
-      val query = Query(List("1", "3"), Nil, "correlation", "http://localhost", "nsa:surfnet.nl")
+      val query = Query(connectionIds = List("1", "3"), globalReservationIds = Nil, "correlation", "http://localhost", "nsa:surfnet.nl")
       val envelope = query.toEnvelope
 
       envelope must \\("connectionId") \> "1"
@@ -16,7 +16,7 @@ object QuerySpec extends Specification {
     }
 
     "contain an envelope with glogalIds" in {
-      val query = Query(Nil, List("1", "2"), "corr", "http://localhost", "nsa:surfnet.nl")
+      val query = Query(connectionIds = Nil, globalReservationIds = List("1", "2"), "corr", "http://localhost", "nsa:surfnet.nl")
       val envelope = query.toEnvelope
 
       envelope must \\("globalReservationId") \> "1"
