@@ -8,7 +8,7 @@ object QuerySpec extends Specification {
   "queries" should {
 
     "contain an envelope with connectionIds" in {
-      val query = Query(connectionIds = List("1", "3"), globalReservationIds = Nil, correlationId = "correlation", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
+      val query = defaultQuery(connectionIds = List("1", "3"))
       val envelope = query.toEnvelope
 
       envelope must \\("connectionId") \> "1"
@@ -17,7 +17,7 @@ object QuerySpec extends Specification {
     }
 
     "contain an envelope with glogalIds" in {
-      val query = Query(connectionIds = Nil, globalReservationIds = List("1", "2"), correlationId = "corr", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
+      val query = defaultQuery(globalReservationIds = List("1", "2"))
       val envelope = query.toEnvelope
 
       envelope must \\("globalReservationId") \> "1"
@@ -26,7 +26,7 @@ object QuerySpec extends Specification {
     }
 
     "contain an envelope with both globalReservationIds and ConnecionIds" in {
-      val query = Query(connectionIds = List("5", "9"), globalReservationIds = List("1", "2"), correlationId = "corr", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
+      val query = defaultQuery(connectionIds = List("5", "9"), globalReservationIds = List("1", "2"))
       val envelope = query.toEnvelope
 
       envelope must \\("globalReservationId") \> "2"
@@ -34,12 +34,17 @@ object QuerySpec extends Specification {
     }
 
     "doen't contain any filter" in {
-      val query = Query(connectionIds = Nil, globalReservationIds = Nil, correlationId = "corr", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
+      val query = defaultQuery(connectionIds = Nil, globalReservationIds = Nil)
       val envelope = query.toEnvelope
 
       envelope must \\("queryFilter")
       envelope must not \\("connectionId")
       envelope must not \\("globalReservationId")
     }
+  }
+
+  object defaultQuery {
+    def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil) =
+        Query(connectionIds = connectionIds, globalReservationIds = globalReservationIds, correlationId = "corr", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
   }
 }
