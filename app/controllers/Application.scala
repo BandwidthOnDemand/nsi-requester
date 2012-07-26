@@ -97,7 +97,7 @@ object Application extends Controller {
   }
 
   def queryForm = Action { implicit request =>
-    val defaultForm = queryF.fill(defaultProvider, Query(Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+    val defaultForm = queryF.fill(defaultProvider, Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
     Ok(views.html.query(defaultForm))
   }
 
@@ -197,15 +197,13 @@ object Application extends Controller {
     tuple(
       "provider" -> providerMapping,
       "query" -> mapping(
+        "operation" -> nonEmptyText,
         "connectionIds" -> listWithoutEmptyStrings,
         "globalReservationIds" -> listWithoutEmptyStrings,
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText
-      ){ Query.apply }{ Query.unapply }.verifying(
-        "Either 'Connecion Ids' or 'Global Reservation Ids' should be given.",
-        q => if (q.connectionIds.isEmpty) !q.globalReservationIds.isEmpty else q.globalReservationIds.isEmpty
-    )
+      ){ Query.apply }{ Query.unapply }
   ))
 
 }

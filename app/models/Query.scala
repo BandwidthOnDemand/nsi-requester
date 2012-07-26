@@ -1,7 +1,12 @@
 package models
 
-case class Query(connectionIds: List[String], globalReservationIds: List[String], correlationId: String, replyTo: String, nsaProvider:
-  String)
+case class Query(
+    operation: String = "Summary",
+    connectionIds: List[String],
+    globalReservationIds: List[String],
+    correlationId: String,
+    replyTo: String,
+    nsaProvider: String)
     extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
   def toEnvelope = inEnvelope(
@@ -9,18 +14,12 @@ case class Query(connectionIds: List[String], globalReservationIds: List[String]
       { nsiRequestFields }
       <type:query>
         { nsas }
-        <operation>Summary</operation>
+        <operation>{ operation }</operation>
         <queryFilter>
-          { eitherConnectionIdsOrGlobalReservationIds }
+          { globalReservationIds.map(id => <globalReservationId>{ id }</globalReservationId>) }
+          { connectionIds.map(id => <connectionId>{ id }</connectionId>) }
         </queryFilter>
       </type:query>
     </int:queryRequest>
   )
-
-  def eitherConnectionIdsOrGlobalReservationIds = {
-    connectionIds match {
-      case Nil => globalReservationIds.map(id => <globalReservationId>{ id }</globalReservationId>)
-      case _ => connectionIds.map(id => <connectionId>{ id }</connectionId>)
-    }
-  }
 }
