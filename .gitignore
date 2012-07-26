@@ -8,3 +8,7 @@ dist
 .target
 .cache
 bin
+.classpath
+.settings
+*.swp
+.project
