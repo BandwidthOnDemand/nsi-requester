@@ -26,7 +26,7 @@ import play.api.mvc.AnyContent
 object Application extends Controller {
 
   def index = Action {
-    Redirect(routes.Application.reserve)
+    Redirect(routes.Application.reserveForm)
   }
 
   def reserveForm = Action { implicit request =>
