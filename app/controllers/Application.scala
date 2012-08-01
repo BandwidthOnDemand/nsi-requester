@@ -150,7 +150,7 @@ object Application extends Controller {
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText,
-        "globalReservationId" -> optional(text)
+        "globalReservationId" ->  nonEmptyText
       ){ Reservation.apply } { Reservation.unapply }
     )
   )

@@ -17,7 +17,7 @@ case class Reservation(
     correlationId: String,
     replyTo: String,
     providerNsa: String,
-    globalReservationId: Option[String] = None) extends NsiRequest(correlationId, replyTo, providerNsa) {
+    globalReservationId: String = "") extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   def toEnvelope = {
 
@@ -29,9 +29,9 @@ case class Reservation(
         <type:reserve>
           { nsas }
           <reservation>
-            <connectionId>{ connectionId }</connectionId>
-            { globalReservationIdField }
+            <globalReservationId>{ globalReservationId }</globalReservationId>
             { descriptionField }
+            <connectionId>{ connectionId }</connectionId>
             <serviceParameters>
               <schedule>
                 <startTime>{ dateTimeFormat.print(new DateTime(startDate)) }</startTime>
@@ -55,12 +55,7 @@ case class Reservation(
       </int:reserveRequest>
     )
   }
-
-  private def globalReservationIdField = globalReservationId match {
-    case Some(id) => <globalReservationId>{ id }</globalReservationId>
-    case None => Null
-  }
-
+  
   private def descriptionField = description match {
     case Some(d) => <description>{ d }</description>
     case None => Null
