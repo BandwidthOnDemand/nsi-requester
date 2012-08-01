@@ -29,7 +29,7 @@ case class Reservation(
         <type:reserve>
           { nsas }
           <reservation>
-            <globalReservationId>{ globalReservationId }</globalReservationId>
+            { globalReservationIdField }
             { descriptionField }
             <connectionId>{ connectionId }</connectionId>
             <serviceParameters>
@@ -54,6 +54,11 @@ case class Reservation(
         </type:reserve>
       </int:reserveRequest>
     )
+  }
+  
+  private def globalReservationIdField = globalReservationId match {
+    case g: String => <globalReservationId>{ g }</globalReservationId>
+    case _ => <globalReservationId/>
   }
   
   private def descriptionField = description match {

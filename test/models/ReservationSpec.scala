@@ -40,6 +40,12 @@ class ReservationSpec extends Specification {
 
       res.toEnvelope must \\("globalReservationId") \> "urn:surfnet:123456"
     }
+
+    "have an envelople with an empty globalReservationid" in {
+      val res = defaultReservation(globalReservationId = null)
+
+      res.toEnvelope must \\("globalReservationId") \> ""
+    }
   }
 
   object defaultReservation {
