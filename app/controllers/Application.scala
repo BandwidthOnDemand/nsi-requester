@@ -14,6 +14,7 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.iteratee.PushEnumerator
 import play.api.libs.ws.WS
+import play.api.libs.ws.Response
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.WebSocket
@@ -114,8 +115,15 @@ object Application extends Controller {
     val soapRequest = nsiRequest.toEnvelope
     WS.url(provider.providerUrl)
       .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-      .post(soapRequest).map { response =>
-        Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify)))
+      .post(soapRequest)
+      .recover { case e: Throwable => new Response(null) {
+          override def status = 500
+          override lazy val body = e.toString
+        }
+      }
+      .map {
+        case response if response.status == 500 => Ok("Server %s could not be reached".format(provider.providerUrl))
+        case response => Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify)))
     }
   }
 
