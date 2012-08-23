@@ -10,3 +10,5 @@ For editing in Eclipse the [Scala IDE](http://scala-ide.org/) is very usefull.
 
 Eclipse Juno users please use the follwoing update site:
 [Scala 2.9 Nigthly] (http://download.scala-ide.org/nightly-update-juno-master-29x/)
+
+Generating the Eclipse project files can be done by running `eclipse with-source=true` in the sbt console.
