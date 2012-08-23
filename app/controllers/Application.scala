@@ -23,6 +23,8 @@ import models._
 import org.joda.time.Period
 import org.joda.time.DateTime
 import play.api.mvc.AnyContent
+import scala.Left
+import FormSupport._
 
 object Application extends Controller {
 
@@ -122,7 +124,7 @@ object Application extends Controller {
         }
       }
       .map {
-        case response if response.status == 500 => Ok("Server %s could not be reached".format(provider.providerUrl))
+        case response if response.status == 500 => Ok("Server %s could not be reached:\n %s".format(provider.providerUrl, response.body))
         case response => Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify)))
     }
   }
@@ -144,13 +146,27 @@ object Application extends Controller {
     "username" -> text,
     "password" -> text){ Provider.apply } { Provider.unapply }
 
+  private val endTuple = tuple(
+    "date" -> optional(date("yyyy-MM-dd HH:mm")),
+    "period" -> optional(of[Period])
+  ).verifying("Either end date or period is required", t => t match {
+      case (None, None) => false
+      case _ => true
+  }).transform[Either[Date, Period]](
+      tuple => if (tuple._1.isDefined) Left(tuple._1.get) else Right(tuple._2.get),
+      {
+        case Left(date) => (Some(date), None)
+        case Right(period) => (None, Some(period))
+      }
+  )
+
   private val reserveF: Form[(Provider, Reservation)] = Form(
     tuple(
       "provider" -> providerMapping,
       "reservation" -> mapping(
         "description" -> optional(text),
         "startDate" -> date("yyyy-MM-dd HH:mm"),
-        "endDate" -> date("yyyy-MM-dd HH:mm").transform[Either[Date, Period]](d => Left(d), e => e.left.get),
+        "end" -> endTuple,
         "connectionId" -> nonEmptyText,
         "source" -> nonEmptyText,
         "destination" -> nonEmptyText,

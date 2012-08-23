@@ -16,7 +16,14 @@
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start")
-                @inputText(requestForm("reservation.endDate"), '_label -> "End")
+
+                @requestForm.error("reservation.end").map { error =>
+                    <div class="alert alert-error">@error.message</div>
+                }
+
+                @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
+                @inputText(requestForm("reservation.end.period"), '_label -> "Period")
+
                 @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")

@@ -55,12 +55,12 @@ case class Reservation(
       </int:reserveRequest>
     )
   }
-  
+
   private def globalReservationIdField = globalReservationId match {
     case g: String => <globalReservationId>{ g }</globalReservationId>
     case _ => <globalReservationId/>
   }
-  
+
   private def descriptionField = description match {
     case Some(d) => <description>{ d }</description>
     case None => Null
