@@ -6,7 +6,7 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.Period
 import scala.xml.Null
 
-case class Reservation(
+case class Reserve(
     description: Option[String],
     startDate: Date,
     end: Either[Date, Period],

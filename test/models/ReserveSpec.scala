@@ -6,9 +6,9 @@ import org.joda.time.DateTime
 import org.joda.time.Period
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReservationSpec extends Specification {
+class ReserveSpec extends Specification {
 
-  "resevations" should {
+  "reserves" should {
 
     "have an envelope with endTime" in {
       val endDate = new DateTime(2015, 1, 1, 12, 10).toDate
@@ -50,7 +50,7 @@ class ReservationSpec extends Specification {
 
   object defaultReservation {
     def apply(description: Option[String] = None, end: Either[Date, Period] = Left(new Date()), globalReservationId: String) =
-      Reservation(description, new Date(), end, "connection", "source", "dest", 10, "correlation:1", "http://localhost", "nsa:surfnet.nl", globalReservationId)
+      Reserve(description, new Date(), end, "connection", "source", "dest", 10, "correlation:1", "http://localhost", "nsa:surfnet.nl", globalReservationId)
   }
 
 }

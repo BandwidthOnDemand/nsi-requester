@@ -38,7 +38,7 @@ object Application extends Controller {
 
     val defaultForm = reserveF.fill((
       defaultProvider,
-      Reservation(
+      Reserve(
         description = Some("A NSI reserve test"), startDate = startDate.toDate, end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
         source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 1000, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
@@ -160,7 +160,7 @@ object Application extends Controller {
       }
   )
 
-  private val reserveF: Form[(Provider, Reservation)] = Form(
+  private val reserveF: Form[(Provider, Reserve)] = Form(
     tuple(
       "provider" -> providerMapping,
       "reservation" -> mapping(
@@ -175,7 +175,7 @@ object Application extends Controller {
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText,
         "globalReservationId" ->  text
-      ){ Reservation.apply } { Reservation.unapply }
+      ){ Reserve.apply } { Reserve.unapply }
     )
   )
 
