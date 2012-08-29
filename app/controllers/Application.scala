@@ -135,7 +135,7 @@ object Application extends Controller {
 
   private def generateCorrelationId = generateConnectionId
 
-  private def defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "nsi123")
+  private def defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "")
 
   private def defaultProviderNsa = "urn:ogf:network:nsa:surfnet.nl"
 
