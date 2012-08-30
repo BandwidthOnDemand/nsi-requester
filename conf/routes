@@ -14,6 +14,8 @@ GET     /release                    controllers.Application.releaseForm
 POST    /release                    controllers.Application.release
 GET     /query                      controllers.Application.queryForm
 POST    /query                      controllers.Application.query
+GET     /settings                   controllers.Application.settingsForm
+POST    /settings                   controllers.Application.settings
 
 GET     /response                   controllers.ResponseController.response
 GET     /wsrequest                  controllers.ResponseController.wsRequest

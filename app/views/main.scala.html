@@ -1,4 +1,4 @@
-@(title: String, activeMenu: String)(content: Html)
+@(title: String, activeMenu: String)(content: Html)(implicit flash: Flash)
 
 @menuItems = @{List(
     ("reserve", routes.Application.reserveForm),
@@ -37,9 +37,20 @@
                                 }
                             }
                         </ul>
+                        <ul class="nav pull-right">
+                            <li @if(activeMenu == "settings") {class="active"}>
+                                <a href="@routes.Application.settingsForm">Settings</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
+            @flash.get("success").map { message =>
+                <div class="alert alert-success">
+                    <button class="close" data-dismiss="alert">×</button>
+                    @message
+                </div>
+            }
             @content
         </div>
         <script src="@routes.Assets.at("javascripts/prettify.js")" type="text/javascript"></script>

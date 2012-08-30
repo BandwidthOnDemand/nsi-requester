@@ -107,7 +107,26 @@ object Application extends Controller {
   def query = Action { implicit request =>
     queryF.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.query(formWithErrors)),
-      { case(provider, query) => sendEnvelope(provider, query) }
+      { case (provider, query) => sendEnvelope(provider, query) }
+    )
+  }
+
+  def settingsForm = Action { implicit request =>
+    Ok(views.html.settings(settingsF.fill((defaultProvider, (defaultReplyToUrl, defaultProviderNsa)))))
+  }
+
+  def settings = Action { implicit request =>
+    settingsF.bindFromRequest.fold(
+        formWithErrors => BadRequest(views.html.settings(formWithErrors)),
+        { case (provider, (replyTo, providerNsa)) =>
+            Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
+              .withSession(
+                "providerUrl" -> provider.providerUrl,
+                "username" -> provider.username,
+                "password" -> provider.password,
+                "replyTo" -> replyTo,
+                "providerNsa" -> providerNsa)
+        }
     )
   }
 
@@ -135,16 +154,38 @@ object Application extends Controller {
 
   private def generateCorrelationId = generateConnectionId
 
-  private def defaultProvider = Provider("http://localhost:8082/bod/nsi/v1_sc/provider", "nsi", "")
+  private def defaultProvider(implicit request: Request[AnyContent]) = {
+    val url = request.session.get("providerUrl").getOrElse("http://localhost:8082/bod/nsi/v1_sc/provider")
+    val user = request.session.get("username").getOrElse("")
+    val pass = request.session.get("password").getOrElse("")
 
-  private def defaultProviderNsa = "urn:ogf:network:nsa:surfnet.nl"
+    Provider(url, user, pass)
+  }
 
-  private def defaultReplyToUrl(implicit request: Request[AnyContent]) = "http://" + request.host + routes.ResponseController.reply
+  private def defaultProviderNsa(implicit request: Request[AnyContent]) =
+    request.session.get("providerNsa").getOrElse("urn:ogf:network:nsa:surfnet.nl")
+
+  private def defaultReplyToUrl(implicit request: Request[AnyContent]) =
+    request.session.get("replyTo").getOrElse("http://" + request.host + routes.ResponseController.reply)
 
   private val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
     "username" -> text,
     "password" -> text){ Provider.apply } { Provider.unapply }
+
+  private val settingsF: Form[(Provider, (String, String))] = Form(
+    tuple(
+      "provider" -> mapping(
+        "providerUrl" -> nonEmptyText,
+        "username" -> text,
+        "password" -> text
+        ) {Provider.apply} {Provider.unapply},
+      "nsi" -> tuple(
+        "replyTo" -> text,
+        "providerNsa" -> text
+      )
+    )
+  )
 
   private val endTuple = tuple(
     "date" -> optional(date("yyyy-MM-dd HH:mm")),
