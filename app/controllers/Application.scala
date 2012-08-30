@@ -130,6 +130,10 @@ object Application extends Controller {
     )
   }
 
+  def resetSettings = Action { implicit request =>
+    Redirect(routes.Application.settingsForm).withNewSession.flashing("succes" -> "Settings have been reset")
+  }
+
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
     import support.PrettyXml._
 

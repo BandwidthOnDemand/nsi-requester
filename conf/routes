@@ -16,6 +16,7 @@ GET     /query                      controllers.Application.queryForm
 POST    /query                      controllers.Application.query
 GET     /settings                   controllers.Application.settingsForm
 POST    /settings                   controllers.Application.settings
+GET     /resetsettings              controllers.Application.resetSettings
 
 GET     /response                   controllers.ResponseController.response
 GET     /wsrequest                  controllers.ResponseController.wsRequest
