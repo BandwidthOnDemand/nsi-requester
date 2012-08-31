@@ -185,8 +185,8 @@ object Application extends Controller {
         "password" -> text
         ) {Provider.apply} {Provider.unapply},
       "nsi" -> tuple(
-        "replyTo" -> text,
-        "providerNsa" -> text
+        "replyTo" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText
       )
     )
   )
