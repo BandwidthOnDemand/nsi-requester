@@ -4,7 +4,7 @@
 
 @main("NSI Responses", "response") {
     <section>
-        <h1>NSI Responses</h1>
+        <h1>NSI Responses <span>(# of Async <span id="numberOfResponses">0</span>)</span></h1>
         <div class="content">
             @response.map(response => xmlBlock("The Response", response))
             @request.map(request => xmlBlock("The Request", request))
@@ -33,6 +33,8 @@
             appendTime(xmlBlock);
             xmlBlock.prependTo("section .content");
             prettyPrint();
+            var number = $("#numberOfResponses");
+            number.text(parseInt(number.text()) + 1);
           }
           socket.onopen = function(event) { console.log("socket is open"); }
           socket.onclose = function(event) { console.log("socket closed..") }
