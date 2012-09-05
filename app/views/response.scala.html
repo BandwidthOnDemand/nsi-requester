@@ -14,33 +14,40 @@
         </div>
     </section>
 
+    <script src="http://js.pusher.com/1.12/pusher.min.js" type="text/javascript"></script>
     <script>
-      $(function() {
-          var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
-          var socket = new WS("ws://@{httpRequest.host + routes.ResponseController.wsRequest}");
+       var appendTime = function(xmlBlock) {
+         var now = new Date();
+         var minutes = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+         var seconds = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
+         var nowString = now.getHours() + ':' + minutes + ':' + seconds;
+         xmlBlock.find("h3").append($("<span/>", {"class": "time", text: nowString}));
+       }
 
-          var appendTime = function(xmlBlock) {
-            var now = new Date();
-            var minutes = now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
-            var seconds = now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds();
-            var nowString = now.getHours() + ':' + minutes + ':' + seconds;
-            xmlBlock.find("h3").append($("<span/>", {"class": "time", text: nowString}));
-          }
+       var nsiResponse = function(xml) {
+         xmlBlock = $("#template > div").clone();
+         xmlBlock.find(".prettyprint").text(xml);
+         appendTime(xmlBlock);
+         xmlBlock.prependTo("section .content");
+         prettyPrint();
+       }
 
-          socket.onmessage = function(event) {
-            xmlBlock = $("#template > div").clone();
-            xmlBlock.find(".prettyprint").text(event.data);
-            appendTime(xmlBlock);
-            xmlBlock.prependTo("section .content");
-            prettyPrint();
-            var number = $("#numberOfResponses");
-            number.text(parseInt(number.text()) + 1);
-          }
-          socket.onopen = function(event) { console.log("socket is open"); }
-          socket.onclose = function(event) { console.log("socket closed..") }
+       var increaseResponses = function() {
+         var number = $("#numberOfResponses");
+         number.text(parseInt(number.text()) + 1);
+       }
 
-          appendTime($(".content > .xml-content"))
-      })
+       var pusher = new Pusher('9b313b09b03b1631fc81');
+       var channel = pusher.subscribe('response_channel');
+
+       channel.bind('response', function(data) {
+         nsiResponse(data);
+         increaseResponses();
+       })
+
+       $(function() {
+         appendTime($(".content > .xml-content"))
+       })
     </script>
 }
 

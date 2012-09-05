@@ -19,7 +19,6 @@ POST    /settings                   controllers.Application.settings
 GET     /resetsettings              controllers.Application.resetSettings
 
 GET     /response                   controllers.ResponseController.response
-GET     /wsrequest                  controllers.ResponseController.wsRequest
 POST    /reply                      controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path

@@ -1,30 +1,18 @@
 package controllers
 
-import java.util.Date
-import java.util.UUID
-import scala.xml.Elem
-import scala.xml.Node
-import scala.xml.NodeSeq
-import scala.xml.PrettyPrinter
+import java.util.{Date, UUID}
+import org.joda.time.{DateTime, Period}
 import com.ning.http.client.Realm.AuthScheme
+import models._
+import FormSupport._
+import play.api.data.format.Formats._
 import play.api.data.Form
-import play.api.data.Mapping
 import play.api.data.Forms._
-import play.api.libs.iteratee.Enumerator
-import play.api.libs.iteratee.Iteratee
-import play.api.libs.iteratee.PushEnumerator
+import play.api.data.Mapping
 import play.api.libs.ws.WS
 import play.api.libs.ws.Response
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import play.api.mvc.WebSocket
-import play.api.mvc.Request
-import models._
-import org.joda.time.Period
-import org.joda.time.DateTime
-import play.api.mvc.AnyContent
-import scala.Left
-import FormSupport._
+import play.api.mvc.{Response => _, _}
+import support.PrettyXml.nodeToString
 
 object Application extends Controller {
 
