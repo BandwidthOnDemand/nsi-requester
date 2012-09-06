@@ -10,7 +10,7 @@ import java.util.prefs.Base64
 object Pusher {
 
   import play.api.Play.current
-  import Security._
+  import SecurityString._
 
   val appId = Play.configuration.getString("pusher.appId").getOrElse(throw new RuntimeException("Missing Pusher app id"))
   val key = Play.configuration.getString("pusher.key").getOrElse(throw new RuntimeException("Missing Pusher key"))
@@ -29,36 +29,35 @@ object Pusher {
         "auth_key" -> key,
         "auth_timestamp" -> (System.currentTimeMillis / 1000).toString,
         "auth_version" -> "1.0",
-        "body_md5" -> md5(message),
+        "body_md5" -> message.md5(),
         "name" -> event
     ).map{ case (key, value) => "%s=%s".format(key, value) }.mkString("&")
 
-    val signature = sha256(List("POST", requestPath, params).mkString("\n"), secret)
+    val signature = List("POST", requestPath, params).mkString("\n").sha256(secret)
 
     WS.url("http://%s%s?%s&auth_signature=%s".format(domain, requestPath, params, signature)).post(message)
   }
 
 }
 
-object Security {
+class SecurityString(input: String) {
+  import java.security.MessageDigest
+  import javax.crypto.Mac
+  import javax.crypto.spec.SecretKeySpec
+  import java.math.BigInteger
 
   implicit def arrayToHexString(data: Array[Byte]) = data.map("%02x".format(_)).mkString
 
-  def md5(input: String): String = {
-    import java.security.MessageDigest
+  def md5(): String = MessageDigest.getInstance("MD5").digest(input.getBytes("UTF-8"))
 
-    MessageDigest.getInstance("MD5").digest(input.getBytes("UTF-8"))
-  }
-
-  def sha256(input: String, secret: String): String = {
-    import javax.crypto.Mac
-    import javax.crypto.spec.SecretKeySpec
-    import java.math.BigInteger
-
+  def sha256(secret: String): String = {
     val algo = "HmacSHA256"
     val mac = Mac.getInstance(algo)
     mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), algo))
     mac.doFinal(input.getBytes)
   }
+}
 
+object SecurityString {
+  implicit def StringToSecurityString(input: String): SecurityString = new SecurityString(input)
 }
