@@ -136,7 +136,7 @@ object Application extends Controller {
       }
       .map {
         case response if response.status == 500 => Ok("Server %s could not be reached:\n %s".format(provider.providerUrl, response.body))
-        case response => Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify)))
+        case response => Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify), Some((soapRequest \\ "correlationId").text)))
     }
   }
 

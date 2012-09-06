@@ -5,8 +5,7 @@
     ("provision", routes.Application.provisionForm),
     ("release", routes.Application.releaseForm),
     ("terminate", routes.Application.terminateForm),
-    ("query", routes.Application.queryForm),
-    ("response", routes.ResponseController.response)
+    ("query", routes.Application.queryForm)
 )}
 
 <!DOCTYPE html>
@@ -35,6 +34,9 @@
                                         <a href="@href">@menu.capitalize</a>
                                     </li>
                                 }
+                            }
+                            @if(activeMenu == "response") {
+                                <li class="active"><a href="#">Response</a></li>
                             }
                         </ul>
                         <ul class="nav pull-right">

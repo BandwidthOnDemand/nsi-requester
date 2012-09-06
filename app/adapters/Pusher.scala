@@ -6,6 +6,7 @@ import java.math.BigInteger
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.util.prefs.Base64
+import scala.xml.NodeSeq
 
 object Pusher {
 
@@ -16,8 +17,12 @@ object Pusher {
   lazy val key = Play.configuration.getString("pusher.key").getOrElse(throw new RuntimeException("Missing Pusher key"))
   lazy val secret = Play.configuration.getString("pusher.secret").getOrElse(throw new RuntimeException("Missing Pusher secret key"))
 
-  def sendNsiResponse(message: String) = {
-    send("response_channel", "response", message)
+  def sendNsiResponse(message: NodeSeq) = {
+    import support.PrettyXml._
+
+    val correlationId = (message \\ "correlationId").text
+
+    send("response_channel", correlationId, message.prettify)
   }
 
   def send(channel: String, event: String, message: String) = {

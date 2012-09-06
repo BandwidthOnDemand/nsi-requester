@@ -1,4 +1,4 @@
-@(request: Option[String], response: Option[String])(implicit httpRequest: Request[AnyContent], flash: Flash)
+@(request: Option[String], response: Option[String], correlationId: Option[String])(implicit httpRequest: Request[AnyContent], flash: Flash)
 
 @import helper._
 
@@ -40,10 +40,21 @@
        var pusher = new Pusher('@adapters.Pusher.key');
        var channel = pusher.subscribe('response_channel');
 
-       channel.bind('response', function(data) {
-         nsiResponse(data);
-         increaseResponses();
-       })
+   @correlationId match {
+       case Some(id) => {
+           channel.bind('@id', function(data) {
+             nsiResponse(data);
+             increaseResponses();
+           })
+       }
+       case None => {
+           channel.bind_all(function(event, data) {
+             if (event.lastIndexOf("pusher", 0) === 0) return;
+             nsiResponse(data);
+             increaseResponses();
+           })
+       }
+   }
 
        $(function() {
          appendTime($(".content > .xml-content"))
