@@ -12,9 +12,9 @@ object Pusher {
   import play.api.Play.current
   import SecurityString._
 
-  val appId = Play.configuration.getString("pusher.appId").getOrElse(throw new RuntimeException("Missing Pusher app id"))
-  val key = Play.configuration.getString("pusher.key").getOrElse(throw new RuntimeException("Missing Pusher key"))
-  val secret = Play.configuration.getString("pusher.secret").getOrElse(throw new RuntimeException("Missing Pusher secret key"))
+  lazy val appId = Play.configuration.getString("pusher.appId").getOrElse(throw new RuntimeException("Missing Pusher app id"))
+  lazy val key = Play.configuration.getString("pusher.key").getOrElse(throw new RuntimeException("Missing Pusher key"))
+  lazy val secret = Play.configuration.getString("pusher.secret").getOrElse(throw new RuntimeException("Missing Pusher secret key"))
 
   def sendNsiResponse(message: String) = {
     send("response_channel", "response", message)
