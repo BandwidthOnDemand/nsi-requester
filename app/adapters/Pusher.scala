@@ -47,7 +47,7 @@ object Security {
   def md5(input: String): String = {
     import java.security.MessageDigest
 
-    MessageDigest.getInstance("MD5").digest(input.getBytes)
+    MessageDigest.getInstance("MD5").digest(input.getBytes("UTF-8"))
   }
 
   def sha256(input: String, secret: String): String = {
@@ -57,7 +57,7 @@ object Security {
 
     val algo = "HmacSHA256"
     val mac = Mac.getInstance(algo)
-    mac.init(new SecretKeySpec(secret.getBytes, algo))
+    mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), algo))
     mac.doFinal(input.getBytes)
   }
 
