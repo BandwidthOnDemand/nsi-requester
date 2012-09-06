@@ -37,7 +37,7 @@
          number.text(parseInt(number.text()) + 1);
        }
 
-       var pusher = new Pusher('9b313b09b03b1631fc81');
+       var pusher = new Pusher('@adapters.Pusher.key');
        var channel = pusher.subscribe('response_channel');
 
        channel.bind('response', function(data) {
