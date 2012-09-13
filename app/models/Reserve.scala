@@ -8,7 +8,7 @@ import scala.xml.Null
 
 case class Reserve(
     description: Option[String],
-    startDate: Date,
+    startDate: Option[Date],
     end: Either[Date, Period],
     connectionId: String,
     source: String = "",
@@ -21,8 +21,6 @@ case class Reserve(
 
   def toEnvelope = {
 
-    val dateTimeFormat = ISODateTimeFormat.dateTime()
-
     inEnvelope(
       <int:reserveRequest>
         { nsiRequestFields }
@@ -34,7 +32,7 @@ case class Reserve(
             <connectionId>{ connectionId }</connectionId>
             <serviceParameters>
               <schedule>
-                <startTime>{ dateTimeFormat.print(new DateTime(startDate)) }</startTime>
+                { startTimeField }
                 { endDateOrDuration }
               </schedule>
               <bandwidth>
@@ -56,6 +54,10 @@ case class Reserve(
     )
   }
 
+  private def startTimeField = startDate match {
+    case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
+    case None => Null
+  }
   private def globalReservationIdField = globalReservationId match {
     case g: String => <globalReservationId>{ g }</globalReservationId>
     case _ => <globalReservationId/>
