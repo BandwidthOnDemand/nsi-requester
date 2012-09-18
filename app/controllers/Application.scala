@@ -29,7 +29,7 @@ object Application extends Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = defaultStpUriPrefix + "56", destination = defaultStpUriPrefix + "72", bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+        source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     ))
 
     Ok(views.html.reserve(defaultForm))
