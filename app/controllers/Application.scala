@@ -13,6 +13,7 @@ import play.api.libs.ws.WS
 import play.api.libs.ws.Response
 import play.api.mvc.{Response => _, _}
 import support.PrettyXml.nodeToString
+import org.apache.commons.codec.binary.Base64
 
 object Application extends Controller {
 
@@ -110,8 +111,9 @@ object Application extends Controller {
             Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
               .withSession(
                 "providerUrl" -> provider.providerUrl,
-                "username" -> provider.username,
-                "password" -> provider.password,
+                "username" -> provider.username.getOrElse(""),
+                "password" -> provider.password.getOrElse(""),
+                "accessToken" -> provider.accessToken.getOrElse(""),
                 "replyTo" -> replyTo,
                 "providerNsa" -> providerNsa)
         }
@@ -126,9 +128,17 @@ object Application extends Controller {
     import support.PrettyXml._
 
     val soapRequest = nsiRequest.toEnvelope
-    WS.url(provider.providerUrl)
-      .withAuth(provider.username, provider.password, AuthScheme.BASIC)
-      .post(soapRequest)
+    val wsRequest = WS.url(provider.providerUrl)
+    val wsAuthRequest = if (provider.username.isDefined) {
+      wsRequest.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
+    } else if (provider.accessToken.isDefined) {
+      val value = "bearer " + provider.accessToken.get
+      wsRequest.withHeaders("Authorization" -> value)
+    } else {
+      wsRequest
+    }
+
+    wsAuthRequest.post(soapRequest)
       .recover { case e: Throwable => new Response(null) {
           override def status = 500
           override lazy val body = e.toString
@@ -148,10 +158,11 @@ object Application extends Controller {
 
   private def defaultProvider(implicit request: Request[AnyContent]) = {
     val url = request.session.get("providerUrl").getOrElse("http://localhost:8082/bod/nsi/v1_sc/provider")
-    val user = request.session.get("username").getOrElse("")
-    val pass = request.session.get("password").getOrElse("")
+    val user = request.session.get("username")
+    val pass = request.session.get("password")
+    val token = request.session.get("accessToken")
 
-    Provider(url, user, pass)
+    Provider(url, user, pass, token)
   }
 
   private def defaultProviderNsa(implicit request: Request[AnyContent]) =
@@ -162,16 +173,14 @@ object Application extends Controller {
 
   private val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
-    "username" -> text,
-    "password" -> text){ Provider.apply } { Provider.unapply }
+    "username" -> optional(text),
+    "password" -> optional(text),
+    "accessToken" -> optional(text)
+  ){ Provider.apply } { Provider.unapply }
 
   private val settingsF: Form[(Provider, (String, String))] = Form(
     tuple(
-      "provider" -> mapping(
-        "providerUrl" -> nonEmptyText,
-        "username" -> text,
-        "password" -> text
-        ) {Provider.apply} {Provider.unapply},
+      "provider" -> providerMapping,
       "nsi" -> tuple(
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText

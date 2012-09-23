@@ -1,3 +1,3 @@
 package models
 
-case class Provider(providerUrl: String, username: String, password: String)
+case class Provider(providerUrl: String, username: Option[String], password: Option[String], accessToken: Option[String])

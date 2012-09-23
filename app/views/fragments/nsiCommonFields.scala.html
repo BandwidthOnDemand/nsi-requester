@@ -1,14 +1,14 @@
-@(formField: String => Field)
+@(formField: String => Field, showCollapse: Boolean = true)
 
 @import helper._
 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
-<div class="message extra-fields">
-    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> NSI common attributes</h3>
+<div class="message@if(showCollapse){ extra-fields}">
+    <h3>@if(showCollapse){<i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> }NSI common attributes</h3>
 </div>
-<fieldset class="extra-fields">
-    @inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")
-    @inputText(formField("replyTo"), '_label -> "Reply To", 'class -> "input-xlarge")
+<fieldset @if(showCollapse){class="extra-fields"}>
+    @if(showCollapse){@inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")}
+    @inputText(formField("replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge")
     @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
 </fieldset>

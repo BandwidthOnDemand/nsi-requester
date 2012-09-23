@@ -1,15 +1,16 @@
-@(formField: String => Field)
+@(formField: String => Field, showCollapse: Boolean = true)
 
 @import helper._
 
 @implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
 
-<div class="message extra-fields">
-    <h3><i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> Provider attributes</h3>
+<div class="message@if(showCollapse){ extra-fields}">
+    <h3>@if(showCollapse){<i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> }Provider attributes</h3>
 </div>
 
-<fieldset class="extra-fields">
+<fieldset @if(showCollapse){class="extra-fields"}>
     @inputText(formField("providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
-    @inputText(formField("username"), '_label -> "Username", 'class -> "input-medium")
-    @inputPassword(formField("password"), '_label -> "Password", 'class -> "input-medium")
+    @inputText(formField("username"), '_label -> "Basic Auth Username", 'class -> "input-xlarge")
+    @inputPassword(formField("password"), '_label -> "Basic Auth Password", 'class -> "input-xlarge")
+    @inputText(formField("accessToken"), '_label -> "OAuth2 Access Token", 'class -> "input-xlarge")
 </fieldset>

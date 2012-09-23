@@ -11,14 +11,10 @@
         <div class="content">
 
             @helper.form(action = routes.Application.settings, 'class -> "form form-horizontal") {
-                <div class="message"><h3>Provider attributes</h3></div>
-                @inputText(settingsF("provider.providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge")
-                @inputText(settingsF("provider.username"), '_label -> "Provider username", 'class -> "input-xlarge")
-                @inputPassword(settingsF("provider.password"), '_label -> "Provider password", 'class -> "input-xlarge")
+                @fragments.providerFields(name => settingsF("provider." + name), false)
 
-                <div class="message"><h3>NSI attributes</h3></div>
-                @inputText(settingsF("nsi.replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge")
-                @inputText(settingsF("nsi.providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
+                @fragments.nsiCommonFields(name => settingsF("nsi." + name), false)
+
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Use settings</button>
                     <a href="@routes.Application.resetSettings" class="btn">Reset settings</a>
