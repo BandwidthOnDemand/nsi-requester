@@ -9,6 +9,10 @@
 </div>
 <fieldset @if(showCollapse){class="extra-fields"}>
     @if(showCollapse){@inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")}
-    @inputText(formField("replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge")
+
+    @helper.input(formField("replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge") { (id, name, value, args) =>
+        <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" required @toHtmlArgs(args)>
+    }
+
     @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
 </fieldset>
