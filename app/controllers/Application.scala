@@ -155,14 +155,15 @@ object Application extends Controller {
       }
   }
 
-  private def defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
+  private val defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
+  private val defaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
 
   private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
 
   private def generateCorrelationId = generateConnectionId
 
   private def defaultProvider(implicit request: Request[AnyContent]) = {
-    val url = request.session.get("providerUrl").getOrElse("http://localhost:8082/bod/nsi/v1_sc/provider")
+    val url = request.session.get("providerUrl").getOrElse(defaultProviderUrl)
     val user = request.session.get("username")
     val pass = request.session.get("password")
     val token = request.session.get("accessToken")
