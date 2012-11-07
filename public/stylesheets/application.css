@@ -23,3 +23,23 @@ a i[class^="icon-"] {
     color: #DC322F;
     font-size: 0.8em;
 }
+.error {
+  background-color: #ffffff;
+  border: 1px solid #BFBFBF;
+  padding-top: 1.5em;
+}
+.error > p {
+  margin: 0 0 1em 3em;
+}
+.error > h3 {
+  margin-left: 40px;
+}
+.error > pre {
+  margin-left: 40px;
+  padding: 0;
+}
+.error .message {
+    padding: .4em 40px;
+    margin-bottom: 1em;
+    background-color: #CAE8F0;
+}

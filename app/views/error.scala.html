@@ -1,0 +1,21 @@
+@(error: Throwable, response: Option[String])(implicit flash: Flash)
+
+@import helper._
+
+@main("Error Occurred", "response") {
+    <section>
+        <h1>Error Occurred</h1>
+
+        <div class="content">
+          <div class="error">
+            <div class="message"><h3>@error.getMessage</h3></div>
+            @response.map { s =>
+              <h3>Response</h3>
+              <pre class="prettyprint">@s</pre>
+            }
+            <h3>Stack trace</h3>
+            <p>@error.getStackTraceString</p>
+          </div>
+        </div>
+    </section>
+}

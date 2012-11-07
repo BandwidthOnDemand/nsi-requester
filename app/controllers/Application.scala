@@ -139,15 +139,20 @@ object Application extends Controller {
     }
 
     wsAuthRequest.post(soapRequest)
-      .recover { case e: Throwable => new Response(null) {
-          override def status = 500
-          override lazy val body = e.toString
+      .map(response => {
+        try {
+          val prettyRequest = Some(soapRequest.prettify)
+          val prettyResponse = Some(response.xml.prettify)
+          val correlationId = Some((soapRequest \\ "correlationId").text)
+
+          Ok(views.html.response(prettyRequest, prettyResponse, correlationId))
+        } catch {
+          case e: Throwable => InternalServerError(views.html.error(e, Some(response.body)))
         }
+      })
+      .recover {
+        case e: Throwable => InternalServerError(views.html.error(e, None))
       }
-      .map {
-        case response if response.status == 500 => Ok("Server %s could not be reached:\n %s".format(provider.providerUrl, response.body))
-        case response => Ok(views.html.response(Some(soapRequest.prettify), Some(response.xml.prettify), Some((soapRequest \\ "correlationId").text)))
-    }
   }
 
   private def defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
