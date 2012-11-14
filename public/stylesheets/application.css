@@ -43,3 +43,9 @@ a i[class^="icon-"] {
     margin-bottom: 1em;
     background-color: #CAE8F0;
 }
+.timezone {
+  color: gray;
+  font-size: 12px;
+  float: right;
+  margin-right: -25px;
+}
