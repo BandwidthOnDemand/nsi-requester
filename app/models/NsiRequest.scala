@@ -3,7 +3,7 @@ package models
 abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: String) extends Soapable {
 
   protected def nsas = {
-    <requesterNSA>urn:nl:surfnet:requester:example</requesterNSA>
+    <requesterNSA>urn:ogf:network:nsa:surfnet-nsi-requester</requesterNSA>
     <providerNSA>{ providerNsa }</providerNSA>
   }
 
