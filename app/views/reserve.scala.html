@@ -27,6 +27,7 @@
                 @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
+                @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected path", '_showConstraints -> false)
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
                 @fragments.providerFields(name => requestForm("provider." + name))

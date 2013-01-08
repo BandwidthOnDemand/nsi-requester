@@ -222,7 +222,8 @@ object Application extends Controller {
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText,
-        "globalReservationId" ->  text
+        "globalReservationId" ->  text,
+        "unprotected" -> boolean
       ){ Reserve.apply } { Reserve.unapply }
     )
   )
