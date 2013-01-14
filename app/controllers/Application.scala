@@ -11,6 +11,7 @@ import play.api.data.Forms._
 import play.api.data.Mapping
 import play.api.libs.ws.WS
 import play.api.libs.ws.Response
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{Response => _, _}
 import support.PrettyXml.nodeToString
 import org.apache.commons.codec.binary.Base64
