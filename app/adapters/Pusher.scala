@@ -20,7 +20,10 @@ object Pusher {
   def sendNsiResponse(message: NodeSeq) = {
     import support.PrettyXml._
 
-    val correlationId = (message \\ "correlationId").text
+    val correlationId = (message \\ "correlationId") match {
+      case NodeSeq.Empty => "123456780" // "hack to show all soap responses"
+      case xs => xs.text
+    }
 
     send("response_channel", correlationId, message.prettify)
   }
