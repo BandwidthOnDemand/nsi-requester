@@ -1,8 +1,7 @@
 @(settingsF: Form[(Provider, (String, String))])(implicit flash: Flash)
 
 @import helper._
-
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+@import views.helper.MyHelpers._
 
 @main("Settings for this session", "settings") {
     <section>
@@ -10,7 +9,7 @@
 
         <div class="content">
 
-            @helper.form(action = routes.Application.settings, 'class -> "form form-horizontal") {
+            @form(action = routes.Application.settings, 'class -> "form form-horizontal") {
                 @fragments.providerFields(name => settingsF("provider." + name), false)
 
                 @fragments.nsiCommonFields(name => settingsF("nsi." + name), false)

@@ -1,15 +1,14 @@
 @(requestForm: Form[(Provider, Reserve)])(implicit flash: Flash)
 
 @import helper._
-
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+@import views.helper.MyHelpers._
 
 @main("Make a NSI Reserve Request", "reserve") {
     <section>
         <h1>Make a NSI Reserve Request</h1>
 
         <div class="content">
-            @helper.form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
+            @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
                 @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")

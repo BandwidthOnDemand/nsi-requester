@@ -1,14 +1,13 @@
 @(queryForm: Form[(Provider, Query)])(implicit flash: Flash)
 
 @import helper._
-
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+@import views.helper.MyHelpers._
 
 @main("Make a NSI Query Request", "query") {
     <section>
         <h1>Make a NSI Query Request</h1>
         <div class="content">
-             @helper.form(action = routes.Application.query, 'class -> "form form-horizontal") {
+             @form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
                 @select(

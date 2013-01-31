@@ -1,14 +1,13 @@
 @(provisionForm: Form[(Provider, Provision)])(implicit flash: Flash)
 
 @import helper._
-
-@implicitFieldConstructor = @{ FieldConstructor(twitterBootstrap2FieldConstructor.f) }
+@import views.helper.MyHelpers._
 
 @main("Make a NSI Provision Request", "provision") {
     <section>
         <h1>Make a NSI Provision Request</h1>
         <div class="content">
-             @helper.form(action = routes.Application.provision, 'class -> "form form-horizontal") {
+             @form(action = routes.Application.provision, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Provision attributes</h3></div>
                 @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
