@@ -13,8 +13,7 @@ import play.api.libs.ws.WS
 import play.api.libs.ws.Response
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{Response => _, _}
-import support.PrettyXml.nodeToString
-import org.apache.commons.codec.binary.Base64
+import support.JsonResponse
 
 object Application extends Controller {
 
@@ -49,6 +48,7 @@ object Application extends Controller {
       defaultProvider,
       Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
+
     Ok(views.html.provision(defaultForm))
   }
 
@@ -64,6 +64,7 @@ object Application extends Controller {
       defaultProvider,
       Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
+
     Ok(views.html.terminate(defaultForm))
   }
 
@@ -79,6 +80,7 @@ object Application extends Controller {
       defaultProvider,
       Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
+
     Ok(views.html.release(defaultForm))
   }
 
@@ -90,7 +92,9 @@ object Application extends Controller {
   }
 
   def queryForm = Action { implicit request =>
-    val defaultForm = queryF.fill(defaultProvider, Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+    val defaultForm = queryF.fill(
+      defaultProvider, Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+
     Ok(views.html.query(defaultForm))
   }
 
@@ -102,22 +106,25 @@ object Application extends Controller {
   }
 
   def settingsForm = Action { implicit request =>
-    Ok(views.html.settings(settingsF.fill((defaultProvider, (defaultReplyToUrl, defaultProviderNsa)))))
+    val defaultForm = settingsF.fill((defaultProvider, (defaultReplyToUrl, defaultProviderNsa)))
+
+    Ok(views.html.settings(defaultForm))
   }
 
   def settings = Action { implicit request =>
     settingsF.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.settings(formWithErrors)),
-        { case (provider, (replyTo, providerNsa)) =>
-            Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
-              .withSession(
-                "providerUrl" -> provider.providerUrl,
-                "username" -> provider.username.getOrElse(""),
-                "password" -> provider.password.getOrElse(""),
-                "accessToken" -> provider.accessToken.getOrElse(""),
-                "replyTo" -> replyTo,
-                "providerNsa" -> providerNsa)
-        }
+      formWithErrors => BadRequest(views.html.settings(formWithErrors)),
+      {
+        case (provider, (replyTo, providerNsa)) =>
+          Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
+            .withSession(
+              "providerUrl" -> provider.providerUrl,
+              "username" -> provider.username.getOrElse(""),
+              "password" -> provider.password.getOrElse(""),
+              "accessToken" -> provider.accessToken.getOrElse(""),
+              "replyTo" -> replyTo,
+              "providerNsa" -> providerNsa)
+       }
     )
   }
 
@@ -126,41 +133,37 @@ object Application extends Controller {
   }
 
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
-    import support.PrettyXml._
+
+    val wsRequest = WS.url(provider.providerUrl)
+
+    val wsAuthRequest =
+      if (provider.username.isDefined)
+        wsRequest.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
+      else if (provider.accessToken.isDefined)
+        wsRequest.withHeaders("Authorization" -> s"bearer ${provider.accessToken.get}")
+      else
+        wsRequest
 
     val soapRequest = nsiRequest.toEnvelope
-    val wsRequest = WS.url(provider.providerUrl)
-    val wsAuthRequest = if (provider.username.isDefined) {
-      wsRequest.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
-    } else if (provider.accessToken.isDefined) {
-      val value = "bearer " + provider.accessToken.get
-      wsRequest.withHeaders("Authorization" -> value)
-    } else {
-      wsRequest
-    }
+    val requestTime = DateTime.now()
 
-    wsAuthRequest.post(soapRequest)
-      .map(response => {
-        try {
-          val prettyRequest = Some(soapRequest.prettify)
-          val prettyResponse = Some(response.xml.prettify)
-          val correlationId = Some((soapRequest \\ "correlationId").text)
+    wsAuthRequest.post(soapRequest).map(response => {
+      try {
+        val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
 
-          Ok(views.html.response(prettyRequest, prettyResponse, correlationId))
-        } catch {
-          case e: Throwable => InternalServerError(views.html.error(e, Some(response.body)))
-        }
-      })
-      .recover {
-        case e: Throwable => InternalServerError(views.html.error(e, None))
+        Ok(jsonResponse)
+      } catch {
+        case e => InternalServerError(views.html.error(e, Some(response.body)))
       }
+    }).recover {
+      case e => InternalServerError(views.html.error(e, None))
+    }
   }
 
   private val defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
   private val defaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
 
-  private def generateConnectionId = "urn:uuid:%s".formatted(UUID.randomUUID.toString)
-
+  private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId
 
   private def defaultProvider(implicit request: Request[AnyContent]) = {
@@ -265,7 +268,7 @@ object Application extends Controller {
     )
   )
 
-  private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(l => l.filterNot(_.isEmpty), identity)
+  private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
 
   private val queryF: Form[(Provider, Query)] = Form(
     tuple(

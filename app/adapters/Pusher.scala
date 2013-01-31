@@ -1,12 +1,20 @@
 package adapters
 
-import play.api.Play
-import play.api.libs.ws.WS
-import java.math.BigInteger
+import java.security.MessageDigest
+
+import scala.Array.canBuildFrom
+import scala.xml.NodeSeq
+
+import org.joda.time.DateTime
+
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import java.util.prefs.Base64
-import scala.xml.NodeSeq
+import play.api.Play
+import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.Json
+import play.api.libs.ws.WS
+import support.JsonResponse
 
 object Pusher {
 
@@ -17,22 +25,19 @@ object Pusher {
   lazy val key = Play.configuration.getString("pusher.key").getOrElse(throw new RuntimeException("Missing Pusher key"))
   lazy val secret = Play.configuration.getString("pusher.secret").getOrElse(throw new RuntimeException("Missing Pusher secret key"))
 
-  def sendNsiResponse(message: NodeSeq) = {
-    import support.PrettyXml._
+  def sendNsiResponse(response: NodeSeq) = {
+    val correlationId = (response \\ "correlationId")
 
-    val correlationId = (message \\ "correlationId") match {
-      case NodeSeq.Empty => "123456780" // "hack to show all soap responses"
-      case xs => xs.text
-    }
-
-    send("response_channel", correlationId, message.prettify)
+    correlationId foreach (id => {
+      val message = JsonResponse.toJson(response, DateTime.now())
+      send("response_channel", id.text, Json.stringify(message))
+    })
   }
 
   def send(channel: String, event: String, message: String) = {
     val domain = "api.pusherapp.com"
-    val requestPath = "/apps/%s/channels/%s/events".format(appId, channel)
+    val requestPath = s"/apps/$appId/channels/$channel/events"
 
-    // socket_id: optional
     val params = List(
         "auth_key" -> key,
         "auth_timestamp" -> (System.currentTimeMillis / 1000).toString,
@@ -43,7 +48,9 @@ object Pusher {
 
     val signature = List("POST", requestPath, params).mkString("\n").sha256(secret)
 
-    WS.url("http://%s%s?%s&auth_signature=%s".format(domain, requestPath, params, signature)).post(message)
+    WS.url(s"http://$domain$requestPath?$params&auth_signature=$signature").post(message).onFailure {
+      case e => println("Post to Pusher failed with: " + e.getMessage())
+    }
   }
 
 }

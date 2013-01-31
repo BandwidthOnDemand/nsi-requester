@@ -3,13 +3,15 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@main("Make a NSI Terminate Request", "terminate") {
-    <section>
+@nsirequest("Make a NSI Terminate Request", "terminate") {
+
+    <section id="formS">
         <h1>Make a NSI Terminate Request</h1>
         <div class="content">
              @form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Terminate attributes</h3></div>
+
                 @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => terminateForm("terminate." + name))

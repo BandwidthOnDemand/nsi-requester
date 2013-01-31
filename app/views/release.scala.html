@@ -3,8 +3,9 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@main("Make a NSI Release Request", "release") {
-    <section>
+@nsirequest("Make a NSI Release Request", "release") {
+
+    <section id="formS">
         <h1>Make a NSI Release Request</h1>
         <div class="content">
              @form(action = routes.Application.release, 'class -> "form form-horizontal") {

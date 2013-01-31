@@ -3,8 +3,9 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@main("Make a NSI Query Request", "query") {
-    <section>
+@nsirequest("Make a NSI Query Request", "query") {
+
+    <section id="formS">
         <h1>Make a NSI Query Request</h1>
         <div class="content">
              @form(action = routes.Application.query, 'class -> "form form-horizontal") {
@@ -45,25 +46,27 @@
         <div id="template-reservation" class="template">
             @inputText(queryForm("query.globalReservationIds[x]"), '_label -> "", 'class -> "input-xlarge")
         </div>
+
         <script>
             $(function() {
-                $("#plus-connection").click(function(event) {
-                    $("#template-connection").children().clone().appendTo("#connectionIds");
-                    reNumber($("#connectionIds input"));
-                });
 
-                $("#plus-reservation").click(function(event) {
-                    $("#template-reservation").children().clone().appendTo("#globalReservationIds");
-                    reNumber($("#globalReservationIds input"));
-                });
+              $("#plus-connection").click(function(event) {
+                 $("#template-connection").children().clone().appendTo("#connectionIds");
+                 reNumber($("#connectionIds input"));
+              });
 
-                function reNumber(elements) {
-                    elements.each(function(i, input) {
-                        var target = $(input);
-                        target.attr('name', target.attr('name').replace(/\[.+\]/, '['+i+']'))
-                    });
-                }
-            })
+              $("#plus-reservation").click(function(event) {
+                 $("#template-reservation").children().clone().appendTo("#globalReservationIds");
+                 reNumber($("#globalReservationIds input"));
+              });
+
+              function reNumber(elements) {
+                 elements.each(function(i, input) {
+                    var target = $(input);
+                    target.attr('name', target.attr('name').replace(/\[.+\]/, '['+i+']'))
+                 });
+              }
+           })
         </script>
     </section>
 }

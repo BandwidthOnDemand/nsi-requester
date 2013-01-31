@@ -10,11 +10,11 @@ import play.api.data.format.Formats._
 object FormSupport {
 
   private val periodFormatter = new PeriodFormatterBuilder()
-       .printZeroAlways()
-       .appendDays().appendSuffix(":")
-       .appendHours().appendSuffix(":")
-       .appendMinutes()
-       .toFormatter
+    .printZeroAlways()
+    .appendDays().appendSuffix(":")
+    .appendHours().appendSuffix(":")
+    .appendMinutes()
+    .toFormatter
 
   implicit def periodFormat: Formatter[Period] = new Formatter[Period] {
 
@@ -27,6 +27,7 @@ object FormSupport {
           .left.map(e => Seq(FormError(key, "error.period", Nil)))
       }
     }
+
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
   }
 }

@@ -11,7 +11,7 @@
 .message.extra-fields {
     cursor: pointer;
 }
-.template {
+.template, #responseS {
     display: none;
 }
 a i[class^="icon-"] {

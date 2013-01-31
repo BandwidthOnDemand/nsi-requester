@@ -1,0 +1,16 @@
+@(title: String, activeMenu: String)(content: Html)(implicit flash: Flash)
+
+@main(title, activeMenu) {
+
+    @content
+
+    <section id="responseS" data-pusher="@adapters.Pusher.key">
+        <h1>NSI Responses <span>(# of async <span id="numberOfResponses">0</span>)</span></h1>
+        <div class="content">
+        </div>
+        <div class="xml-content template" id="xml-template">
+            <div class="message"><h3></h3></div>
+            <pre class="prettyprint"></pre>
+        </div>
+    </section>
+}

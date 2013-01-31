@@ -18,7 +18,6 @@ GET     /settings                   controllers.Application.settingsForm
 POST    /settings                   controllers.Application.settings
 GET     /resetsettings              controllers.Application.resetSettings
 
-GET     /responses                  controllers.ResponseController.responses
 POST    /reply                      controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path

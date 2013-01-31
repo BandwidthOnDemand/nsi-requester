@@ -20,46 +20,44 @@ case class Reserve(
     globalReservationId: String = "",
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope = {
-
-    inEnvelope(
-      <int:reserveRequest>
-        { nsiRequestFields }
-        <type:reserve>
-          { nsas }
-          <reservation>
-            { globalReservationIdField }
-            { descriptionField }
-            <connectionId>{ connectionId }</connectionId>
-            <serviceParameters>
-              <schedule>
-                { startTimeField }
-                { endDateOrDuration }
-              </schedule>
-              <bandwidth>
-                <desired>{ bandwidth }</desired>
-              </bandwidth>
-              { possibleUnprotected }
-            </serviceParameters>
-            <path>
-              <directionality>Bidirectional</directionality>
-              <sourceSTP>
-                <stpId>{ source }</stpId>
-              </sourceSTP>
-              <destSTP>
-                <stpId>{ destination }</stpId>
-              </destSTP>
-            </path>
-          </reservation>
-        </type:reserve>
-      </int:reserveRequest>
-    )
-  }
+  def toEnvelope = inEnvelope(
+    <int:reserveRequest>
+      { nsiRequestFields }
+      <type:reserve>
+        { nsas }
+        <reservation>
+          { globalReservationIdField }
+          { descriptionField }
+          <connectionId>{ connectionId }</connectionId>
+          <serviceParameters>
+            <schedule>
+              { startTimeField }
+              { endDateOrDuration }
+            </schedule>
+            <bandwidth>
+              <desired>{ bandwidth }</desired>
+            </bandwidth>
+            { possibleUnprotected }
+          </serviceParameters>
+          <path>
+            <directionality>Bidirectional</directionality>
+            <sourceSTP>
+              <stpId>{ source }</stpId>
+            </sourceSTP>
+            <destSTP>
+              <stpId>{ destination }</stpId>
+            </destSTP>
+          </path>
+        </reservation>
+      </type:reserve>
+    </int:reserveRequest>
+  )
 
   private def startTimeField = startDate match {
     case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
     case None => Null
   }
+
   private def globalReservationIdField = globalReservationId match {
     case g: String => <globalReservationId>{ g }</globalReservationId>
     case _ => <globalReservationId/>
