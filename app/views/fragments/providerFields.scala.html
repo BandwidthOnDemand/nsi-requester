@@ -10,11 +10,15 @@
 
 <fieldset @if(showCollapse){class="extra-fields"}>
 
-    @helper.input(formField("providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge") { (id, name, value, args) =>
+    @input(formField("providerUrl"), '_label -> "Provider URL", 'class -> "input-xlarge") { (id, name, value, args) =>
         <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" required @toHtmlArgs(args)>
     }
 
     @inputText(formField("username"), '_label -> "Basic Auth Username", 'class -> "input-xlarge")
-    @inputPassword(formField("password"), '_label -> "Basic Auth Password", 'class -> "input-xlarge")
+
+    @input(formField("password"), '_label -> "Basic Auth Password", 'class -> "input-xlarge") { (id,name, value, args) =>
+        <input type="password" id="@id" name="@name" value="@value" @toHtmlArgs(args)>
+    }
+
     @inputText(formField("accessToken"), '_label -> "OAuth2 Access Token", 'class -> "input-xlarge")
 </fieldset>

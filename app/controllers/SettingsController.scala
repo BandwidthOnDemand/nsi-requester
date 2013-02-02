@@ -37,7 +37,7 @@ object SettingsController extends Controller {
     Redirect(routes.SettingsController.settingsForm).withNewSession.flashing("success" -> "Settings have been reset")
   }
 
-  private val settingsF: Form[(Provider, (String, String))] = Form(
+  private[controllers] val settingsF: Form[(Provider, (String, String))] = Form(
     tuple(
       "provider" -> providerMapping,
       "nsi" -> tuple(

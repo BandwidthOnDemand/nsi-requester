@@ -4,6 +4,10 @@ import org.specs2.mutable.Specification
 import play.api.test.WithApplication
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import play.api.data.Form
+import models.Provider
+import play.api.test.WithApplication
+import play.api.mvc.Flash
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class SettingsControllerSpec extends Specification {
@@ -66,6 +70,19 @@ class SettingsControllerSpec extends Specification {
       session(result).get("replyTo") must beNone
 
       flash(result).get("success") must beSome
+    }
+  }
+
+  "The settings view" should {
+
+    "contain the password when set in session" in new WithApplication {
+      val settingsForm = SettingsController.settingsF.fill(
+          Provider("http://localhost", Some("John"), Some("secret"), None), ("http://localhost/reply", "urn:ogf:network:nsa:surnfet.nl")
+      )
+      val result = views.html.settings(settingsForm)(Flash())
+
+      contentAsString(result) must contain("""name="provider.username" value="John"""")
+      contentAsString(result) must contain("""name="provider.password" value="secret"""")
     }
   }
 }
