@@ -109,20 +109,21 @@ object Application extends Controller {
 
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
 
-    val wsRequest = WS.url(provider.providerUrl)
+    val wsRequest = {
+      val request = WS.url(provider.providerUrl)
 
-    val wsAuthRequest =
       if (provider.username.isDefined)
-        wsRequest.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
+        request.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
       else if (provider.accessToken.isDefined)
-        wsRequest.withHeaders("Authorization" -> s"bearer ${provider.accessToken.get}")
+        request.withHeaders("Authorization" -> s"bearer ${provider.accessToken.get}")
       else
-        wsRequest
+        request
+    }
 
     val soapRequest = nsiRequest.toEnvelope
     val requestTime = DateTime.now()
 
-    wsAuthRequest.post(soapRequest).map(response => {
+    wsRequest.post(soapRequest).map(response => {
       try {
         val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
 
