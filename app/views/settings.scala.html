@@ -9,14 +9,14 @@
 
         <div class="content">
 
-            @form(action = routes.Application.settings, 'class -> "form form-horizontal") {
+            @form(action = routes.SettingsController.settings, 'class -> "form form-horizontal") {
                 @fragments.providerFields(name => settingsF("provider." + name), false)
 
                 @fragments.nsiCommonFields(name => settingsF("nsi." + name), false)
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Use settings</button>
-                    <a href="@routes.Application.resetSettings" class="btn">Reset settings</a>
+                    <a href="@routes.SettingsController.resetSettings" class="btn">Reset settings</a>
                 </div>
             }
         </div>

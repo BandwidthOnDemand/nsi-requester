@@ -5,6 +5,7 @@ import org.joda.time.{DateTime, Period}
 import com.ning.http.client.Realm.AuthScheme
 import models._
 import FormSupport._
+import Defaults._
 import play.api.data.format.Formats._
 import play.api.data.Form
 import play.api.data.Forms._
@@ -25,13 +26,14 @@ object Application extends Controller {
     val startDate = DateTime.now.plusMinutes(5)
     val endDate = startDate.plusMinutes(10)
 
-    val defaultForm = reserveF.fill((
+    val defaultForm = reserveF.fill(
       defaultProvider,
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
-    ))
+        source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa
+      )
+    )
 
     Ok(views.html.reserve(defaultForm))
   }
@@ -105,33 +107,6 @@ object Application extends Controller {
     )
   }
 
-  def settingsForm = Action { implicit request =>
-    val defaultForm = settingsF.fill((defaultProvider, (defaultReplyToUrl, defaultProviderNsa)))
-
-    Ok(views.html.settings(defaultForm))
-  }
-
-  def settings = Action { implicit request =>
-    settingsF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.settings(formWithErrors)),
-      {
-        case (provider, (replyTo, providerNsa)) =>
-          Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
-            .withSession(
-              "providerUrl" -> provider.providerUrl,
-              "username" -> provider.username.getOrElse(""),
-              "password" -> provider.password.getOrElse(""),
-              "accessToken" -> provider.accessToken.getOrElse(""),
-              "replyTo" -> replyTo,
-              "providerNsa" -> providerNsa)
-       }
-    )
-  }
-
-  def resetSettings = Action { implicit request =>
-    Redirect(routes.Application.settingsForm).withNewSession.flashing("succes" -> "Settings have been reset")
-  }
-
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
 
     val wsRequest = WS.url(provider.providerUrl)
@@ -160,43 +135,8 @@ object Application extends Controller {
     }
   }
 
-  private val defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
-  private val defaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
-
   private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId
-
-  private def defaultProvider(implicit request: Request[AnyContent]) = {
-    val url = request.session.get("providerUrl").getOrElse(defaultProviderUrl)
-    val user = request.session.get("username")
-    val pass = request.session.get("password")
-    val token = request.session.get("accessToken")
-
-    Provider(url, user, pass, token)
-  }
-
-  private def defaultProviderNsa(implicit request: Request[AnyContent]) =
-    request.session.get("providerNsa").getOrElse("urn:ogf:network:nsa:surfnet.nl")
-
-  private def defaultReplyToUrl(implicit request: Request[AnyContent]) =
-    request.session.get("replyTo").getOrElse("http://" + request.host + routes.ResponseController.reply)
-
-  private val providerMapping: Mapping[Provider] = mapping(
-    "providerUrl" -> nonEmptyText,
-    "username" -> optional(text),
-    "password" -> optional(text),
-    "accessToken" -> optional(text)
-  ){ Provider.apply } { Provider.unapply }
-
-  private val settingsF: Form[(Provider, (String, String))] = Form(
-    tuple(
-      "provider" -> providerMapping,
-      "nsi" -> tuple(
-        "replyTo" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText
-      )
-    )
-  )
 
   private val endTuple = tuple(
     "date" -> optional(date("yyyy-MM-dd HH:mm")),

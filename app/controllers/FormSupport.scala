@@ -1,11 +1,14 @@
 package controllers
 
-import play.api.data.format.Formatter
-import org.joda.time.LocalDateTime
 import org.joda.time.Period
 import org.joda.time.format.PeriodFormatterBuilder
-import play.api.data._
-import play.api.data.format.Formats._
+
+import models.Provider
+import play.api.data.FormError
+import play.api.data.Forms._
+import play.api.data.Mapping
+import play.api.data.format.Formats.stringFormat
+import play.api.data.format.Formatter
 
 object FormSupport {
 
@@ -30,4 +33,12 @@ object FormSupport {
 
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
   }
+
+  val providerMapping: Mapping[Provider] = mapping(
+    "providerUrl" -> nonEmptyText,
+    "username" -> optional(text),
+    "password" -> optional(text),
+    "accessToken" -> optional(text)
+  ){ Provider.apply } { Provider.unapply }
+
 }
