@@ -15,8 +15,20 @@ import play.api.libs.ws.Response
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{Response => _, _}
 import support.JsonResponse
+import play.api.libs.json.Json
+import play.api.libs.json.Writes
+import play.api.data.FormError
+import play.api.libs.json.JsValue
 
 object Application extends Controller {
+
+  implicit object FormErrorWrites extends Writes[FormError] {
+    def writes(error: FormError) = Json.toJson(
+      Map(
+        "id" -> Json.toJson(error.key.replace('.', '_')),
+        "message" -> Json.toJson(error.message)
+      ))
+  }
 
   def index = Action {
     Redirect(routes.Application.reserveForm)
@@ -38,9 +50,10 @@ object Application extends Controller {
     Ok(views.html.reserve(defaultForm))
   }
 
+
   def reserve = Action { implicit request =>
     reserveF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.reserve(formWithErrors)),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case (provider, reservation) => sendEnvelope(provider, reservation) }
     )
   }
@@ -56,7 +69,7 @@ object Application extends Controller {
 
   def provision = Action { implicit request =>
     provisionF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.provision(formWithErrors)),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case (provider, provision) => sendEnvelope(provider, provision) }
     )
   }
@@ -72,7 +85,7 @@ object Application extends Controller {
 
   def terminate = Action { implicit request =>
     terminateF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.terminate(formWithErrors)),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case(provider, terminate) => sendEnvelope(provider, terminate) }
     )
   }
@@ -88,7 +101,7 @@ object Application extends Controller {
 
   def release = Action { implicit request =>
     releaseF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.release(formWithErrors)),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case(provider, release) => sendEnvelope(provider, release) }
     )
   }
@@ -102,7 +115,7 @@ object Application extends Controller {
 
   def query = Action { implicit request =>
     queryF.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.query(formWithErrors)),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case (provider, query) => sendEnvelope(provider, query) }
     )
   }

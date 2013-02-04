@@ -32,8 +32,7 @@ $(function() {
          var pusher = new Pusher(responseS.attr('data-pusher'));
          var channel = pusher.subscribe('response_channel');
 
-         queryS.css("display", "none");
-         responseS.css("display", "block");
+         hideQueryForm();
 
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          channel.bind(correlationId, function(data) {
@@ -46,13 +45,20 @@ $(function() {
             type: 'POST',
             url: event.target.action,
             success: function(data) {
+               showResponses();
                addXmlBlock("Query Request", data.request.xml, data.request.time)
                addXmlBlock("Query Response", data.response.xml, data.response.time);
             },
             error: function(err) {
-               queryS.css("display", "block");
-               responseS.css("display", "none");
-               alert("Error occurred");
+               showQueryForm();
+
+               if (err.status === 400) {
+                 $.each(JSON.parse(err.responseText), function(index, value) {
+                   $("#" + value.id).closest('.control-group').addClass('error');
+                 })
+               } else {
+                 alert('Error occurred ' + err.status + ' ' + err.statusText);
+               }
             }
          });
 
@@ -66,6 +72,18 @@ $(function() {
          xmlBlock.prependTo(responseContent);
          xmlBlock.find("h3").append($("<span/>", {"class": "time", text: time}));
          prettyPrint();
+      }
+
+      function hideQueryForm() {
+         queryS.css("display", "none");
+      }
+
+      function showQueryForm() {
+        queryS.css("display", "block");
+      }
+
+      function showResponses() {
+        responseS.css("display", "block");
       }
 
       function increaseResponses() {
