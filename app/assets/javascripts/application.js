@@ -51,7 +51,7 @@ $(function() {
             },
             error: function(err) {
                showQueryForm();
-
+               $('.control-group').removeClass('error');
                if (err.status === 400) {
                  $.each(JSON.parse(err.responseText), function(index, value) {
                    $("#" + value.id).closest('.control-group').addClass('error');
