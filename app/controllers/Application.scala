@@ -19,6 +19,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.Writes
 import play.api.data.FormError
 import play.api.libs.json.JsValue
+import views.html.defaultpages.badRequest
 
 object Application extends Controller {
 
@@ -137,15 +138,15 @@ object Application extends Controller {
     val requestTime = DateTime.now()
 
     wsRequest.post(soapRequest).map(response => {
-      try {
-        val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
-
-        Ok(jsonResponse)
-      } catch {
-        case e => InternalServerError(views.html.error(e, Some(response.body)))
-      }
+        try {
+          val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
+          Ok(jsonResponse)
+        } catch {
+          case e: Exception =>
+            BadRequest(Json.obj("message" -> response.statusText))
+        }
     }).recover {
-      case e => InternalServerError(views.html.error(e, None))
+      case e => BadRequest(Json.obj("message" -> e.getMessage()))
     }
   }
 

@@ -53,17 +53,26 @@ $(function() {
                showQueryForm();
                $('.control-group').removeClass('error');
                if (err.status === 400) {
-                 $.each(JSON.parse(err.responseText), function(index, value) {
-                   $("#" + value.id).closest('.control-group').addClass('error');
-                 })
+                  var response = JSON.parse(err.responseText);
+
+                  $.each(response, function(index, value) {
+                     $("#" + value.id).closest('.control-group').addClass('error');
+                  })
+                  if (response.message) {
+                     addErrorMessage(response.message);
+                  }
                } else {
-                 alert('Error occurred ' + err.status + ' ' + err.statusText);
+                  addErrorMessage('Error occurred ' + err.status + ', ' + err.statusText);
                }
             }
          });
 
          return false;
       });
+
+      function addErrorMessage(message) {
+         $("nav").after('<div class="alert alert-error"><button class="close" data-dismiss="alert">×</button>' + message + '</div>');
+      }
 
       function addXmlBlock(name, xml, time) {
          var xmlBlock = xmlTemplate.clone().removeClass('template');
