@@ -20,6 +20,8 @@ import play.api.libs.json.Writes
 import play.api.data.FormError
 import play.api.libs.json.JsValue
 import views.html.defaultpages.badRequest
+import play.api.http.HeaderNames.CONTENT_TYPE
+import play.api.http.MimeTypes
 
 object Application extends Controller {
 
@@ -124,7 +126,7 @@ object Application extends Controller {
   private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
 
     val wsRequest = {
-      val request = WS.url(provider.providerUrl)
+      val request = WS.url(provider.providerUrl).withFollowRedirects(false)
 
       if (provider.username.isDefined)
         request.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
@@ -138,13 +140,12 @@ object Application extends Controller {
     val requestTime = DateTime.now()
 
     wsRequest.post(soapRequest).map(response => {
-        try {
-          val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
-          Ok(jsonResponse)
-        } catch {
-          case e: Exception =>
-            BadRequest(Json.obj("message" -> response.statusText))
-        }
+      if (response.status == 200 && response.header(CONTENT_TYPE).map(_.contains(MimeTypes.XML)).getOrElse(false)) {
+        val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
+        Ok(jsonResponse)
+      } else {
+        BadRequest(Json.obj("message" -> s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"))
+      }
     }).recover {
       case e => BadRequest(Json.obj("message" -> e.getMessage()))
     }
