@@ -46,8 +46,8 @@ $(function() {
             url: event.target.action,
             success: function(data) {
                showResponses();
-               addXmlBlock("Query Request", data.request.xml, data.request.time)
-               addXmlBlock("Query Response", data.response.xml, data.response.time);
+               addXmlBlock("Request", data.request.xml, data.request.time)
+               addXmlBlock("Response", data.response.xml, data.response.time);
             },
             error: function(err) {
                showQueryForm();
