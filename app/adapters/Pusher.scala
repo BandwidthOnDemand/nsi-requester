@@ -1,12 +1,9 @@
 package adapters
 
 import java.security.MessageDigest
-
 import scala.Array.canBuildFrom
 import scala.xml.NodeSeq
-
 import org.joda.time.DateTime
-
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import play.api.Play
@@ -14,7 +11,10 @@ import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
+import play.mvc.Http.Status.ACCEPTED
 import support.JsonResponse
+import scala.util.Success
+import scala.util.Failure
 
 object Pusher {
 
@@ -48,9 +48,14 @@ object Pusher {
 
     val signature = List("POST", requestPath, params).mkString("\n").sha256(secret)
 
-    WS.url(s"http://$domain$requestPath?$params&auth_signature=$signature").post(message).onFailure {
-      case e => println("Post to Pusher failed with: " + e.getMessage())
-    }
+    val result = WS.url(s"http://$domain$requestPath?$params&auth_signature=$signature").post(message)
+
+    result onComplete(result => result match {
+      case Success(response) => if (response.status != ACCEPTED) println(s"Post to Pusher failed with ${response.status}, ${response.statusText}")
+      case Failure(e) => println("Post to Pusher failed with: " + e.getMessage())
+    })
+
+    result
   }
 
 }
