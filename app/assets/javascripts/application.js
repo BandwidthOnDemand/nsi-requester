@@ -36,8 +36,7 @@ $(function() {
 
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          channel.bind(correlationId, function(data) {
-            addXmlBlock("Callback response", data.response.xml, data.response.time);
-            increaseResponses();
+            addXmlResponse("Callback response", data.id, data.response.xml, data.response.time);
          });
 
          $.ajax({
@@ -46,8 +45,8 @@ $(function() {
             url: event.target.action,
             success: function(data) {
                showResponses();
-               addXmlBlock("Request", data.request.xml, data.request.time)
-               addXmlBlock("Response", data.response.xml, data.response.time);
+               addXmlBlock("Request", "request-0", data.request.xml, data.request.time)
+               addXmlBlock("Response", "response-0", data.response.xml, data.response.time);
             },
             error: function(err) {
                showQueryForm();
@@ -74,13 +73,27 @@ $(function() {
          $("nav").after('<div class="alert alert-error"><button class="close" data-dismiss="alert">×</button>' + message + '</div>');
       }
 
-      function addXmlBlock(name, xml, time) {
-         var xmlBlock = xmlTemplate.clone().removeClass('template');
+      function addXmlBlock(name, id, xml, time) {
+         var xmlBlock = xmlTemplate.clone().removeClass('template').attr("id", id);
          xmlBlock.find("h3").text(name)
          xmlBlock.find(".prettyprint").text(xml);
          xmlBlock.prependTo(responseContent);
          xmlBlock.find("h3").append($("<span/>", {"class": "time", text: time}));
+
          prettyPrint();
+      }
+
+      function addXmlResponse(name, id, xml, time) {
+         var existing = $('#'+id)
+
+         if (existing.length > 0) {
+           existing.find(".prettyprint").text(existing.find(".prettyprint").text() + xml);
+           prettyPrint();
+         } else {
+             addXmlBlock(name, id, xml, time);
+
+             increaseResponses();
+         }
       }
 
       function hideQueryForm() {

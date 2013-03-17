@@ -27,10 +27,10 @@ object Pusher {
 
   def sendNsiResponse(response: NodeSeq) = {
     val correlationId = (response \\ "correlationId")
+    val messages = JsonResponse.toJson(response, DateTime.now())
 
     correlationId foreach (id => {
-      val message = JsonResponse.toJson(response, DateTime.now())
-      send("response_channel", id.text, Json.stringify(message))
+      messages foreach { message => send("response_channel", id.text, Json.stringify(message)) }
     })
   }
 
