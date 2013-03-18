@@ -27,11 +27,6 @@ After you have cloned the repo.
     heroku create --stack cedar
     git push heroku master
 
-## Pusher
-
-The application uses [Pusher][pusher] for async communication between the application and the client (browser). Because [Heroku][heroku] does not support websockets yet [Pusher][pusher] is used as an alternative.  
-Default the application is configured with a pusher application (see `application.properties`, `pusher.appId`, `pusher.key` and `pusher.secret`) so it should run out of the box. But if you want to run this application as a service pleas create your own application on [Pusher][pusher].
-
 ## Eclipse
 For editing in Eclipse the [Scala IDE](http://scala-ide.org/) is very usefull.
 
@@ -42,5 +37,4 @@ Generating the Eclipse project files can be done by running `eclipse with-source
 
 
 [heroku]: http://www.heroku.com
-[pusher]: http://pusher.com
 [homebrew]: http://mxcl.github.com/homebrew

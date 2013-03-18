@@ -27,26 +27,24 @@ $(function() {
           xmlTemplate = $("#xml-template"),
           responseContent = $("#responseS > div.content");
 
+      window.message = function(data) {
+        var json = $.parseJSON(data);
+        addXmlBlock("Callback response", json.response.xml, json.response.time);
+        increaseResponses();
+      }
+
       queryS.find("form").submit(function(event) {
 
-         var pusher = new Pusher(responseS.attr('data-pusher'));
-         var channel = pusher.subscribe('response_channel');
-
-         hideQueryForm();
-
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
-         channel.bind(correlationId, function(data) {
-            addXmlResponse("Callback response", data.id, data.response.xml, data.response.time);
-         });
+         hideQueryForm(correlationId);
 
          $.ajax({
             data: $(event.target).serialize(),
             type: 'POST',
             url: event.target.action,
             success: function(data) {
-               showResponses();
-               addXmlBlock("Request", "request-0", data.request.xml, data.request.time)
-               addXmlBlock("Response", "response-0", data.response.xml, data.response.time);
+               addXmlBlock("Request", data.request.xml, data.request.time)
+               addXmlBlock("Response", data.response.xml, data.response.time);
             },
             error: function(err) {
                showQueryForm();
@@ -73,8 +71,8 @@ $(function() {
          $("nav").after('<div class="alert alert-error"><button class="close" data-dismiss="alert">×</button>' + message + '</div>');
       }
 
-      function addXmlBlock(name, id, xml, time) {
-         var xmlBlock = xmlTemplate.clone().removeClass('template').attr("id", id);
+      function addXmlBlock(name, xml, time) {
+         var xmlBlock = xmlTemplate.clone().removeClass('template');
          xmlBlock.find("h3").text(name)
          xmlBlock.find(".prettyprint").text(xml);
          xmlBlock.prependTo(responseContent);
@@ -83,29 +81,16 @@ $(function() {
          prettyPrint();
       }
 
-      function addXmlResponse(name, id, xml, time) {
-         var existing = $('#'+id)
-
-         if (existing.length > 0) {
-           existing.find(".prettyprint").text(existing.find(".prettyprint").text() + xml);
-           prettyPrint();
-         } else {
-             addXmlBlock(name, id, xml, time);
-
-             increaseResponses();
-         }
-      }
-
-      function hideQueryForm() {
+      function hideQueryForm(correlationId) {
+         $('<iframe></iframe>').attr('src', 'comet/'+correlationId).insertAfter(responseS);
          queryS.css("display", "none");
+         responseS.css("display", "block");
       }
 
       function showQueryForm() {
-        queryS.css("display", "block");
-      }
-
-      function showResponses() {
-        responseS.css("display", "block");
+         $('iframe').remove();
+         queryS.css("display", "block");
+         responseS.css("display", "none");
       }
 
       function increaseResponses() {

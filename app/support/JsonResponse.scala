@@ -17,13 +17,10 @@ object JsonResponse {
       "response" -> jsonObject(response.prettify, responseTime)
     )
 
-  def toJson(response: NodeSeq, time: DateTime): List[JsObject] = {
+  def toJson(response: NodeSeq, time: DateTime): JsObject = {
     val data = response.prettify
-    val id = UUID.randomUUID().toString()
 
-    data.getBytes("UTF-8").grouped(9500).map { message =>
-      Json.obj("id" -> id, "response" -> jsonObject(new String(message, "UTF-8"), time))
-    }.toList
+    Json.obj("response" -> jsonObject(data, time))
   }
 
   private def jsonObject(data: String, time: DateTime): JsValue = {

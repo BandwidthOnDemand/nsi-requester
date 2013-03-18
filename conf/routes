@@ -19,6 +19,7 @@ GET     /settings                   controllers.SettingsController.settingsForm
 POST    /settings                   controllers.SettingsController.settings
 GET     /resetsettings              controllers.SettingsController.resetSettings
 
+GET     /comet/:id                  controllers.ResponseController.comet(id)
 POST    /reply                      controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path

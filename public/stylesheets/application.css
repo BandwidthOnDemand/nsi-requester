@@ -49,3 +49,6 @@ a i[class^="icon-"] {
   float: right;
   margin-right: -25px;
 }
+iframe {
+  display: none;
+}

@@ -1,23 +1,38 @@
 package controllers
 
-import adapters.Pusher
-import play.api.mvc.Action
-import play.api.mvc.Controller
+import play.api._
+import play.api.mvc._
+import play.api.libs._
+import play.api.libs.json.Json.stringify
+import play.api.libs.iteratee._
+import play.api.libs.iteratee.Concurrent.Channel
+import play.api.libs.concurrent.Execution.Implicits._
 import views.html.defaultpages.badRequest
+import org.joda.time.DateTime
+import scala.concurrent.stm.TMap
+import support.JsonResponse.toJson
 
 object ResponseController extends Controller {
 
+  val channels: TMap.View[String, Channel[String]] = TMap().single
+
   def reply = Action { request =>
 
-    val soapResponse = request.body.asXml
-
-    if (soapResponse.isDefined) {
-      Pusher.sendNsiResponse(soapResponse.get)
+    request.body.asXml.map { xml =>
+      (xml \\ "correlationId") foreach { id =>
+        channels.get(id.text).map(c => c.push(stringify(toJson(xml, DateTime.now()))))
+      }
       Ok
-    } else {
-      BadRequest
-    }
+    }.getOrElse(BadRequest)
 
+  }
+
+  def comet(id: String) = Action {
+    val (enumerator, channel) = Concurrent.broadcast[String]
+
+    channels += (id -> channel)
+
+    Ok.stream(enumerator &> Comet(callback = "parent.message"))
   }
 
 }
