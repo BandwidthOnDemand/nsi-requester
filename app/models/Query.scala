@@ -9,7 +9,9 @@ case class Query(
     nsaProvider: String)
     extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
-  def toEnvelope = inEnvelope(
+  override def toNsiV2Envelope = ???
+
+  override def toNsiV1Envelope = wrapNsiV1Envelope(
     <int:queryRequest>
       { nsiRequestFields }
       <type:query>

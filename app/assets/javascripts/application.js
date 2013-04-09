@@ -25,6 +25,8 @@ $(function() {
 
       var queryS = $("#formS"),
           xmlTemplate = $("#xml-template"),
+          form = queryS.find("form"),
+          submitButtons = queryS.find('.form-actions button[type="submit"]')
           responseContent = $("#responseS > div.content");
 
       window.message = function(data) {
@@ -33,8 +35,12 @@ $(function() {
         increaseResponses();
       }
 
-      queryS.find("form").submit(function(event) {
+      submitButtons.on('click', function(event) {
+        var action = $(event.target).attr("data-location");
+        form.attr("action", action);
+      });
 
+      form.submit(function(event) {
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          hideQueryForm(correlationId);
 

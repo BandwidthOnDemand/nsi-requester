@@ -9,7 +9,7 @@
         <h1>Make a NSI Reserve Request</h1>
 
         <div class="content">
-            @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
+            @form(action = routes.Application.reserve(2), 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
                 @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
@@ -33,7 +33,9 @@
                 @fragments.providerFields(name => requestForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Request</button>
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.reserve(1)">NSI v1 Reserve</button>
+                    or
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.reserve(2)">NSI v2 Reserve</button>
                 </div>
             }
         </div>

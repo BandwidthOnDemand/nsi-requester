@@ -53,11 +53,10 @@ object Application extends Controller {
     Ok(views.html.reserve(defaultForm))
   }
 
-
-  def reserve = Action { implicit request =>
+  def reserve(version: Int) = Action { implicit request =>
     reserveF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case (provider, reservation) => sendEnvelope(provider, reservation) }
+      { case (provider, reservation) => sendEnvelope(provider, reservation, version) }
     )
   }
 
@@ -123,7 +122,7 @@ object Application extends Controller {
     )
   }
 
-  private def sendEnvelope(provider: Provider, nsiRequest: Soapable)(implicit request: Request[AnyContent]) = Async {
+  private def sendEnvelope(provider: Provider, nsiRequest: NsiRequest, version: Int = 1)(implicit request: Request[AnyContent]) = Async {
 
     val wsRequest = {
       val request = WS.url(provider.providerUrl).withFollowRedirects(false)
@@ -136,7 +135,7 @@ object Application extends Controller {
         request
     }
 
-    val soapRequest = nsiRequest.toEnvelope
+    val soapRequest = nsiRequest.toNsiEnvelope(version)
     val requestTime = DateTime.now()
 
     wsRequest.post(soapRequest).map(response => {
@@ -182,7 +181,7 @@ object Application extends Controller {
         "correlationId" -> nonEmptyText,
         "replyTo" -> nonEmptyText,
         "providerNsa" -> nonEmptyText,
-        "globalReservationId" ->  text,
+        "globalReservationId" -> optional(text),
         "unprotected" -> boolean
       ){ Reserve.apply } { Reserve.unapply }
     )

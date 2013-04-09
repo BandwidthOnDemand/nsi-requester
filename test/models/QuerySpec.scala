@@ -9,7 +9,7 @@ class QuerySpec extends Specification {
 
     "contain an envelope with connectionIds" in {
       val query = defaultQuery(connectionIds = List("1", "3"))
-      val envelope = query.toEnvelope
+      val envelope = query.toNsiV1Envelope
 
       envelope must \\("connectionId") \> "1"
       envelope must \\("connectionId") \> "3"
@@ -18,7 +18,7 @@ class QuerySpec extends Specification {
 
     "contain an envelope with glogalIds" in {
       val query = defaultQuery(globalReservationIds = List("1", "2"))
-      val envelope = query.toEnvelope
+      val envelope = query.toNsiV1Envelope
 
       envelope must \\("globalReservationId") \> "1"
       envelope must \\("globalReservationId") \> "2"
@@ -27,7 +27,7 @@ class QuerySpec extends Specification {
 
     "contain an envelope with both globalReservationIds and ConnecionIds" in {
       val query = defaultQuery(connectionIds = List("5", "9"), globalReservationIds = List("1", "2"))
-      val envelope = query.toEnvelope
+      val envelope = query.toNsiV1Envelope
 
       envelope must \\("globalReservationId") \> "2"
       envelope must \\("connectionId") \> "9"
@@ -35,7 +35,7 @@ class QuerySpec extends Specification {
 
     "doen't contain any filter" in {
       val query = defaultQuery(connectionIds = Nil, globalReservationIds = Nil)
-      val envelope = query.toEnvelope
+      val envelope = query.toNsiV1Envelope
 
       envelope must \\("queryFilter")
       envelope must not \\("connectionId")

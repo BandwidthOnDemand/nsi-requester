@@ -17,10 +17,35 @@ case class Reserve(
     correlationId: String,
     replyTo: String,
     providerNsa: String,
-    globalReservationId: String = "",
+    globalReservationId: Option[String] = None,
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope = inEnvelope(
+  override def toNsiV2Envelope = wrapNsiV2Envelope(
+    nsiV2Header,
+    <type:reserve>
+      { globalReservationIdField }
+      { descriptionField }
+      <criteria version="0">
+        <schedule>
+          { startTimeField }
+          { endDateOrDuration }
+        </schedule>
+        <bandwidth>{ bandwidth }</bandwidth>
+        <path>
+          <directionality>Bidirectional</directionality>
+          <sourceSTP>
+            <networkId>{ source.split(':').init.mkString(":") }</networkId>
+            <localId>{ source.split(':').last }</localId>
+          </sourceSTP>
+          <destSTP>
+            <networkId>{ source.split(':').init.mkString(":") }</networkId>
+            <localId>{ source.split(':').last }</localId>
+          </destSTP>
+        </path>
+      </criteria>
+    </type:reserve>)
+
+  override def toNsiV1Envelope = wrapNsiV1Envelope(
     <int:reserveRequest>
       { nsiRequestFields }
       <type:reserve>
@@ -59,8 +84,8 @@ case class Reserve(
   }
 
   private def globalReservationIdField = globalReservationId match {
-    case g: String => <globalReservationId>{ g }</globalReservationId>
-    case _ => <globalReservationId/>
+    case Some(g) => <globalReservationId>{ g }</globalReservationId>
+    case None => <globalReservationId/>
   }
 
   private def descriptionField = description match {

@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /reserve                    controllers.Application.reserveForm
-POST    /reserve                    controllers.Application.reserve
+POST    /v$version<1|2>/reserve     controllers.Application.reserve(version: Int)
 GET     /provision                  controllers.Application.provisionForm
 POST    /provision                  controllers.Application.provision
 GET     /terminate                  controllers.Application.terminateForm

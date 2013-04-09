@@ -3,7 +3,9 @@ package models
 case class Terminate(connectionId: String, correlationId: String, replyTo: String, providerNsa: String)
     extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  def toEnvelope = inEnvelope(
+  override def toNsiV2Envelope = ???
+
+  override def toNsiV1Envelope = wrapNsiV1Envelope(
     <int:terminateRequest>
       { nsiRequestFields }
       <type:terminate>
