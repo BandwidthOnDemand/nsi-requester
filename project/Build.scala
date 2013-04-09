@@ -4,15 +4,15 @@ import play.Project._
 
 object ApplicationBuild extends Build {
 
-    val appName         = "nsi-requester"
-    val appVersion      = "1.0-SNAPSHOT"
+  val appName         = "nsi-requester"
+  val appVersion      = "1.0-SNAPSHOT"
 
-    val appDependencies = Seq(
-        "joda-time" % "joda-time" % "2.1"
-    )
+  val appDependencies = Seq(
+    "joda-time" % "joda-time" % "2.1"
+  )
 
-    val main = play.Project(appName, appVersion, appDependencies).settings(
-      // Add your own project settings here
-    )
+  val main = play.Project(appName, appVersion, appDependencies).settings(
+    scalaVersion := "2.10.1"
+  )
 
 }
