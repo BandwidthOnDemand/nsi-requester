@@ -41,13 +41,13 @@ object Application extends Controller {
     val startDate = DateTime.now.plusMinutes(5)
     val endDate = startDate.plusMinutes(10)
 
-    val defaultForm = reserveF.fill(
+    val defaultForm = reserveF.fill((
       defaultProvider,
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
         source = defaultStpUriPrefix, destination = defaultStpUriPrefix, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa
-      )
+      ))
     )
 
     Ok(views.html.reserve(defaultForm))
@@ -61,10 +61,10 @@ object Application extends Controller {
   }
 
   def provisionForm = Action { implicit request =>
-    val defaultForm = provisionF.fill(
+    val defaultForm = provisionF.fill((
       defaultProvider,
       Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
-    )
+    ))
 
     Ok(views.html.provision(defaultForm))
   }
@@ -77,10 +77,10 @@ object Application extends Controller {
   }
 
   def terminateForm = Action { implicit request =>
-    val defaultForm = terminateF.fill(
+    val defaultForm = terminateF.fill((
       defaultProvider,
       Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
-    )
+    ))
 
     Ok(views.html.terminate(defaultForm))
   }
@@ -93,10 +93,10 @@ object Application extends Controller {
   }
 
   def releaseForm = Action { implicit request =>
-    val defaultForm = releaseF.fill(
+    val defaultForm = releaseF.fill((
       defaultProvider,
       Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
-    )
+    ))
 
     Ok(views.html.release(defaultForm))
   }
@@ -109,8 +109,10 @@ object Application extends Controller {
   }
 
   def queryForm = Action { implicit request =>
-    val defaultForm = queryF.fill(
-      defaultProvider, Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+    val defaultForm = queryF.fill((
+      defaultProvider,
+      Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa)
+    ))
 
     Ok(views.html.query(defaultForm))
   }

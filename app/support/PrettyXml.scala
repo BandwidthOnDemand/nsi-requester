@@ -6,17 +6,17 @@ import scala.xml.PrettyPrinter
 
 object PrettyXml {
 
-  implicit def nodeToString(xml: Node) = new {
-    def prettify(): String = {
-      new PrettyPrinter(80, 4).format(xml)
-    }
-  }
+  implicit class nodeSeqToString(xml: NodeSeq) {
 
-  implicit def nodeSeqToString(xml: NodeSeq) = new {
-    def prettify: String = {
-      xml.foldLeft("")((a, b) => a + b.prettify)
-    }
-  }
+    val pp = new PrettyPrinter(80, 4)
 
+    def prettify: String = xml match {
+        case x: Node => pp.format(x);
+        case x: NodeSeq => xml.foldLeft("") { (str, node) =>
+          val sep = if (str.isEmpty) "" else "\n"
+          str + sep + node.prettify
+        }
+      }
+  }
 
 }
