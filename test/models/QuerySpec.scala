@@ -5,7 +5,7 @@ import org.specs2.mutable.Specification
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class QuerySpec extends Specification {
 
-  "queries" should {
+  "NSI v1 queries" should {
 
     "contain an envelope with connectionIds" in {
       val query = defaultQuery(connectionIds = List("1", "3"))
@@ -43,8 +43,49 @@ class QuerySpec extends Specification {
     }
   }
 
+  "NSI v2 queries" should {
+
+    "give a querySummary containing a connectionId" in {
+      val query = defaultQuery(connectionIds = List("abc-123"))
+      val envelope = query.toNsiV2Envelope
+
+      envelope must \\("querySummary")
+      envelope must \\("connectionId") \> "abc-123"
+      envelope must not \\("globalReservationId")
+    }
+
+   "give a querySummarySync containing a connectionId" in {
+      val query = defaultQuery(connectionIds = List("abc-123"), operation = "SummarySync")
+      val envelope = query.toNsiV2Envelope
+
+      envelope must \\("querySummarySync")
+      envelope must \\("connectionId") \> "abc-123"
+    }
+
+   "give a queryRecursive containing a connectionId" in {
+      val query = defaultQuery(connectionIds = List("abc-123"), operation = "Recursive")
+      val envelope = query.toNsiV2Envelope
+
+      envelope must \\("queryRecursive")
+      envelope must \\("connectionId") \> "abc-123"
+    }
+
+   "give an exception for a not supported NSI 2 operation" in {
+      val query = defaultQuery(operation = "Details")
+
+      query.toNsiV2Envelope must throwA[RuntimeException]("Unsupported NSI v2 query type 'Details'")
+    }
+  }
+
   object defaultQuery {
-    def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil) =
-        Query(connectionIds = connectionIds, globalReservationIds = globalReservationIds, correlationId = "corr", replyTo = "http://localhost", nsaProvider = "nsa:surfnet.nl")
+
+    def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil, operation: String = "Summary") =
+      Query(
+        connectionIds = connectionIds,
+        globalReservationIds = globalReservationIds,
+        correlationId = "corr",
+        operation = operation,
+        replyTo = "http://localhost",
+        nsaProvider = "nsa:surfnet.nl")
   }
 }

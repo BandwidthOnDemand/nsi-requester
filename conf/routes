@@ -13,7 +13,7 @@ POST    /terminate                  controllers.Application.terminate
 GET     /release                    controllers.Application.releaseForm
 POST    /release                    controllers.Application.release
 GET     /query                      controllers.Application.queryForm
-POST    /query                      controllers.Application.query
+POST    /v$version<1|2>/query       controllers.Application.query(version: Int)
 
 GET     /settings                   controllers.SettingsController.settingsForm
 POST    /settings                   controllers.SettingsController.settings

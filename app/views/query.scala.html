@@ -8,12 +8,12 @@
     <section id="formS">
         <h1>Make a NSI Query Request</h1>
         <div class="content">
-             @form(action = routes.Application.query, 'class -> "form form-horizontal") {
+             @form(action = routes.Application.query(1), 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
                 @select(
                     queryForm("query.operation"),
-                    options = options(List("Summary", "Details")),
+                    options = Seq("Summary" -> "Summary (v1 and v2)", "SummarySync" -> "SummarySync (v2 only)", "Recursive" -> "Recursive (v2 only)", "Details" -> "Details (v1 only)"),
                     '_label -> "Operation"
                 )
 
@@ -35,7 +35,9 @@
                 @fragments.providerFields(name => queryForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Query</button>
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.query(1)">NSI v1 Query</button>
+                    or
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.query(2)">NSI v2 Query</button>
                 </div>
             }
         </div>

@@ -3,9 +3,9 @@ package models
 case class Provision(connectionId: String, correlationId: String, replyTo: String, providerNsa: String)
     extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  override def toNsiV2Envelope = ???
+  override def nsiV2Body = ???
 
-  override def toNsiV1Envelope = wrapNsiV1Envelope(
+  override def nsiV1Body =
     <int:provisionRequest>
        { nsiRequestFields }
        <type:provision>
@@ -13,6 +13,5 @@ case class Provision(connectionId: String, correlationId: String, replyTo: Strin
           <connectionId>{ connectionId }</connectionId>
        </type:provision>
     </int:provisionRequest>
-  )
 
 }

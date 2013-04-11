@@ -117,10 +117,10 @@ object Application extends Controller {
     Ok(views.html.query(defaultForm))
   }
 
-  def query = Action { implicit request =>
+  def query(version: Int) = Action { implicit request =>
     queryF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case (provider, query) => sendEnvelope(provider, query) }
+      { case (provider, query) => sendEnvelope(provider, query, version) }
     )
   }
 

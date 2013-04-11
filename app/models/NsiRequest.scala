@@ -1,11 +1,11 @@
 package models
 
-import scala.xml.{Node, Elem}
+import scala.xml.Node
 
 abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: String) {
 
-  def toNsiV1Envelope: Node
-  def toNsiV2Envelope: Node
+  def nsiV1Body: Node
+  def nsiV2Body: Node
 
   def toNsiEnvelope(version: Int = 1): Node = version match {
     case 1 => toNsiV1Envelope
@@ -13,17 +13,20 @@ abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: S
     case x => sys.error(s"Non supported NSI version $x")
   }
 
-  protected def nsas = {
+  def toNsiV1Envelope: Node = wrapNsiV1Envelope(nsiV1Body)
+  def toNsiV2Envelope: Node = wrapNsiV2Envelope(nsiV2Header, nsiV2Body)
+
+  private[models] def nsas = {
     <requesterNSA>{ NsiRequest.RequesterNsa }</requesterNSA>
     <providerNSA>{ providerNsa }</providerNSA>
   }
 
-  protected def nsiRequestFields = {
+  private[models] def nsiRequestFields = {
     <int:correlationId>{ "urn:uuid:" + correlationId }</int:correlationId>
     <int:replyTo>{ replyTo }</int:replyTo>
   }
 
-  protected def nsiV2Header = {
+  private def nsiV2Header = {
     <head:nsiHeader>
       <protocolVersion>2.0</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
@@ -33,7 +36,7 @@ abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: S
     </head:nsiHeader>
   }
 
-  protected def wrapNsiV1Envelope(body: Elem) = {
+  private def wrapNsiV1Envelope(body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:type="http://schemas.ogf.org/nsi/2011/10/connection/types"
@@ -45,7 +48,7 @@ abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: S
     </soapenv:Envelope>
   }
 
-  protected def wrapNsiV2Envelope(header: Elem, body: Elem) = {
+  private def wrapNsiV2Envelope(header: Node, body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:head="http://schemas.ogf.org/nsi/2013/04/framework/headers"

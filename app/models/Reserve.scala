@@ -20,8 +20,7 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  override def toNsiV2Envelope = wrapNsiV2Envelope(
-    nsiV2Header,
+  override def nsiV2Body =
     <type:reserve>
       { globalReservationIdField }
       { descriptionField }
@@ -43,9 +42,9 @@ case class Reserve(
           </destSTP>
         </path>
       </criteria>
-    </type:reserve>)
+    </type:reserve>
 
-  override def toNsiV1Envelope = wrapNsiV1Envelope(
+  override def nsiV1Body =
     <int:reserveRequest>
       { nsiRequestFields }
       <type:reserve>
@@ -76,7 +75,6 @@ case class Reserve(
         </reservation>
       </type:reserve>
     </int:reserveRequest>
-  )
 
   private def startTimeField = startDate match {
     case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
