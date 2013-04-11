@@ -1,4 +1,4 @@
-@(requestForm: Form[(Provider, Reserve)])(implicit flash: Flash)
+@(requestForm: Form[Reserve], provider: Provider)(implicit flash: Flash)
 
 @import helper._
 @import views.helper.MyHelpers._
@@ -6,13 +6,19 @@
 @nsirequest("Make a NSI Reserve Request", "reserve") {
 
     <section id="formS">
-        <h1>Make a NSI Reserve Request</h1>
+        <h1>Make a NSI v@provider.nsiVersion Reserve Request</h1>
 
         <div class="content">
-            @form(action = routes.Application.reserve(2), 'class -> "form form-horizontal") {
+            @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
-                @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+
+                @if(provider.nsiVersion == 1) {
+                  @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                } else {
+                  <input type="hidden" name="reservation.connectionId" value="" />
+                }
+
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start")
@@ -27,15 +33,15 @@
                 @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
-                @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected path", '_showConstraints -> false)
+
+                @if(provider.nsiVersion == 1) {
+                  @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected path", '_showConstraints -> false)
+                }
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
-                @fragments.providerFields(name => requestForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.reserve(1)">NSI v1 Reserve</button>
-                    or
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.reserve(2)">NSI v2 Reserve</button>
+                    <button type="submit" class="btn btn-primary">Reserve</button>
                 </div>
             }
         </div>

@@ -1,4 +1,4 @@
-@(queryForm: Form[(Provider, Query)])(implicit flash: Flash)
+@(queryForm: Form[Query], provider: Provider)(implicit flash: Flash)
 
 @import helper._
 @import views.helper.MyHelpers._
@@ -6,16 +6,18 @@
 @nsirequest("Make a NSI Query Request", "query") {
 
     <section id="formS">
-        <h1>Make a NSI Query Request</h1>
+        <h1>Make a NSI v@provider.nsiVersion Query Request</h1>
         <div class="content">
-             @form(action = routes.Application.query(1), 'class -> "form form-horizontal") {
+             @form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
-                @select(
-                    queryForm("query.operation"),
-                    options = Seq("Summary" -> "Summary (v1 and v2)", "SummarySync" -> "SummarySync (v2 only)", "Recursive" -> "Recursive (v2 only)", "Details" -> "Details (v1 only)"),
-                    '_label -> "Operation"
-                )
+                @defining(if(provider.nsiVersion == 1) List("Summary", "Details") else List("Summary", "SummarySync", "Recursive")) { os =>
+                    @select(
+                        queryForm("query.operation"),
+                        options = options(os),
+                        '_label -> "Operation"
+                    )
+                }
 
                 <fieldset id="connectionIds" style="position: relative">
                     <a href="#" id="plus-connection" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
@@ -32,12 +34,9 @@
                 </fieldset>
 
                 @fragments.nsiCommonFields(name => queryForm("query." + name))
-                @fragments.providerFields(name => queryForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.query(1)">NSI v1 Query</button>
-                    or
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.query(2)">NSI v2 Query</button>
+                    <button type="submit" class="btn btn-primary">Query</button>
                 </div>
             }
         </div>

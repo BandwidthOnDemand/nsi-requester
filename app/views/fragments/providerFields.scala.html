@@ -14,6 +14,13 @@
         <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" required @toHtmlArgs(args)>
     }
 
+    @select(
+      formField("nsiVersion"),
+      options = Seq("1" -> "NSI version 1.0 sc", "2" -> "NSI version 2.0"),
+      '_help -> "",
+      '_label -> "NSI version",
+      'class -> "input-xlarge")
+
     @inputText(formField("username"), '_label -> "Basic Auth Username", 'class -> "input-xlarge")
 
     @input(formField("password"), '_label -> "Basic Auth Password", 'class -> "input-xlarge") { (id,name, value, args) =>

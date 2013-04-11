@@ -24,6 +24,7 @@ object SettingsController extends Controller {
           Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
             .withSession(
               "providerUrl" -> provider.providerUrl,
+              "nsiVersion" -> provider.nsiVersion.toString,
               "username" -> provider.username.getOrElse(""),
               "password" -> provider.password.getOrElse(""),
               "accessToken" -> provider.accessToken.getOrElse(""),

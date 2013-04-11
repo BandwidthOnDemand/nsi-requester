@@ -3,24 +3,24 @@
 # ~~~~
 
 # Home page
-GET    /                           controllers.Application.index
-GET    /reserve                    controllers.Application.reserveForm
-POST   /v$version<1|2>/reserve     controllers.Application.reserve(version: Int)
-GET    /provision                  controllers.Application.provisionForm
-POST   /v$version<1|2>/provision   controllers.Application.provision(version: Int)
-GET    /terminate                  controllers.Application.terminateForm
-POST   /v$version<1|2>/terminate   controllers.Application.terminate(version: Int)
-GET    /release                    controllers.Application.releaseForm
-POST   /v$version<1|2>/release     controllers.Application.release(version: Int)
-GET    /query                      controllers.Application.queryForm
-POST   /v$version<1|2>/query       controllers.Application.query(version: Int)
+GET    /                controllers.Application.index
+GET    /reserve         controllers.Application.reserveForm
+POST   /reserve         controllers.Application.reserve
+GET    /provision       controllers.Application.provisionForm
+POST   /provision       controllers.Application.provision
+GET    /terminate       controllers.Application.terminateForm
+POST   /terminate       controllers.Application.terminate
+GET    /release         controllers.Application.releaseForm
+POST   /release         controllers.Application.release
+GET    /query           controllers.Application.queryForm
+POST   /query           controllers.Application.query
 
-GET    /settings                   controllers.SettingsController.settingsForm
-POST   /settings                   controllers.SettingsController.settings
-GET    /resetsettings              controllers.SettingsController.resetSettings
+GET    /settings        controllers.SettingsController.settingsForm
+POST   /settings        controllers.SettingsController.settings
+GET    /resetsettings   controllers.SettingsController.resetSettings
 
-GET    /comet/:id                  controllers.ResponseController.comet(id)
-POST   /reply                      controllers.ResponseController.reply
+GET    /comet/:id       controllers.ResponseController.comet(id)
+POST   /reply           controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path
-GET    /assets/*file               controllers.Assets.at(path="/public", file)
+GET    /assets/*file    controllers.Assets.at(path="/public", file)

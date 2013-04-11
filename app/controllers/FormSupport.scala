@@ -36,6 +36,7 @@ object FormSupport {
 
   val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> nonEmptyText,
+    "nsiVersion" -> number,
     "username" -> optional(text),
     "password" -> optional(text),
     "accessToken" -> optional(text)

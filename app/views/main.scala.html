@@ -3,13 +3,15 @@
 @import play.api.Play
 @import play.api.Mode
 
-@menuItems = @{List(
+@menuItems = @{
+  List(
     ("reserve", routes.Application.reserveForm),
     ("provision", routes.Application.provisionForm),
     ("release", routes.Application.releaseForm),
     ("terminate", routes.Application.terminateForm),
     ("query", routes.Application.queryForm)
-)}
+  )
+}
 
 <!DOCTYPE html>
 <html>

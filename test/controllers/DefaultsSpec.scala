@@ -23,7 +23,8 @@ class DefaultsSpec extends Specification {
 
       val provider = Defaults.defaultProvider(FakeRequest())
 
-      provider.providerUrl must beEqualTo("https://bod.surfnet.nl/nsi/v1_sc/provider")
+      provider.providerUrl must equalTo("https://bod.surfnet.nl/nsi/v1_sc/provider")
+      provider.nsiVersion must equalTo(2)
       provider.accessToken must beNone
       provider.password must beNone
       provider.username must beNone
@@ -35,13 +36,13 @@ class DefaultsSpec extends Specification {
     "be filled without a session" in {
       val providerNsa = Defaults.defaultProviderNsa(FakeRequest())
 
-      providerNsa must beEqualTo("urn:ogf:network:nsa:surfnet.nl")
+      providerNsa must equalTo("urn:ogf:network:nsa:surfnet.nl")
     }
 
     "be filled from the session" in new WithApplication {
       val providerNsa = Defaults.defaultProviderNsa(FakeRequest().withSession("providerNsa" -> "urn:ogf:network:nsa:some-network"))
 
-      providerNsa must beEqualTo("urn:ogf:network:nsa:some-network")
+      providerNsa must equalTo("urn:ogf:network:nsa:some-network")
     }
   }
 }

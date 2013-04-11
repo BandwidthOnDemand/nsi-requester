@@ -6,22 +6,24 @@ import play.api.mvc.AnyContent
 
 object Defaults {
 
-  val defaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
+  val DefaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
 
-  private val defaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
-  private val defaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
+  private val DefaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
+  private val DefaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
+  private val DefaultNsiVersion = 2
 
   def defaultProvider(implicit request: Request[AnyContent]) = {
-    val url = request.session.get("providerUrl").getOrElse(defaultProviderUrl)
+    val url = request.session.get("providerUrl").getOrElse(DefaultProviderUrl)
+    val nsiVersion = request.session.get("nsiVersion").map(_.toInt).getOrElse(DefaultNsiVersion)
     val user = request.session.get("username")
     val pass = request.session.get("password")
     val token = request.session.get("accessToken")
 
-    Provider(url, user, pass, token)
+    Provider(url, nsiVersion, user, pass, token)
   }
 
   def defaultProviderNsa(implicit request: Request[AnyContent]) =
-    request.session.get("providerNsa").getOrElse(defaultProviderNsaUri)
+    request.session.get("providerNsa").getOrElse(DefaultProviderNsaUri)
 
   def defaultReplyToUrl(implicit request: Request[AnyContent]) =
     request.session.get("replyTo").getOrElse("http://" + request.host + routes.ResponseController.reply)

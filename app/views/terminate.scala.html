@@ -1,4 +1,4 @@
-@(terminateForm: Form[(Provider, Terminate)])(implicit flash: Flash)
+@(terminateForm: Form[Terminate], provider: Provider)(implicit flash: Flash)
 
 @import helper._
 @import views.helper.MyHelpers._
@@ -6,21 +6,18 @@
 @nsirequest("Make a NSI Terminate Request", "terminate") {
 
     <section id="formS">
-        <h1>Make a NSI Terminate Request</h1>
+        <h1>Make a NSI v@provider.nsiVersion Terminate Request</h1>
         <div class="content">
-             @form(action = routes.Application.terminate(2), 'class -> "form form-horizontal") {
+             @form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Terminate attributes</h3></div>
 
                 @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => terminateForm("terminate." + name))
-                @fragments.providerFields(name => terminateForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.terminate(1)">NSI v1 Terminate</button>
-                    or
-                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.terminate(2)">NSI v2 Terminate</button>
+                    <button type="submit" class="btn btn-primary">Terminate</button>
                 </div>
             }
         </div>

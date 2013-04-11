@@ -16,6 +16,7 @@ class SettingsControllerSpec extends Specification {
 
     val basicSettings = Seq(
       "provider.providerUrl" -> "http://someurl.nl",
+      "provider.nsiVersion" -> "2",
       "nsi.replyTo" -> "http://localhost:9000/reply",
       "nsi.providerNsa" -> "urn:ogf:network:nsa:surfnet.nl"
     )
@@ -23,6 +24,8 @@ class SettingsControllerSpec extends Specification {
     "store stettings in the session" in new WithApplication {
 
       val result = SettingsController.settings()(FakeRequest().withFormUrlEncodedBody(basicSettings: _*))
+
+      status(result) must equalTo(303)
 
       session(result).get("providerUrl") must beSome("http://someurl.nl")
       session(result).get("replyTo") must beSome("http://localhost:9000/reply")
@@ -65,6 +68,7 @@ class SettingsControllerSpec extends Specification {
 
       val result = SettingsController.resetSettings()(FakeRequest().withSession(initialSessionData: _*))
 
+      session(result).get("nsiVersion") must beNone
       session(result).get("username") must beNone
       session(result).get("password") must beNone
       session(result).get("replyTo") must beNone
@@ -77,8 +81,9 @@ class SettingsControllerSpec extends Specification {
 
     "contain the password when set in session" in new WithApplication {
       val settingsForm = SettingsController.settingsF.fill(
-          Provider("http://localhost", Some("John"), Some("secret"), None), ("http://localhost/reply", "urn:ogf:network:nsa:surnfet.nl")
+        (Provider("http://localhost", 2, Some("John"), Some("secret"), None), ("http://localhost/reply", "urn:ogf:network:nsa:surnfet.nl"))
       )
+
       val result = views.html.settings(settingsForm)(Flash())
 
       contentAsString(result) must contain("""name="provider.username" value="John"""")
