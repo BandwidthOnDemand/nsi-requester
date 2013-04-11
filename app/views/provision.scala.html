@@ -8,7 +8,7 @@
     <section id="formS">
         <h1>Make a NSI Provision Request</h1>
         <div class="content">
-             @form(action = routes.Application.provision, 'class -> "form form-horizontal") {
+            @form(action = routes.Application.provision(2), 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Provision attributes</h3></div>
                 @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
@@ -17,7 +17,9 @@
                 @fragments.providerFields(name => provisionForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Provision</button>
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.provision(1)">NSI v1 Provision</button>
+                    or
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.provision(2)">NSI v2 Provision</button>
                 </div>
             }
         </div>

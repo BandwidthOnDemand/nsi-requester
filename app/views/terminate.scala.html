@@ -8,7 +8,7 @@
     <section id="formS">
         <h1>Make a NSI Terminate Request</h1>
         <div class="content">
-             @form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
+             @form(action = routes.Application.terminate(2), 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Terminate attributes</h3></div>
 
@@ -18,7 +18,9 @@
                 @fragments.providerFields(name => terminateForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Terminate</button>
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.terminate(1)">NSI v1 Terminate</button>
+                    or
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.terminate(2)">NSI v2 Terminate</button>
                 </div>
             }
         </div>

@@ -8,7 +8,7 @@ class QuerySpec extends Specification {
   "NSI v1 queries" should {
 
     "contain an envelope with connectionIds" in {
-      val query = defaultQuery(connectionIds = List("1", "3"))
+      val query = DefaultQuery(connectionIds = List("1", "3"))
       val envelope = query.toNsiV1Envelope
 
       envelope must \\("connectionId") \> "1"
@@ -17,7 +17,7 @@ class QuerySpec extends Specification {
     }
 
     "contain an envelope with glogalIds" in {
-      val query = defaultQuery(globalReservationIds = List("1", "2"))
+      val query = DefaultQuery(globalReservationIds = List("1", "2"))
       val envelope = query.toNsiV1Envelope
 
       envelope must \\("globalReservationId") \> "1"
@@ -26,7 +26,7 @@ class QuerySpec extends Specification {
     }
 
     "contain an envelope with both globalReservationIds and ConnecionIds" in {
-      val query = defaultQuery(connectionIds = List("5", "9"), globalReservationIds = List("1", "2"))
+      val query = DefaultQuery(connectionIds = List("5", "9"), globalReservationIds = List("1", "2"))
       val envelope = query.toNsiV1Envelope
 
       envelope must \\("globalReservationId") \> "2"
@@ -34,7 +34,7 @@ class QuerySpec extends Specification {
     }
 
     "doen't contain any filter" in {
-      val query = defaultQuery(connectionIds = Nil, globalReservationIds = Nil)
+      val query = DefaultQuery(connectionIds = Nil, globalReservationIds = Nil)
       val envelope = query.toNsiV1Envelope
 
       envelope must \\("queryFilter")
@@ -46,7 +46,7 @@ class QuerySpec extends Specification {
   "NSI v2 queries" should {
 
     "give a querySummary containing a connectionId" in {
-      val query = defaultQuery(connectionIds = List("abc-123"))
+      val query = DefaultQuery(connectionIds = List("abc-123"))
       val envelope = query.toNsiV2Envelope
 
       envelope must \\("querySummary")
@@ -55,7 +55,7 @@ class QuerySpec extends Specification {
     }
 
    "give a querySummarySync containing a connectionId" in {
-      val query = defaultQuery(connectionIds = List("abc-123"), operation = "SummarySync")
+      val query = DefaultQuery(connectionIds = List("abc-123"), operation = "SummarySync")
       val envelope = query.toNsiV2Envelope
 
       envelope must \\("querySummarySync")
@@ -63,7 +63,7 @@ class QuerySpec extends Specification {
     }
 
    "give a queryRecursive containing a connectionId" in {
-      val query = defaultQuery(connectionIds = List("abc-123"), operation = "Recursive")
+      val query = DefaultQuery(connectionIds = List("abc-123"), operation = "Recursive")
       val envelope = query.toNsiV2Envelope
 
       envelope must \\("queryRecursive")
@@ -71,13 +71,13 @@ class QuerySpec extends Specification {
     }
 
    "give an exception for a not supported NSI 2 operation" in {
-      val query = defaultQuery(operation = "Details")
+      val query = DefaultQuery(operation = "Details")
 
       query.toNsiV2Envelope must throwA[RuntimeException]("Unsupported NSI v2 query type 'Details'")
     }
   }
 
-  object defaultQuery {
+  object DefaultQuery {
 
     def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil, operation: String = "Summary") =
       Query(

@@ -69,10 +69,10 @@ object Application extends Controller {
     Ok(views.html.provision(defaultForm))
   }
 
-  def provision = Action { implicit request =>
+  def provision(version: Int) = Action { implicit request =>
     provisionF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case (provider, provision) => sendEnvelope(provider, provision) }
+      { case (provider, provision) => sendEnvelope(provider, provision, version) }
     )
   }
 
@@ -85,10 +85,10 @@ object Application extends Controller {
     Ok(views.html.terminate(defaultForm))
   }
 
-  def terminate = Action { implicit request =>
+  def terminate(version: Int) = Action { implicit request =>
     terminateF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case(provider, terminate) => sendEnvelope(provider, terminate) }
+      { case(provider, terminate) => sendEnvelope(provider, terminate, version) }
     )
   }
 
@@ -101,10 +101,10 @@ object Application extends Controller {
     Ok(views.html.release(defaultForm))
   }
 
-  def release = Action { implicit request =>
+  def release(version: Int) = Action { implicit request =>
     releaseF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case(provider, release) => sendEnvelope(provider, release) }
+      { case(provider, release) => sendEnvelope(provider, release, version) }
     )
   }
 

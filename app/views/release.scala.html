@@ -8,7 +8,7 @@
     <section id="formS">
         <h1>Make a NSI Release Request</h1>
         <div class="content">
-             @form(action = routes.Application.release, 'class -> "form form-horizontal") {
+             @form(action = routes.Application.release(2), 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Release attributes</h3></div>
                 @inputText(releaseForm("release.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
@@ -17,7 +17,9 @@
                 @fragments.providerFields(name => releaseForm("provider." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Release</button>
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.release(1)">NSI v1 Release</button>
+                    or
+                    <button type="submit" class="btn btn-primary" data-location="@routes.Application.release(2)">NSI v2 Release</button>
                 </div>
             }
         </div>
