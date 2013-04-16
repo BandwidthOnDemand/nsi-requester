@@ -21,7 +21,7 @@ object FormSupport {
 
   implicit def periodFormat: Formatter[Period] = new Formatter[Period] {
 
-    override val format = Some(("Period ('days:hours:minuts')", Nil))
+    override val format = Some(("Period ('days:hours:minutes')", Nil))
 
     def bind(key: String, data: Map[String, String]) = {
       stringFormat.bind(key, data).right.flatMap { s =>
