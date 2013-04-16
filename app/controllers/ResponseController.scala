@@ -10,7 +10,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import views.html.defaultpages.badRequest
 import org.joda.time.DateTime
 import scala.concurrent.stm.TMap
-import support.JsonResponse.toJson
+import support.JsonResponse
 import scala.xml.NodeSeq
 
 object ResponseController extends Controller {
@@ -23,7 +23,7 @@ object ResponseController extends Controller {
     val correlationId = parseCorrelationId(request.body)
 
     correlationId.foreach { id =>
-      channels.get(id).map(_.push(stringify(toJson(request.body, DateTime.now()))))
+      channels.get(id).map(_.push(stringify(JsonResponse.response(request.body, DateTime.now()))))
     }
 
     correlationId.fold(BadRequest)(_ => Ok)

@@ -11,22 +11,23 @@ import java.util.UUID
 
 object JsonResponse {
 
-  def toJson(request: NodeSeq, requestTime: DateTime, response: NodeSeq, responseTime: DateTime): JsObject =
+  def success(request: NodeSeq, requestTime: DateTime, response: NodeSeq, responseTime: DateTime): JsObject =
     Json.obj(
       "request" -> jsonObject(request.prettify, requestTime),
       "response" -> jsonObject(response.prettify, responseTime)
     )
 
-  def toJson(response: NodeSeq, time: DateTime): JsObject = {
-    val data = response.prettify
+  def failure(request: NodeSeq, requestTime: DateTime, message: String): JsObject =
+    Json.obj(
+      "request" -> jsonObject(request.prettify, requestTime),
+      "message" -> message)
 
-    Json.obj("response" -> jsonObject(data, time))
-  }
+  def response(response: NodeSeq, time: DateTime): JsObject =
+    Json.obj("response" -> jsonObject(response.prettify, time))
 
-  private def jsonObject(data: String, time: DateTime): JsValue = {
+  private def jsonObject(data: String, time: DateTime): JsValue =
     Json.obj(
       "xml" -> data,
       "time" -> time.toString("HH:mm:ss,SSS")
     )
-  }
 }

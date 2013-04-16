@@ -37,19 +37,20 @@ $(function() {
       form.submit(function(event) {
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          hideQueryForm(correlationId);
+         clearResponses();
 
          $.ajax({
             data: $(event.target).serialize(),
             type: 'POST',
             url: event.target.action,
             success: function(data) {
-               addXmlBlock("Request", data.request.xml, data.request.time)
+               addXmlBlock("Request", data.request.xml, data.request.time);
                addXmlBlock("Response", data.response.xml, data.response.time);
             },
             error: function(err) {
                showQueryForm();
                $('.control-group').removeClass('error');
-               if (err.status === 400) {
+               if (err.status === 400) { // BadRequest
                   var response = JSON.parse(err.responseText);
 
                   $.each(response, function(index, value) {
@@ -57,6 +58,9 @@ $(function() {
                   })
                   if (response.message) {
                      addErrorMessage(response.message);
+
+                     responseS.css("display", "block");
+                     addXmlBlock("Failed request", response.request.xml, response.request.time);
                   }
                } else {
                   addErrorMessage('Error occurred ' + err.status + ', ' + err.statusText);
@@ -72,7 +76,7 @@ $(function() {
       }
 
       function addXmlBlock(name, xml, time) {
-         var xmlBlock = xmlTemplate.clone().removeClass('template');
+         var xmlBlock = xmlTemplate.clone().removeClass('template').removeAttr("id");
          xmlBlock.find("h3").text(name)
          xmlBlock.find(".prettyprint").text(xml);
          xmlBlock.prependTo(responseContent);
@@ -91,6 +95,10 @@ $(function() {
          $('iframe').remove();
          queryS.css("display", "block");
          responseS.css("display", "none");
+      }
+
+      function clearResponses() {
+          responseS.find('div.xml-content').remove();
       }
 
       function increaseResponses() {

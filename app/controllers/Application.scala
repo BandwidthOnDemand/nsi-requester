@@ -167,10 +167,11 @@ object Application extends Controller {
 
     wsRequest.post(soapRequest).map(response => {
       if (response.status == 200 && response.header(CONTENT_TYPE).map(_.contains(MimeTypes.XML)).getOrElse(false)) {
-        val jsonResponse = JsonResponse.toJson(soapRequest, requestTime, response.xml, DateTime.now())
+        val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {
-        BadRequest(Json.obj("message" -> s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"))
+        val jsonResponse = JsonResponse.failure(soapRequest, requestTime, s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}")
+        BadRequest(jsonResponse)
       }
     }).recover {
       case e => BadRequest(Json.obj("message" -> e.getMessage()))
