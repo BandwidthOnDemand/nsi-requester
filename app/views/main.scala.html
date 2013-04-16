@@ -1,15 +1,17 @@
-@(title: String, activeMenu: String)(content: Html)(implicit flash: Flash)
+@(title: String, activeMenu: String, nsiVersion: Int)(content: Html)(implicit flash: Flash)
 
 @import play.api.Play
 @import play.api.Mode
 
 @menuItems = @{
   List(
-    ("reserve", routes.Application.reserveForm),
-    ("provision", routes.Application.provisionForm),
-    ("release", routes.Application.releaseForm),
-    ("terminate", routes.Application.terminateForm),
-    ("query", routes.Application.queryForm)
+    ("reserve", routes.Application.reserveForm, Seq(1, 2)),
+    ("reserveCommit", routes.Application.reserveCommitForm, Seq(2)),
+    ("reserveAbort", routes.Application.reserveAbortForm, Seq(2)),
+    ("provision", routes.Application.provisionForm, Seq(1, 2)),
+    ("release", routes.Application.releaseForm, Seq(1, 2)),
+    ("terminate", routes.Application.terminateForm, Seq(1, 2)),
+    ("query", routes.Application.queryForm, Seq(1, 2))
   )
 }
 
@@ -34,11 +36,12 @@
                     <div class="container">
                         <ul class="nav">
                             @menuItems.map {
-                                case (menu, href) => {
+                                case (menu, href, versions) if versions contains nsiVersion => {
                                     <li @if(activeMenu == menu) {class="active"}>
                                         <a href="@href">@menu.capitalize</a>
                                     </li>
                                 }
+                                case _ => { }
                             }
                             @if(activeMenu == "response") {
                                 <li class="active"><a href="#">Response</a></li>

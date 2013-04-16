@@ -3,7 +3,7 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest("Make a NSI Terminate Request", "terminate") {
+@nsirequest(s"Make a NSI v${provider.nsiVersion} Terminate Request", "terminate", provider.nsiVersion) {
 
     <section id="formS">
         <h1>Make a NSI v@provider.nsiVersion Terminate Request</h1>

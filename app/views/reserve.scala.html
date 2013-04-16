@@ -3,7 +3,7 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest("Make a NSI Reserve Request", "reserve") {
+@nsirequest(s"Make a NSI v${provider.nsiVersion} Reserve Request", "reserve", provider.nsiVersion) {
 
     <section id="formS">
         <h1>Make a NSI v@provider.nsiVersion Reserve Request</h1>

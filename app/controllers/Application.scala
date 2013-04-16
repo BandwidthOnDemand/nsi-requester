@@ -59,6 +59,36 @@ object Application extends Controller {
     )
   }
 
+  def reserveCommitForm = Action { implicit request =>
+    val defaultForm = reserveCommitF.fill(
+      ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+    )
+
+    Ok(views.html.reserveCommit(defaultForm, defaultProvider))
+  }
+
+  def reserveCommit = Action { implicit request =>
+    reserveCommitF.bindFromRequest.fold(
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
+      { case reserveCommit => sendEnvelope(defaultProvider, reserveCommit) }
+    )
+  }
+
+  def reserveAbortForm = Action { implicit request =>
+    val defaultForm = reserveAbortF.fill(
+      ReserveAbort(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+    )
+
+    Ok(views.html.reserveAbort(defaultForm, defaultProvider))
+  }
+
+  def reserveAbort = Action { implicit request =>
+    reserveAbortF.bindFromRequest.fold(
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
+      { case reserveAbort => sendEnvelope(defaultProvider, reserveAbort) }
+    )
+  }
+
   def provisionForm = Action { implicit request =>
     val defaultForm = provisionF.fill(
       Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
@@ -180,29 +210,33 @@ object Application extends Controller {
       "unprotected" -> boolean
     ) { Reserve.apply } { Reserve.unapply })
 
+  private val reserveAbortF: Form[ReserveAbort] = Form(
+    "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply)
+  )
+
+  private val reserveCommitF: Form[ReserveCommit] = Form(
+    "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply)
+  )
+
   private val provisionF: Form[Provision] = Form(
-    "provision" -> mapping(
-      "connectionId" -> nonEmptyText,
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText
-    ) { Provision.apply } { Provision.unapply })
+    "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply)
+  )
 
   private val terminateF: Form[Terminate] = Form(
-    "terminate" -> mapping(
-      "connectionId" -> nonEmptyText,
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText
-    ) { Terminate.apply } { Terminate.unapply })
+    "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply)
+  )
 
   private val releaseF: Form[Release] = Form(
-    "release" -> mapping(
+    "release" -> genericOperationMapping(Release.apply)(Release.unapply)
+  )
+
+  private def genericOperationMapping[R](apply: Function4[String, String, String, String, R])(unapply: Function1[R, Option[(String, String, String, String)]]) =
+    mapping(
       "connectionId" -> nonEmptyText,
       "correlationId" -> nonEmptyText,
       "replyTo" -> nonEmptyText,
       "providerNsa" -> nonEmptyText
-    ) { Release.apply } { Release.unapply })
+    )(apply)(unapply)
 
   private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
 

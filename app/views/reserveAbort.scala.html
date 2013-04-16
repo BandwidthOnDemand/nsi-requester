@@ -1,0 +1,24 @@
+@(reserveAbortForm: Form[ReserveAbort], provider: Provider)(implicit flash: Flash)
+
+@import helper._
+@import views.helper.MyHelpers._
+
+@nsirequest(s"Make a NSI v${provider.nsiVersion} ReserveAbort Request", "reserveAbort", provider.nsiVersion) {
+
+    <section id="formS">
+        <h1>Make a NSI v@provider.nsiVersion ReserveAbort Request</h1>
+        <div class="content">
+             @form(action = routes.Application.reserveAbort, 'class -> "form form-horizontal") {
+
+                <div class="message"><h3>ReserveAbort attributes</h3></div>
+                @inputText(reserveAbortForm("reserveAbort.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+
+                @fragments.nsiCommonFields(name => reserveAbortForm("reserveAbort." + name))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">ReserveAbort</button>
+                </div>
+            }
+        </div>
+    </section>
+}

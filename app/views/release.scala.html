@@ -3,7 +3,7 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest("Make a NSI Release Request", "release") {
+@nsirequest(s"Make a NSI v${provider.nsiVersion} Release Request", "release", provider.nsiVersion) {
 
     <section id="formS">
         <h1>Make a NSI v@provider.nsiVersion Release Request</h1>

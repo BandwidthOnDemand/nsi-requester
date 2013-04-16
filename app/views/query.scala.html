@@ -3,7 +3,7 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest("Make a NSI Query Request", "query") {
+@nsirequest(s"Make a NSI v${provider.nsiVersion} Query Request", "query", provider.nsiVersion) {
 
     <section id="formS">
         <h1>Make a NSI v@provider.nsiVersion Query Request</h1>
