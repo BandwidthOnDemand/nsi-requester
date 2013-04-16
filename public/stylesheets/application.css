@@ -49,6 +49,19 @@ a i[class^="icon-"] {
   float: right;
   margin-right: -25px;
 }
+#valid-indicator {
+  background-color: #FFBABA;
+  color: #D8000C;
+  border: 1px solid #D8000C;
+  margin: 0 10px 10px 10px;
+  padding: 5px;
+  text-align: center;
+}
+#valid-indicator.valid {
+  background-color: #DFF2BF;
+  color: #4F8A10;
+  border: 1px solid #4F8A10;
+}
 iframe {
   display: none;
 }

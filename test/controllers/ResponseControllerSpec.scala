@@ -18,7 +18,7 @@ class ResponseControllerSpec extends Specification {
           <correlationId>{ "urn:uuid:1234" }</correlationId>
         </header>
 
-      val result = ResponseController.reply()(FakeRequest("POST", "/", FakeHeaders(), body = body))
+      val result = ResponseController.reply()(FakeXmlRequest(body))
 
       status(result) must equalTo(200)
     }
@@ -29,7 +29,7 @@ class ResponseControllerSpec extends Specification {
           <noCorrelationId/>
         </header>
 
-      val result = ResponseController.reply()(FakeRequest("POST", "/", FakeHeaders(), body = body))
+      val result = ResponseController.reply()(FakeXmlRequest(body))
 
       status(result) must equalTo(400)
     }
@@ -40,10 +40,15 @@ class ResponseControllerSpec extends Specification {
           <correlationId>{ "123-abc" }</correlationId>
         </header>
 
-      val result = ResponseController.reply()(FakeRequest("POST", "/", FakeHeaders(), body = body))
+      val result = ResponseController.reply()(FakeXmlRequest(body))
 
       status(result) must equalTo(400)
     }
+  }
+
+  object FakeXmlRequest {
+    def apply(body: scala.xml.Elem): FakeRequest[scala.xml.Elem] =
+      FakeRequest("POST", "/", FakeHeaders(), body)
   }
 
 }

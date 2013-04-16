@@ -3,28 +3,29 @@
 # ~~~~
 
 # Home page
-GET    /                controllers.Application.index
-GET    /reserve         controllers.Application.reserveForm
-POST   /reserve         controllers.Application.reserve
-GET    /reserveCommit   controllers.Application.reserveCommitForm
-POST   /reserveCommit   controllers.Application.reserveCommit
-GET    /reserveAbort    controllers.Application.reserveAbortForm
-POST   /reserveAbort    controllers.Application.reserveAbort
-GET    /provision       controllers.Application.provisionForm
-POST   /provision       controllers.Application.provision
-GET    /terminate       controllers.Application.terminateForm
-POST   /terminate       controllers.Application.terminate
-GET    /release         controllers.Application.releaseForm
-POST   /release         controllers.Application.release
-GET    /query           controllers.Application.queryForm
-POST   /query           controllers.Application.query
+GET    /                   controllers.Application.index
+GET    /reserve            controllers.Application.reserveForm
+POST   /reserve            controllers.Application.reserve
+GET    /reserveCommit      controllers.Application.reserveCommitForm
+POST   /reserveCommit      controllers.Application.reserveCommit
+GET    /reserveAbort       controllers.Application.reserveAbortForm
+POST   /reserveAbort       controllers.Application.reserveAbort
+GET    /provision          controllers.Application.provisionForm
+POST   /provision          controllers.Application.provision
+GET    /terminate          controllers.Application.terminateForm
+POST   /terminate          controllers.Application.terminate
+GET    /release            controllers.Application.releaseForm
+POST   /release            controllers.Application.release
+GET    /query              controllers.Application.queryForm
+POST   /query              controllers.Application.query
+POST   /validateProvider   controllers.Application.validateProvider
 
-GET    /settings        controllers.SettingsController.settingsForm
-POST   /settings        controllers.SettingsController.settings
-GET    /resetsettings   controllers.SettingsController.resetSettings
+GET    /settings           controllers.SettingsController.settingsForm
+POST   /settings           controllers.SettingsController.settings
+GET    /resetsettings      controllers.SettingsController.resetSettings
 
-GET    /comet/:id       controllers.ResponseController.comet(id)
-POST   /reply           controllers.ResponseController.reply
+GET    /comet/:id          controllers.ResponseController.comet(id)
+POST   /reply              controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path
-GET    /assets/*file    controllers.Assets.at(path="/public", file)
+GET    /assets/*file       controllers.Assets.at(path="/public", file)

@@ -108,7 +108,60 @@ $(function() {
 
    }
 
+   var initValidateProviderUrl = function() {
+      var providerInput = $("#providerUrl");
+
+      if (!providerInput.length) return;
+
+      var validIndicator = $("#valid-indicator"),
+          usernameInput = $("#provider_username"),
+          passwordInput = $("#provider_password"),
+          nsiVersionInput = $("#provider_nsiVersion"),
+          tokenInput = $("#provider_accessToken");
+
+      providerInput.closest('fieldset').find('input').on('change', function(event) {
+          validateProviderUrl();
+      });
+
+      function validateProviderUrl(providerUrl) {
+          var data = {
+              url: providerInput.val(),
+              username: usernameInput.val(),
+              password: passwordInput.val(),
+              token: tokenInput.val()
+          };
+
+          $.ajax({
+              url: providerInput.attr("data-validate"),
+              type: 'POST',
+              data: JSON.stringify(data),
+              dataType: 'json',
+              contentType: 'application/json; charset=utf-8',
+              success: function(data) {
+                  validProviderUrl(data);
+              },
+              error: function(err) {
+                  validProviderUrl(false, err.status);
+              }
+          })
+      }
+
+      function validProviderUrl(data) {
+          if (data.valid) {
+              nsiVersionInput.find('option[value="'+data.version+'"]').prop("selected", true);
+              validIndicator.addClass("valid");
+              validIndicator.text("Provider is valid, NSI version " + data.version + " detected");
+          } else {
+              validIndicator.removeClass("valid");
+              validIndicator.text("Could not verify the provider, " + data.message);
+          }
+      }
+
+      validateProviderUrl(providerInput.val());
+   }
+
    initExtraFields();
-   initNsiRequestSubmit()
+   initNsiRequestSubmit();
+   initValidateProviderUrl();
 
 })
