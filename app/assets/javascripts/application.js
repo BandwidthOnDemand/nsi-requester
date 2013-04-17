@@ -124,6 +124,8 @@ $(function() {
       });
 
       function validateProviderUrl(providerUrl) {
+          providerUrlChecking();
+
           var data = {
               url: providerInput.val(),
               username: usernameInput.val(),
@@ -144,6 +146,10 @@ $(function() {
                   validProviderUrl(false, err.status);
               }
           })
+      }
+
+      function providerUrlChecking() {
+          validIndicator.text("Checking.....");
       }
 
       function validProviderUrl(data) {
