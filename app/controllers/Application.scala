@@ -130,29 +130,25 @@ object Application extends Controller {
 
   def validateProvider = Action(parse.json) { implicit request =>
 
-    def containsNsi2Schema(body: String) = body.contains("http://schemas.ogf.org/nsi/2013/04/connection/provider")
+    def containsNsi2Schema(body: String) = body.contains(NsiRequest.NsiV2ProviderNamespace)
 
     val wsdlValid =
       for {
         url <- (request.body \ "url").asOpt[String] if !url.isEmpty()
-      } yield {
-        Async {
-          var wsdlRequest = WS.url(s"$url?wsdl")
-          (request.body \ "username").asOpt[String].filterNot(_.isEmpty).foreach { u =>
-            val password = (request.body \ "password").asOpt[String].getOrElse("")
-            wsdlRequest = wsdlRequest.withAuth(u, password, AuthScheme.BASIC)
-          }
-          (request.body \ "token").asOpt[String].filterNot(_.isEmpty).foreach { t =>
-            wsdlRequest = wsdlRequest.withHeaders("Authorization" -> s"bearer $t")
-          }
+      } yield Async {
+        val authenticated = addAuthentication(
+          (request.body \ "username").asOpt[String],
+          (request.body \ "password").asOpt[String],
+          (request.body \ "token").asOpt[String])
 
-          wsdlRequest.get.map { wsdlResponse =>
-            if (wsdlResponse.status == 200) {
-              val version = if (containsNsi2Schema(wsdlResponse.body)) 2 else 1
-              Ok(Json.obj("valid" -> true, "version" -> version))
-            } else
-              Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
-          }
+        val wsdlRequest = authenticated(WS.url(s"$url?wsdl"))
+
+        wsdlRequest.get.map { wsdlResponse =>
+          if (wsdlResponse.status == 200) {
+            val version = if (containsNsi2Schema(wsdlResponse.body)) 2 else 1
+            Ok(Json.obj("valid" -> true, "version" -> version))
+          } else
+            Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
         }
       }
 
@@ -160,33 +156,33 @@ object Application extends Controller {
   }
 
   private def sendEnvelope(provider: Provider, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]) = Async {
-
-    val wsRequest = {
-      val request = WS.url(provider.providerUrl).withFollowRedirects(false)
-
-      if (provider.username.isDefined)
-        request.withAuth(provider.username.get, provider.password.getOrElse(""), AuthScheme.BASIC)
-      else if (provider.accessToken.isDefined)
-        request.withHeaders("Authorization" -> s"bearer ${provider.accessToken.get}")
-      else
-        request
-    }
-
     val soapRequest = nsiRequest.toNsiEnvelope(provider.nsiVersion)
     val requestTime = DateTime.now()
 
-    wsRequest.post(soapRequest).map(response => {
-      if (response.status == 200 && response.header(CONTENT_TYPE).map(_.contains(MimeTypes.XML)).getOrElse(false)) {
+    val authenticated = addAuthentication(provider.username, provider.password, provider.accessToken)
+    val wsRequest = authenticated(WS.url(provider.providerUrl).withFollowRedirects(false))
+
+    wsRequest.post(soapRequest).map { response =>
+      if (response.status == 200 && response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {
-        val jsonResponse = JsonResponse.failure(soapRequest, requestTime, s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}")
-        BadRequest(jsonResponse)
+        val message = s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"
+        BadRequest(JsonResponse.failure(soapRequest, requestTime, message))
       }
-    }).recover {
+    }.recover {
       case e => BadRequest(Json.obj("message" -> e.getMessage()))
     }
   }
+
+  private[controllers] def addAuthentication(username: Option[String], password: Option[String], token: Option[String]): WS.WSRequestHolder => WS.WSRequestHolder =
+    addBasicAuth(username, password) _ andThen addOAuthToken(token) _
+
+  private def addOAuthToken(token: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
+    token.filterNot(_.isEmpty).fold(request)(t => request.withHeaders("Authorization" -> s"bearer $t"))
+
+  private def addBasicAuth(username: Option[String], password: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
+    username.filterNot(_.isEmpty).fold(request)(u => request.withAuth(u, password.getOrElse(""), AuthScheme.BASIC))
 
   private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId
