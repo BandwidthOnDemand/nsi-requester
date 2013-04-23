@@ -163,7 +163,7 @@ object Application extends Controller {
     val wsRequest = authenticated(WS.url(provider.providerUrl).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
-      if (response.status == 200 && response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
+      if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {
