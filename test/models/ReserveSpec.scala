@@ -68,6 +68,13 @@ class ReserveSpec extends Specification {
       res.toNsiV2Envelope must \\("sourceSTP") \("networkId") \> "urn:ogf:network:stp:surfnet.nl"
       res.toNsiV2Envelope must \\("sourceSTP") \("localId") \> "22"
     }
+
+    "have a source and destination STP id" in {
+      val res = DefaultReservation().copy(source = "source:port", destination = "destination:port")
+
+      res.toNsiV2Envelope must \\("sourceSTP") \("networkId") \> "source"
+      res.toNsiV2Envelope must \\("destSTP") \("networkId") \> "destination"
+    }
   }
 
   object DefaultReservation {

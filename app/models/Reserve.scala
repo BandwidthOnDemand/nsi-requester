@@ -37,8 +37,8 @@ case class Reserve(
             <localId>{ source.split(':').last }</localId>
           </sourceSTP>
           <destSTP>
-            <networkId>{ source.split(':').init.mkString(":") }</networkId>
-            <localId>{ source.split(':').last }</localId>
+            <networkId>{ destination.split(':').init.mkString(":") }</networkId>
+            <localId>{ destination.split(':').last }</localId>
           </destSTP>
         </path>
       </criteria>
