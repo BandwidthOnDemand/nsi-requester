@@ -30,6 +30,7 @@ case class Reserve(
           { endDateOrDuration }
         </schedule>
         <bandwidth>{ bandwidth }</bandwidth>
+        <serviceAttributes />
         <path>
           <directionality>Bidirectional</directionality>
           <sourceSTP>
