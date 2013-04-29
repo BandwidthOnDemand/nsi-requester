@@ -28,7 +28,13 @@
                 }
 
                 @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
-                @inputText(requestForm("reservation.end.period"), '_label -> "Period")
+
+                @if(provider.nsiVersion == 1) {
+                  @inputText(requestForm("reservation.end.period"), '_label -> "Period")
+                } else {
+                  <input type="hidden" name="reservation.end.period" value="" />
+                }
+
 
                 @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
