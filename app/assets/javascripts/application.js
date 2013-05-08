@@ -79,10 +79,24 @@ $(function() {
          var xmlBlock = xmlTemplate.clone().removeClass('template').removeAttr("id");
          xmlBlock.find("h3").text(name)
          xmlBlock.find(".prettyprint").text(xml);
-         xmlBlock.prependTo(responseContent);
          xmlBlock.find("h3").append($("<span/>", {"class": "time", text: time}));
 
+         xmlBlock.prependTo(responseContent);
+
          prettyPrint();
+         selectConnectionId();
+      }
+
+      function selectConnectionId() {
+          if (window.getSelection) {
+              var connectionId = responseContent.find(".tag:contains('connectionId') ~ span")[0];
+              if (connectionId) {
+                  var range = document.createRange();
+                  range.selectNode(connectionId);
+                  window.getSelection().removeAllRanges();
+                  window.getSelection().addRange(range);
+              }
+          }
       }
 
       function hideQueryForm(correlationId) {
