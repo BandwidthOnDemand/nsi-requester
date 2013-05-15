@@ -184,9 +184,25 @@ $(function() {
        $('input[type!="hidden"]').first().focus();
    }
 
+   var initKeymaster = function() {
+       key('shift+r', function() { clickMenu("reserve") });
+       key('c', function() { clickMenu("reserveCommit") });
+       key('a', function() { clickMenu("reserveAbort") });
+       key('p', function() { clickMenu("provision") });
+       key('r', function() { clickMenu("release") });
+       key('t', function() { clickMenu("terminate") });
+       key('q', function() { clickMenu("query") });
+       key('s', function() { clickMenu("settings") });
+
+       function clickMenu(menuId) {
+           $(".navbar #"+menuId+" > a")[0].click();
+       }
+   }
+
    initExtraFields();
    initNsiRequestSubmit();
    initValidateProviderUrl();
    initSelectInput();
+   initKeymaster();
 
 })
