@@ -180,8 +180,13 @@ $(function() {
       validateProviderUrl(providerInput.val());
    }
 
+   var initSelectInput = function() {
+       $('input[type!="hidden"]').first().focus();
+   }
+
    initExtraFields();
    initNsiRequestSubmit();
    initValidateProviderUrl();
+   initSelectInput();
 
 })
