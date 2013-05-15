@@ -23,7 +23,14 @@ object ResponseController extends Controller {
     val correlationId = parseCorrelationId(request.body)
 
     correlationId.foreach { id =>
-      channels.get(id).map(_.push(stringify(JsonResponse.response(request.body, DateTime.now()))))
+      val clients = channels.get(id).map(Seq(_)).getOrElse {
+        Logger.info(s"Could not find correlation id $id, sending reply to all clients")
+        channels.values
+      }
+
+      clients foreach { client =>
+        client.push(stringify(JsonResponse.response(request.body, DateTime.now())))
+      }
     }
 
     correlationId.fold(BadRequest)(_ => Ok)
