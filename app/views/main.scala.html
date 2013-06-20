@@ -11,7 +11,8 @@
     ("provision", routes.Application.provisionForm, Seq(1, 2)),
     ("release", routes.Application.releaseForm, Seq(1, 2)),
     ("terminate", routes.Application.terminateForm, Seq(1, 2)),
-    ("query", routes.Application.queryForm, Seq(1, 2))
+    ("query", routes.Application.queryForm, Seq(1, 2)),
+    ("queryNotification", routes.Application.queryNotification, Seq(2))
   )
 }
 
@@ -31,6 +32,13 @@
                 <a href="@routes.Application.index">Home</a>
                 <h1>NSI Requester client</h1>
             </header>
+            <section class="user-box">
+                <ul class="nav">
+                  <li @if(activeMenu == "settings") {class="active"}>
+                    <a href="@routes.SettingsController.settingsForm" style="margin: auto">Settings</a>
+                  </li>
+                </ul>
+            </section>
             <nav class="navbar">
                 <div class="navbar-inner">
                     <div class="container">
@@ -46,11 +54,6 @@
                             @if(activeMenu == "response") {
                                 <li class="active"><a href="#">Response</a></li>
                             }
-                        </ul>
-                        <ul class="nav pull-right">
-                            <li @if(activeMenu == "settings") {class="active"} id="settings">
-                                <a href="@routes.SettingsController.settingsForm">Settings</a>
-                            </li>
                         </ul>
                     </div>
                 </div>

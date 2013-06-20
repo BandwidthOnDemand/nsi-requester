@@ -17,6 +17,7 @@ import support.JsonResponse
 import models._
 import FormSupport._
 import Defaults._
+import play.api.data.format.Formatter
 
 object Application extends Controller {
 
@@ -126,6 +127,18 @@ object Application extends Controller {
     queryF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case query => sendEnvelope(defaultProvider, query) })
+  }
+
+  def queryNotificationForm = Action { implicit request =>
+    val defaultForm = queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+
+    Ok(views.html.queryNotification(defaultForm, defaultProvider))
+  }
+
+  def queryNotification = Action { implicit request =>
+    queryNotificationF.bindFromRequest.fold(
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
+      { case queryNotification => sendEnvelope(defaultProvider, queryNotification) })
   }
 
   def validateProvider = Action(parse.json) { implicit request =>
@@ -246,5 +259,32 @@ object Application extends Controller {
       "correlationId" -> nonEmptyText,
       "replyTo" -> nonEmptyText,
       "providerNsa" -> nonEmptyText) { Query.apply } { Query.unapply })
+
+  import QueryNotificationOperation._
+
+  private val queryNotificationF: Form[QueryNotification] = Form(
+    "queryNotification" -> mapping(
+      "operation" -> of[QueryNotificationOperation],
+      "connectionId" -> nonEmptyText,
+      "startNotificationId" -> optional(number),
+      "endNotificationId" -> optional(number),
+      "correlationId" -> nonEmptyText,
+      "replyTo" -> nonEmptyText,
+      "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
+
+  implicit def operationFormat: Formatter[QueryNotificationOperation] = new Formatter[QueryNotificationOperation] {
+
+    override val format = Some(("operation", Nil))
+
+    def bind(key: String, data: Map[String, String]) =
+      stringFormat.bind(key, data).right.map { s =>
+        QueryNotificationOperation.withName(s)
+      }
+//      scala.util.control.Exception.allCatch[T]
+//        .either(parse(s))
+//        .left.map(e => Seq(FormError(key, errMsg, errArgs)))
+
+    def unbind(key: String, value: QueryNotificationOperation) = Map(key -> value.toString)
+  }
 
 }
