@@ -14,7 +14,8 @@
                 @select(
                     queryNotificationForm("queryNotification.operation"),
                     options = options(List("Async", "Sync")),
-                    '_label -> "Operation"
+                    '_label -> "Operation",
+                    '_showConstraints -> false
                 )
 
                 @inputText(queryNotificationForm("queryNotification.connectionId"), 'class -> "input-xlarge", '_label -> "ConnectionId")
