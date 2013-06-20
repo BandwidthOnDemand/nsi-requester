@@ -4,6 +4,9 @@ import org.joda.time.Period
 import org.joda.time.format.PeriodFormatterBuilder
 
 import models.Provider
+import models.QueryNotificationOperation._
+import models.QueryNotificationOperation
+
 import play.api.data.FormError
 import play.api.data.Forms._
 import play.api.data.Mapping
@@ -20,7 +23,6 @@ object FormSupport {
     .toFormatter
 
   implicit def periodFormat: Formatter[Period] = new Formatter[Period] {
-
     override val format = Some(("Period ('days:hours:minutes')", Nil))
 
     def bind(key: String, data: Map[String, String]) = {
@@ -32,6 +34,19 @@ object FormSupport {
     }
 
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
+  }
+
+  implicit def queryNotificationOperationFormat: Formatter[QueryNotificationOperation] = new Formatter[QueryNotificationOperation] {
+    override val format = Some((s"Allowed values: ${QueryNotificationOperation.values.mkString(", ")}", Nil))
+
+    def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryNotificationOperation] =
+      stringFormat.bind(key, data).right.flatMap { s =>
+        scala.util.control.Exception.allCatch[QueryNotificationOperation]
+          .either(QueryNotificationOperation.withName(s))
+          .left.map(e => Seq(FormError(key, "error.queryNotificationOperation", Nil)))
+      }
+
+    def unbind(key: String, value: QueryNotificationOperation) = Map(key -> value.toString)
   }
 
   val providerMapping: Mapping[Provider] = mapping(

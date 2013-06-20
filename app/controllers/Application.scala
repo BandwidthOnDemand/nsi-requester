@@ -272,19 +272,4 @@ object Application extends Controller {
       "replyTo" -> nonEmptyText,
       "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
 
-  implicit def operationFormat: Formatter[QueryNotificationOperation] = new Formatter[QueryNotificationOperation] {
-
-    override val format = Some(("operation", Nil))
-
-    def bind(key: String, data: Map[String, String]) =
-      stringFormat.bind(key, data).right.map { s =>
-        QueryNotificationOperation.withName(s)
-      }
-//      scala.util.control.Exception.allCatch[T]
-//        .either(parse(s))
-//        .left.map(e => Seq(FormError(key, errMsg, errArgs)))
-
-    def unbind(key: String, value: QueryNotificationOperation) = Map(key -> value.toString)
-  }
-
 }
