@@ -20,9 +20,9 @@
 <html>
     <head>
         <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/style.min.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/prettify.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/application.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/style.min.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/prettify.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("css/application.min.css")">
         <link rel="shortcut icon" href="@routes.Assets.at("images/favicon.ico")">
         <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
     </head>
@@ -35,7 +35,7 @@
             <section class="user-box">
                 <ul class="nav">
                   <li @if(activeMenu == "settings") {class="active"}>
-                    <a href="@routes.SettingsController.settingsForm" style="margin: auto">Settings</a>
+                    <a href="@routes.SettingsController.settingsForm">Settings</a>
                   </li>
                 </ul>
             </section>
