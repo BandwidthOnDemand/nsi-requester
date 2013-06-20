@@ -11,11 +11,12 @@
              @form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
-                @defining(if(provider.nsiVersion == 1) List("Summary", "Details") else List("Summary", "SummarySync", "Recursive")) { os =>
+                @defining(if(provider.nsiVersion == 1) QueryOperation.operationsV1 else QueryOperation.operationsV2) { os =>
                     @select(
                         queryForm("query.operation"),
-                        options = options(os),
-                        '_label -> "Operation"
+                        options = options(os.map(_.toString).toList),
+                        '_label -> "Operation",
+                        '_showConstraints -> false
                     )
                 }
 

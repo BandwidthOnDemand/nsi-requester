@@ -1,7 +1,17 @@
 package models
 
+object QueryOperation extends Enumeration {
+  type QueryOperation = Value
+  val Summary, SummarySync, Details, Recursive = Value
+
+  def operationsV1 = List(Summary, Details)
+  def operationsV2 = List(Summary, SummarySync, Recursive)
+}
+
+import QueryOperation._
+
 case class Query(
-    operation: String = "Summary",
+    operation: QueryOperation = Summary,
     connectionIds: List[String],
     globalReservationIds: List[String],
     correlationId: String,
@@ -9,17 +19,17 @@ case class Query(
     nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
   override def nsiV2Body = operation match {
-    case "Summary" =>
+    case Summary =>
       <type:querySummary>
         { connectionIdTags }
         { globalReservationIdTags }
       </type:querySummary>
-    case "SummarySync" =>
+    case SummarySync =>
       <type:querySummarySync>
         { connectionIdTags }
         { globalReservationIdTags }
       </type:querySummarySync>
-    case "Recursive" =>
+    case Recursive =>
       <type:queryRecursive>
         { connectionIdTags }
         { globalReservationIdTags }

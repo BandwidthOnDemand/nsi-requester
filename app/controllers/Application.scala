@@ -15,6 +15,7 @@ import play.api.http.HeaderNames.CONTENT_TYPE
 import play.api.http.MimeTypes
 import support.JsonResponse
 import models._
+import models.QueryOperation._
 import FormSupport._
 import Defaults._
 import play.api.data.format.Formatter
@@ -118,7 +119,7 @@ object Application extends Controller {
 
   def queryForm = Action { implicit request =>
     val defaultForm = queryF.fill(
-      Query("Summary", Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+      Query(Summary, Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
 
     Ok(views.html.query(defaultForm, defaultProvider))
   }
@@ -251,9 +252,11 @@ object Application extends Controller {
 
   private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
 
+  import QueryOperation._
+
   private val queryF: Form[Query] = Form(
     "query" -> mapping(
-      "operation" -> text,
+      "operation" -> of[QueryOperation],
       "connectionIds" -> listWithoutEmptyStrings,
       "globalReservationIds" -> listWithoutEmptyStrings,
       "correlationId" -> nonEmptyText,

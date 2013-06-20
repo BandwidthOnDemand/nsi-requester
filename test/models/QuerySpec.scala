@@ -1,6 +1,7 @@
 package models
 
 import org.specs2.mutable.Specification
+import QueryOperation._
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class QuerySpec extends Specification {
@@ -55,7 +56,7 @@ class QuerySpec extends Specification {
     }
 
    "give a querySummarySync containing a connectionId" in {
-      val query = DefaultQuery(connectionIds = List("abc-123"), operation = "SummarySync")
+      val query = DefaultQuery(connectionIds = List("abc-123"), operation = SummarySync)
       val envelope = query.toNsiV2Envelope
 
       envelope must \\("querySummarySync")
@@ -63,7 +64,7 @@ class QuerySpec extends Specification {
     }
 
    "give a queryRecursive containing a connectionId" in {
-      val query = DefaultQuery(connectionIds = List("abc-123"), operation = "Recursive")
+      val query = DefaultQuery(connectionIds = List("abc-123"), operation = Recursive)
       val envelope = query.toNsiV2Envelope
 
       envelope must \\("queryRecursive")
@@ -71,7 +72,7 @@ class QuerySpec extends Specification {
     }
 
    "give an exception for a not supported NSI 2 operation" in {
-      val query = DefaultQuery(operation = "Details")
+      val query = DefaultQuery(operation = Details)
 
       query.toNsiV2Envelope must throwA[RuntimeException]("Unsupported NSI v2 query type 'Details'")
     }
@@ -79,7 +80,7 @@ class QuerySpec extends Specification {
 
   object DefaultQuery {
 
-    def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil, operation: String = "Summary") =
+    def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil, operation: QueryOperation = Summary) =
       Query(
         connectionIds = connectionIds,
         globalReservationIds = globalReservationIds,

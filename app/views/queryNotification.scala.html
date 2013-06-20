@@ -13,7 +13,7 @@
 
                 @select(
                     queryNotificationForm("queryNotification.operation"),
-                    options = options(List("Async", "Sync")),
+                    options = options(QueryNotificationOperation.values.map(_.toString).toList),
                     '_label -> "Operation",
                     '_showConstraints -> false
                 )
