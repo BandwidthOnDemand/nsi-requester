@@ -21,7 +21,7 @@
 
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
-                @inputText(requestForm("reservation.startDate"), '_label -> "Start")
+                @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
 
                 @requestForm.error("reservation.end").map { error =>
                     <div class="alert alert-error">@error.message</div>
