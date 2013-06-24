@@ -28,7 +28,7 @@ abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: S
 
   private def nsiV2Header = {
     <head:nsiHeader>
-      <protocolVersion>2.0</protocolVersion>
+      <protocolVersion>application/vdn.ogf.nsi.cs.v2.provider+soap</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
       <requesterNSA>{  NsiRequest.RequesterNsa }</requesterNSA>
       <providerNSA>{ providerNsa }</providerNSA>
