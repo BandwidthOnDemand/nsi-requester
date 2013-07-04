@@ -21,9 +21,9 @@ case class Query(
   override def nsiV1SoapAction = ""
   override def nsiV2SoapAction = {
     val action = operation match {
-      case Summary => "summary"
-      case SummarySync => "summarySync"
-      case Recursive => "recursive"
+      case Summary => "querySummary"
+      case SummarySync => "querySummarySync"
+      case Recursive => "queryRecursive"
     }
    s"http://schemas.ogf.org/nsi/2013/04/connection/service/$action"
   }
