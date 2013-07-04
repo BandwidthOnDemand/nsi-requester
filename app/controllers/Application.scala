@@ -150,7 +150,7 @@ object Application extends Controller {
       for {
         url <- (request.body \ "url").asOpt[String] if !url.isEmpty()
       } yield Async {
-        val authenticated = addAuthentication(
+        val authenticated = addAuthenticationHeader(
           (request.body \ "username").asOpt[String],
           (request.body \ "password").asOpt[String],
           (request.body \ "token").asOpt[String])
@@ -173,8 +173,8 @@ object Application extends Controller {
     val soapRequest = nsiRequest.toNsiEnvelope(provider.nsiVersion)
     val requestTime = DateTime.now()
 
-    val authenticated = addAuthentication(provider.username, provider.password, provider.accessToken)
-    val wsRequest = authenticated(WS.url(provider.providerUrl).withFollowRedirects(false))
+    val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
+    val wsRequest = addHeaders(WS.url(provider.providerUrl).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
       if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
@@ -189,7 +189,7 @@ object Application extends Controller {
     }
   }
 
-  private[controllers] def addAuthentication(username: Option[String], password: Option[String], token: Option[String]): WS.WSRequestHolder => WS.WSRequestHolder =
+  private[controllers] def addAuthenticationHeader(username: Option[String], password: Option[String], token: Option[String]): WS.WSRequestHolder => WS.WSRequestHolder =
     addBasicAuth(username, password) _ andThen addOAuthToken(token) _
 
   private def addOAuthToken(token: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
@@ -197,6 +197,8 @@ object Application extends Controller {
 
   private def addBasicAuth(username: Option[String], password: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
     username.filterNot(_.isEmpty).fold(request)(u => request.withAuth(u, password.getOrElse(""), AuthScheme.BASIC))
+
+  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> action)
 
   private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId

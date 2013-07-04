@@ -4,8 +4,17 @@ import scala.xml.Node
 
 abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: String) {
 
+  def nsiV2SoapAction: String
+  def nsiV1SoapAction: String
+
   def nsiV1Body: Node
   def nsiV2Body: Node
+
+  def soapAction(version: Int = 1): String = version match {
+    case 1 => nsiV1SoapAction
+    case 2 => nsiV2SoapAction
+    case x => sys.error(s"Non supported NSI version $x")
+  }
 
   def toNsiEnvelope(version: Int = 1): Node = version match {
     case 1 => toNsiV1Envelope

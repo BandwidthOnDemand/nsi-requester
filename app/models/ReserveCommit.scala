@@ -6,6 +6,9 @@ case class ReserveCommit(
     replyTo: String,
     providerNsa: String) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
+  override def nsiV1SoapAction = ""
+  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/04/connection/service/reserveCommit"
+
   override def nsiV2Body =
     <type:reserveCommit>
       <connectionId>{ connectionId }</connectionId>

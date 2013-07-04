@@ -75,6 +75,12 @@ class ReserveSpec extends Specification {
       res.toNsiV2Envelope must \\("sourceSTP") \("networkId") \> "source"
       res.toNsiV2Envelope must \\("destSTP") \("networkId") \> "destination"
     }
+
+    "have a soap action" in {
+      val res = DefaultReservation()
+
+      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/04/connection/service/reserve")
+    }
   }
 
   object DefaultReservation {

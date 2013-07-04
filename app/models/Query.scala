@@ -18,6 +18,16 @@ case class Query(
     replyTo: String,
     nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
+  override def nsiV1SoapAction = ""
+  override def nsiV2SoapAction = {
+    val action = operation match {
+      case Summary => "summary"
+      case SummarySync => "summarySync"
+      case Recursive => "recursive"
+    }
+   s"http://schemas.ogf.org/nsi/2013/04/connection/service/$action"
+  }
+
   override def nsiV2Body = operation match {
     case Summary =>
       <type:querySummary>

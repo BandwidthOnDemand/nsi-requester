@@ -28,21 +28,21 @@ class ApplicationSpec extends Specification {
   "Adding Authorization" should {
 
     "add no authorization header" in {
-      val holder = Application.addAuthentication(Some(""), None, Some(""))(WS.url("/"))
+      val holder = Application.addAuthenticationHeader(Some(""), None, Some(""))(WS.url("/"))
 
       holder.headers must beEmpty
       holder.auth must beNone
     }
 
     "add a authorization header containing the OAuth token" in {
-      val holder = Application.addAuthentication(None, None, Some("token"))(WS.url("/"))
+      val holder = Application.addAuthenticationHeader(None, None, Some("token"))(WS.url("/"))
 
       holder.headers must havePair("Authorization" -> Seq("bearer token"))
       holder.auth must beNone
     }
 
     "add a Basic Auth header" in {
-      val holder = Application.addAuthentication(Some("user"), Some("pass"), None)(WS.url("/"))
+      val holder = Application.addAuthenticationHeader(Some("user"), Some("pass"), None)(WS.url("/"))
 
       holder.headers must beEmpty
       holder.auth must beSome(("user", "pass", AuthScheme.BASIC))

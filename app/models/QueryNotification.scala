@@ -18,6 +18,15 @@ case class QueryNotification(
   replyTo: String,
   nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
+  override def nsiV1SoapAction = sys.error("QueryNotification is not a supported NSI v1 operation")
+  override def nsiV2SoapAction = {
+    val action = operation match {
+      case Sync => "queryNotificationSync"
+      case Async => "queryNotification"
+    }
+    s"http://schemas.ogf.org/nsi/2013/04/connection/service/$action"
+  }
+
   override def nsiV2Body = operation match {
     case Async =>
       <type:queryNotification>
