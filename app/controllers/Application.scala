@@ -198,7 +198,7 @@ object Application extends Controller {
   private def addBasicAuth(username: Option[String], password: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
     username.filterNot(_.isEmpty).fold(request)(u => request.withAuth(u, password.getOrElse(""), AuthScheme.BASIC))
 
-  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> action)
+  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> s""""$action"""")
 
   private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId
