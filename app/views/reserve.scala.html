@@ -24,7 +24,7 @@
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
 
                 @requestForm.error("reservation.end").map { error =>
-                    <div class="alert alert-error">@error.message</div>
+                  <div class="alert alert-error">@error.message</div>
                 }
 
                 @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
@@ -35,9 +35,10 @@
                   <input type="hidden" name="reservation.end.period" value="" />
                 }
 
-
-                @inputText(requestForm("reservation.source"), '_label -> "Source", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.destination"), '_label -> "Destination", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.source.networkId"), '_label -> "Source networkId", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.source.localId"), '_label -> "Source localId", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.destination.networkId"), '_label -> "Destination networkId", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.destination.localId"), '_label -> "Destination localId", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
                 @if(provider.nsiVersion == 1) {

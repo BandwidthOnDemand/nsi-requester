@@ -11,8 +11,8 @@ case class Reserve(
     startDate: Option[Date],
     end: Either[Date, Period],
     connectionId: String,
-    source: String,
-    destination: String,
+    source: Port,
+    destination: Port,
     bandwidth: Int,
     correlationId: String,
     replyTo: String,
@@ -37,12 +37,10 @@ case class Reserve(
         <path>
           <directionality>Bidirectional</directionality>
           <sourceSTP>
-            <networkId>{ source.split(':').init.mkString(":") }</networkId>
-            <localId>{ source.split(':').last }</localId>
+            { source.xmlV2 }
           </sourceSTP>
           <destSTP>
-            <networkId>{ destination.split(':').init.mkString(":") }</networkId>
-            <localId>{ destination.split(':').last }</localId>
+            { destination.xmlV2 }
           </destSTP>
         </path>
       </criteria>
@@ -70,10 +68,10 @@ case class Reserve(
           <path>
             <directionality>Bidirectional</directionality>
             <sourceSTP>
-              <stpId>{ source }</stpId>
+              <stpId>{ source.stpId }</stpId>
             </sourceSTP>
             <destSTP>
-              <stpId>{ destination }</stpId>
+              { destination.xmlV1 }
             </destSTP>
           </path>
         </reservation>

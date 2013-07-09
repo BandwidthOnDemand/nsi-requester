@@ -41,7 +41,7 @@ object Application extends Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = DefaultStpUriPrefix, destination = DefaultStpUriPrefix, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+        source = DefaultPort, destination = DefaultPort, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.reserve(defaultForm, defaultProvider))
   }
@@ -221,8 +221,8 @@ object Application extends Controller {
       "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
       "end" -> endTuple,
       "connectionId" -> (if (version == 1) nonEmptyText else text),
-      "source" -> nonEmptyText,
-      "destination" -> nonEmptyText,
+      "source" -> portMapping,
+      "destination" -> portMapping,
       "bandwidth" -> number(0, 100000),
       "correlationId" -> nonEmptyText,
       "replyTo" -> nonEmptyText,
@@ -244,6 +244,10 @@ object Application extends Controller {
 
   private val releaseF: Form[Release] = Form(
     "release" -> genericOperationMapping(Release.apply)(Release.unapply))
+
+  private def portMapping = mapping(
+    "networkId" -> text,
+    "localId" -> text)(Port.apply)(Port.unapply)
 
   private def genericOperationMapping[R](apply: Function4[String, String, String, String, R])(unapply: Function1[R, Option[(String, String, String, String)]]) =
     mapping(

@@ -1,12 +1,13 @@
 package controllers
 
-import models.Provider
+import models._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 
 object Defaults {
 
-  val DefaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl:"
+  val DefaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl"
+  val DefaultPort = Port(DefaultStpUriPrefix, "")
 
   private val DefaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
   private val DefaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
