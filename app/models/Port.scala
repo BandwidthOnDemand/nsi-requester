@@ -1,18 +1,31 @@
 package models
 
-case class Port(networkId: String, localId: String) {
+import scala.xml.NodeSeq
+import scala.xml.Elem
+import scala.xml.NodeSeq
+
+case class Port(networkId: String, localId: String, labels: Map[String, Seq[String]] = Map.empty) {
   def stpId = s"$networkId:$localId"
 
-  def xmlV2 = {
+  def xmlV2: NodeSeq = {
     <networkId>{ networkId }</networkId>
-    <localId>{ localId }</localId>
+    <localId>{ localId }</localId> ++ xmlLabels
   }
 
-  def xmlV1 = {
+  private def xmlLabels = {
+    val xml = labels.map {
+      case (key, values) =>
+        <attribute type={key}>
+          { values.map(v => <value>{v}</value> ) }
+        </attribute>
+    }
+
+    xml.toList match {
+      case x::xs => <labels>{ xml }</labels>
+      case Nil => NodeSeq.Empty
+    }
+  }
+
+  def xmlV1: NodeSeq =
     <stpId>{ s"$networkId:$localId" }</stpId>
-  }
-
-//  def xmlLabels = labels.map {
-//    case (key, value) => <attribute type="{key}"><value>{value}</value></attribute>
-//  }
 }

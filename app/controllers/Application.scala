@@ -247,7 +247,7 @@ object Application extends Controller {
 
   private def portMapping = mapping(
     "networkId" -> text,
-    "localId" -> text)(Port.apply)(Port.unapply)
+    "localId" -> text){ (networkId, localId) => Port(networkId, localId) }{ port => Some((port.networkId, port.localId)) }
 
   private def genericOperationMapping[R](apply: Function4[String, String, String, String, R])(unapply: Function1[R, Option[(String, String, String, String)]]) =
     mapping(
