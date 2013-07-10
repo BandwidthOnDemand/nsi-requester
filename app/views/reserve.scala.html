@@ -35,10 +35,10 @@
                   <input type="hidden" name="reservation.end.period" value="" />
                 }
 
-                @inputText(requestForm("reservation.source.networkId"), '_label -> "Source networkId", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.source.localId"), '_label -> "Source localId", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.destination.networkId"), '_label -> "Destination networkId", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.destination.localId"), '_label -> "Destination localId", 'class -> "input-xlarge")
+                @inputPort(field => requestForm("reservation.source." + field), "Source")
+
+                @inputPort(field => requestForm("reservation.destination." + field), "Destination")
+
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
                 @if(provider.nsiVersion == 1) {
@@ -53,4 +53,15 @@
             }
         </div>
     </section>
+
+}
+
+@inputPort(field: String => Field, name: String) = {
+    @inputText(field("networkId"), '_label -> s"$name networkId", 'class -> "input-xlarge")
+    @inputText(field("localId"), '_label -> s"$name localId", 'class -> "input-xlarge")
+    @if(provider.nsiVersion == 2) {
+        @repeat(field("labels"), min = 1) { label =>
+            @inputText(label, '_label -> s"$name label", 'class -> "input-xlarge", '_help -> "key: value, value, value")
+        }
+    }
 }

@@ -18,7 +18,6 @@ import models._
 import models.QueryOperation._
 import FormSupport._
 import Defaults._
-import play.api.data.format.Formatter
 
 object Application extends Controller {
 
@@ -246,8 +245,14 @@ object Application extends Controller {
     "release" -> genericOperationMapping(Release.apply)(Release.unapply))
 
   private def portMapping = mapping(
-    "networkId" -> text,
-    "localId" -> text){ (networkId, localId) => Port(networkId, localId) }{ port => Some((port.networkId, port.localId)) }
+    "networkId" -> nonEmptyText,
+    "localId" -> nonEmptyText,
+    "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
+
+  private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map { label =>
+    val parts = label.split(":")
+    parts.head -> parts.tail.mkString(":").split(",").map(_.trim).toSeq
+  }.toMap, ls => ls.map { case (key, values) => s"$key: " + values.mkString(", ")}.toList)
 
   private def genericOperationMapping[R](apply: Function4[String, String, String, String, R])(unapply: Function1[R, Option[(String, String, String, String)]]) =
     mapping(
