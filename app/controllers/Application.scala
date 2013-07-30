@@ -40,7 +40,10 @@ object Application extends Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = DefaultPort, destination = DefaultPort, bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+        source = if (defaultProvider.nsiVersion == 1)  DefaultPortV1 else DefaultPortV2,
+        destination = if (defaultProvider.nsiVersion == 1)  DefaultPortV1 else DefaultPortV2,
+        bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+    )
 
     Ok(views.html.reserve(defaultForm, defaultProvider))
   }

@@ -6,8 +6,8 @@ import play.api.mvc.AnyContent
 
 object Defaults {
 
-  val DefaultStpUriPrefix = "urn:ogf:network:stp:surfnet.nl"
-  val DefaultPort = Port(DefaultStpUriPrefix, "")
+  val DefaultPortV1 = Port("urn:ogf:network:stp:surfnet.nl", "")
+  val DefaultPortV2 = Port("urn:ogf:network:surfnet.nl:1990", "")
 
   private val DefaultProviderUrl = "https://bod.surfnet.nl/nsi/v1_sc/provider"
   private val DefaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
