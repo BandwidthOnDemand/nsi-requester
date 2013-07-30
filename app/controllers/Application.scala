@@ -252,7 +252,7 @@ object Application extends Controller {
     "localId" -> nonEmptyText,
     "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
 
-  private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map { label =>
+  private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map(_.trim).filter(_.nonEmpty).map { label =>
     val parts = label.split(":")
     parts.head -> parts.tail.mkString(":").split(",").map(_.trim).toSeq
   }.toMap, ls => ls.map { case (key, values) => s"$key: " + values.mkString(", ")}.toList)
