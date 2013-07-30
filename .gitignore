@@ -13,3 +13,6 @@ bin
 *.swp
 .project
 .worksheet/
+.idea/
+.idea_modules
+*.iml
