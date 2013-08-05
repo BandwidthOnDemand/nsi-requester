@@ -1,9 +1,11 @@
 package models
 
+import java.net.URI
+
 case class ReserveAbort(
     connectionId: String,
     correlationId: String,
-    replyTo: String,
+    replyTo: Option[URI],
     providerNsa: String) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   override def nsiV1SoapAction = ""

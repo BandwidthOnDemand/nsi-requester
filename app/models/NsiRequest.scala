@@ -1,8 +1,10 @@
 package models
 
 import scala.xml.Node
+import scala.xml.NodeSeq
+import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: String) {
+abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerNsa: String) {
 
   def nsiV2SoapAction: String
   def nsiV1SoapAction: String
@@ -32,16 +34,16 @@ abstract class NsiRequest(correlationId: String, replyTo: String, providerNsa: S
 
   private[models] def nsiRequestFields = {
     <int:correlationId>{ "urn:uuid:" + correlationId }</int:correlationId>
-    <int:replyTo>{ replyTo }</int:replyTo>
+    <int:replyTo>{ replyTo.getOrElse(throw new IllegalStateException("replyTo is required for NSIv1")) }</int:replyTo>
   }
 
   private def nsiV2Header = {
     <head:nsiHeader>
       <protocolVersion>application/vdn.ogf.nsi.cs.v2.provider+soap</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
-      <requesterNSA>{  NsiRequest.RequesterNsa }</requesterNSA>
+      <requesterNSA>{ NsiRequest.RequesterNsa }</requesterNSA>
       <providerNSA>{ providerNsa }</providerNSA>
-      <replyTo>{ replyTo }</replyTo>
+      { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
     </head:nsiHeader>
   }
 

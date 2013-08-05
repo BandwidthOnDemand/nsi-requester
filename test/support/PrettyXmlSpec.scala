@@ -1,6 +1,5 @@
 package support
 
-import org.specs2.mutable.Specification
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])

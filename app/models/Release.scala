@@ -1,6 +1,8 @@
 package models
 
-case class Release(connectionId: String, correlationId: String, replyTo: String, providerNsa: String)
+import java.net.URI
+
+case class Release(connectionId: String, correlationId: String, replyTo: Option[URI], providerNsa: String)
     extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   override def nsiV1SoapAction = ""

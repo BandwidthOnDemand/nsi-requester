@@ -1,6 +1,5 @@
 package controllers
 
-import org.specs2.mutable.Specification
 import play.api.test.WithApplication
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -10,7 +9,7 @@ import play.api.test.WithApplication
 import play.api.mvc.Flash
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class SettingsControllerSpec extends Specification {
+class SettingsControllerSpec extends support.Specification {
 
   "The SettingsController" should {
 
@@ -78,10 +77,9 @@ class SettingsControllerSpec extends Specification {
   }
 
   "The settings view" should {
-
     "contain the password when set in session" in new WithApplication {
       val settingsForm = SettingsController.settingsF.fill(
-        (Provider("http://localhost", 2, Some("John"), Some("secret"), None), ("http://localhost/reply", "urn:ogf:network:nsa:surnfet.nl"))
+        (Provider(uri("http://localhost"), 2, Some("John"), Some("secret"), None), (Some(uri("http://localhost/reply")), "urn:ogf:network:nsa:surnfet.nl"))
       )
 
       val result = views.html.settings(settingsForm)(Flash())

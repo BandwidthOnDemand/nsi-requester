@@ -1,12 +1,13 @@
 package controllers
 
+import java.net.URI
 import play.api.mvc.Controller
 import play.api.mvc.Action
 import play.api.data.Form
 import play.api.data.Forms._
 import models.Provider
 import Defaults._
-import FormSupport.providerMapping
+import FormSupport._
 
 object SettingsController extends Controller {
 
@@ -23,29 +24,24 @@ object SettingsController extends Controller {
         case (provider, (replyTo, providerNsa)) =>
           Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
             .withSession(
-              "providerUrl" -> provider.providerUrl,
+              "providerUrl" -> provider.providerUrl.toString,
               "nsiVersion" -> provider.nsiVersion.toString,
               "username" -> provider.username.getOrElse(""),
               "password" -> provider.password.getOrElse(""),
               "accessToken" -> provider.accessToken.getOrElse(""),
-              "replyTo" -> replyTo,
+              "replyTo" -> replyTo.map(_.toString).getOrElse(""),
               "providerNsa" -> providerNsa)
-       }
-    )
+      })
   }
 
   def resetSettings = Action { implicit request =>
     Redirect(routes.SettingsController.settingsForm).withNewSession.flashing("success" -> "Settings have been reset")
   }
 
-  private[controllers] val settingsF: Form[(Provider, (String, String))] = Form(
+  private[controllers] val settingsF: Form[(Provider, (Option[URI], String))] = Form(
     tuple(
       "provider" -> providerMapping,
       "nsi" -> tuple(
-        "replyTo" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText
-      )
-    )
-  )
-
+        "replyTo" -> optional(uri),
+        "providerNsa" -> nonEmptyText)))
 }

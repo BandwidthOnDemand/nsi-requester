@@ -11,7 +11,7 @@
     @if(showCollapse){@inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")}
 
     @helper.input(formField("replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge") { (id, name, value, args) =>
-        <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" required @toHtmlArgs(args)>
+        <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" @toHtmlArgs(args)>
     }
 
     @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")

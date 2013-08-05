@@ -1,10 +1,9 @@
 package models
 
-import org.specs2.mutable.Specification
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReleaseSpec extends Specification {
+class ReleaseSpec extends support.Specification {
 
   "NSI v1 terminate" should {
 
@@ -28,7 +27,7 @@ class ReleaseSpec extends Specification {
   }
 
   object DefaultRelease {
-    def apply() = Release("123-abc", "asdf-1234", "http://localhost", NsiRequest.RequesterNsa)
+    def apply() = Release("123-abc", "asdf-1234", Some(uri("http://localhost")), NsiRequest.RequesterNsa)
   }
 
 }

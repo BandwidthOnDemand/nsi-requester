@@ -1,19 +1,18 @@
 package controllers
 
+import java.net.URI
+import models.{Provider, QueryNotificationOperation}
+import models.QueryNotificationOperation.QueryNotificationOperation
+import models.QueryOperation
+import models.QueryOperation.QueryOperation
 import org.joda.time.Period
 import org.joda.time.format.PeriodFormatterBuilder
-
-import models.Provider
-import models.QueryNotificationOperation._
-import models.QueryNotificationOperation
-import models.QueryOperation._
-import models.QueryOperation
-
 import play.api.data.FormError
-import play.api.data.Forms._
+import play.api.data.Forms.{mapping, number, optional, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats.stringFormat
 import play.api.data.format.Formatter
+import scala.util.Try
 
 object FormSupport {
 
@@ -23,6 +22,13 @@ object FormSupport {
     .appendHours().appendSuffix(":")
     .appendMinutes()
     .toFormatter
+
+  def uri: Mapping[URI] = text.verifying("not a valid URI", s => Try(URI.create(s)).isSuccess).transform[URI](URI.create, _.toString).
+    verifying("URI must be HTTP or HTTPS", uri => Option(uri.getScheme).getOrElse("").toLowerCase() match {
+      case "http" | "https" => true
+      case _                => false
+    })
+
 
   implicit def periodFormat: Formatter[Period] = new Formatter[Period] {
     override val format = Some(("Period ('days:hours:minutes')", Nil))
@@ -65,7 +71,7 @@ object FormSupport {
   }
 
   val providerMapping: Mapping[Provider] = mapping(
-    "providerUrl" -> nonEmptyText,
+    "providerUrl" -> uri,
     "nsiVersion" -> number,
     "username" -> optional(text),
     "password" -> optional(text),

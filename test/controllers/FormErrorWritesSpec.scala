@@ -1,14 +1,12 @@
 package controllers
 
-import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
 import play.api.data.FormError
 import play.api.libs.json.Json
 import play.api.libs.json.JsString
 import play.api.libs.json.JsArray
 
-@RunWith(classOf[org.specs2.runner.JUnitRunner])
-class FormErrorWritesSpec extends Specification {
+@org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
+class FormErrorWritesSpec extends support.Specification {
 
   "FormErrorWrites" should {
 

@@ -18,6 +18,7 @@ import models._
 import models.QueryOperation._
 import FormSupport._
 import Defaults._
+import java.net.URI
 
 object Application extends Controller {
 
@@ -36,7 +37,7 @@ object Application extends Controller {
     val startDate = DateTime.now.plusMinutes(5)
     val endDate = startDate.plusMinutes(10)
 
-    val defaultForm = reserveF(defaultProvider.nsiVersion).fill(
+    val defaultForm = defaultProvider.reserveF.fill(
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
@@ -49,97 +50,97 @@ object Application extends Controller {
   }
 
   def reserve = Action { implicit request =>
-    reserveF(defaultProvider.nsiVersion).bindFromRequest.fold(
+    defaultProvider.reserveF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case reservation => sendEnvelope(defaultProvider, reservation) })
   }
 
   def reserveCommitForm = Action { implicit request =>
-    val defaultForm = reserveCommitF.fill(
+    val defaultForm = defaultProvider.reserveCommitF.fill(
       ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.reserveCommit(defaultForm, defaultProvider))
   }
 
   def reserveCommit = Action { implicit request =>
-    reserveCommitF.bindFromRequest.fold(
+    defaultProvider.reserveCommitF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case reserveCommit => sendEnvelope(defaultProvider, reserveCommit) })
   }
 
   def reserveAbortForm = Action { implicit request =>
-    val defaultForm = reserveAbortF.fill(
+    val defaultForm = defaultProvider.reserveAbortF.fill(
       ReserveAbort(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.reserveAbort(defaultForm, defaultProvider))
   }
 
   def reserveAbort = Action { implicit request =>
-    reserveAbortF.bindFromRequest.fold(
+    defaultProvider.reserveAbortF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case reserveAbort => sendEnvelope(defaultProvider, reserveAbort) })
   }
 
   def provisionForm = Action { implicit request =>
-    val defaultForm = provisionF.fill(
+    val defaultForm = defaultProvider.provisionF.fill(
       Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.provision(defaultForm, defaultProvider))
   }
 
   def provision = Action { implicit request =>
-    provisionF.bindFromRequest.fold(
+    defaultProvider.provisionF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case provision => sendEnvelope(defaultProvider, provision) })
   }
 
   def terminateForm = Action { implicit request =>
-    val defaultForm = terminateF.fill(
+    val defaultForm = defaultProvider.terminateF.fill(
       Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.terminate(defaultForm, defaultProvider))
   }
 
   def terminate = Action { implicit request =>
-    terminateF.bindFromRequest.fold(
+    defaultProvider.terminateF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case terminate => sendEnvelope(defaultProvider, terminate) })
   }
 
   def releaseForm = Action { implicit request =>
-    val defaultForm = releaseF.fill(
+    val defaultForm = defaultProvider.releaseF.fill(
       Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
 
     Ok(views.html.release(defaultForm, defaultProvider))
   }
 
   def release = Action { implicit request =>
-    releaseF.bindFromRequest.fold(
+    defaultProvider.releaseF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case release => sendEnvelope(defaultProvider, release) })
   }
 
   def queryForm = Action { implicit request =>
-    val defaultForm = queryF.fill(
+    val defaultForm = defaultProvider.queryF.fill(
       Query(Summary, Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
 
     Ok(views.html.query(defaultForm, defaultProvider))
   }
 
   def query = Action { implicit request =>
-    queryF.bindFromRequest.fold(
+    defaultProvider.queryF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case query => sendEnvelope(defaultProvider, query) })
   }
 
   def queryNotificationForm = Action { implicit request =>
-    val defaultForm = queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
 
     Ok(views.html.queryNotification(defaultForm, defaultProvider))
   }
 
   def queryNotification = Action { implicit request =>
-    queryNotificationF.bindFromRequest.fold(
+    defaultProvider.queryNotificationF.bindFromRequest.fold(
       formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case queryNotification => sendEnvelope(defaultProvider, queryNotification) })
   }
@@ -176,7 +177,7 @@ object Application extends Controller {
     val requestTime = DateTime.now()
 
     val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
-    val wsRequest = addHeaders(WS.url(provider.providerUrl).withFollowRedirects(false))
+    val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
       if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
@@ -205,88 +206,90 @@ object Application extends Controller {
   private def generateConnectionId = UUID.randomUUID.toString
   private def generateCorrelationId = generateConnectionId
 
-  private val endTuple = tuple(
-    "date" -> optional(date("yyyy-MM-dd HH:mm")),
-    "period" -> optional(of[Period])).verifying("Either end date or period is required", t => t match {
-      case (None, None) => false
-      case _            => true
-    }).transform[Either[Date, Period]](
-      tuple => if (tuple._1.isDefined) Left(tuple._1.get) else Right(tuple._2.get),
-      {
-        case Left(date)    => (Some(date), None)
-        case Right(period) => (None, Some(period))
-      })
+  private implicit class Mappings(provider: Provider) {
+    private val nsiVersion = provider.nsiVersion
 
-  private def reserveF(version: Int): Form[Reserve] = Form(
-    "reservation" -> mapping(
-      "description" -> optional(text),
-      "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
-      "end" -> endTuple,
-      "connectionId" -> (if (version == 1) nonEmptyText else text),
-      "source" -> portMapping,
-      "destination" -> portMapping,
-      "bandwidth" -> number(0, 100000),
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText,
-      "globalReservationId" -> optional(text),
-      "unprotected" -> boolean) { Reserve.apply } { Reserve.unapply })
+    private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", _.isDefined || nsiVersion == 2)
+    private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
 
-  private val reserveAbortF: Form[ReserveAbort] = Form(
-    "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))
+    private def endDateOrPeriod = tuple(
+      "date" -> optional(date("yyyy-MM-dd HH:mm")),
+      "period" -> optional(of[Period])).verifying("Either end date or period is required", t => t match {
+        case (None, None) => false
+        case _            => true
+      }).transform[Either[Date, Period]](
+        tuple => if (tuple._1.isDefined) Left(tuple._1.get) else Right(tuple._2.get),
+        {
+          case Left(date)    => (Some(date), None)
+          case Right(period) => (None, Some(period))
+        })
 
-  private val reserveCommitF: Form[ReserveCommit] = Form(
-    "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply))
+    def reserveF: Form[Reserve] = Form(
+      "reservation" -> mapping(
+        "description" -> optional(text),
+        "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
+        "end" -> endDateOrPeriod,
+        "connectionId" -> (if (nsiVersion == 1) nonEmptyText else text),
+        "source" -> portMapping,
+        "destination" -> portMapping,
+        "bandwidth" -> number(0, 100000),
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> replyTo,
+        "providerNsa" -> nonEmptyText,
+        "globalReservationId" -> optional(text),
+        "unprotected" -> boolean)(Reserve.apply)(Reserve.unapply))
 
-  private val provisionF: Form[Provision] = Form(
-    "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply))
+    def reserveAbortF: Form[ReserveAbort] = Form(
+      "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))
 
-  private val terminateF: Form[Terminate] = Form(
-    "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply))
+    def reserveCommitF: Form[ReserveCommit] = Form(
+      "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply))
 
-  private val releaseF: Form[Release] = Form(
-    "release" -> genericOperationMapping(Release.apply)(Release.unapply))
+    def provisionF: Form[Provision] = Form(
+      "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply))
 
-  private def portMapping = mapping(
-    "networkId" -> nonEmptyText,
-    "localId" -> nonEmptyText,
-    "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
+    def terminateF: Form[Terminate] = Form(
+      "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply))
 
-  private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map(_.trim).filter(_.nonEmpty).map { label =>
-    val parts = label.split(":")
-    parts.head -> parts.tail.mkString(":").split(",").map(_.trim).toSeq
-  }.toMap, ls => ls.map { case (key, values) => s"$key: " + values.mkString(", ")}.toList)
+    def releaseF: Form[Release] = Form(
+      "release" -> genericOperationMapping(Release.apply)(Release.unapply))
 
-  private def genericOperationMapping[R](apply: Function4[String, String, String, String, R])(unapply: Function1[R, Option[(String, String, String, String)]]) =
-    mapping(
-      "connectionId" -> nonEmptyText,
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText)(apply)(unapply)
+    def portMapping = mapping(
+      "networkId" -> nonEmptyText,
+      "localId" -> nonEmptyText,
+      "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
 
-  private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
+    private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map(_.trim).filter(_.nonEmpty).map { label =>
+      val parts = label.split(":")
+      parts.head -> parts.tail.mkString(":").split(",").map(_.trim).toSeq
+    }.toMap, ls => ls.map { case (key, values) => s"$key: " + values.mkString(", ") }.toList)
 
-  import QueryOperation._
+    private def genericOperationMapping[R](apply: (String, String, Option[URI], String) => R)(unapply: R => Option[(String, String, Option[URI], String)]) =
+      mapping(
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> replyTo,
+        "providerNsa" -> nonEmptyText)(apply)(unapply)
 
-  private val queryF: Form[Query] = Form(
-    "query" -> mapping(
-      "operation" -> of[QueryOperation],
-      "connectionIds" -> listWithoutEmptyStrings,
-      "globalReservationIds" -> listWithoutEmptyStrings,
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText) { Query.apply } { Query.unapply })
+    import QueryOperation._
 
-  import QueryNotificationOperation._
+    def queryF: Form[Query] = Form(
+      "query" -> mapping(
+        "operation" -> of[QueryOperation],
+        "connectionIds" -> listWithoutEmptyStrings,
+        "globalReservationIds" -> listWithoutEmptyStrings,
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> replyTo,
+        "providerNsa" -> nonEmptyText) { Query.apply } { Query.unapply })
 
-  private val queryNotificationF: Form[QueryNotification] = Form(
-    "queryNotification" -> mapping(
-      "operation" -> of[QueryNotificationOperation],
-      "connectionId" -> nonEmptyText,
-      "startNotificationId" -> optional(number),
-      "endNotificationId" -> optional(number),
-      "correlationId" -> nonEmptyText,
-      "replyTo" -> nonEmptyText,
-      "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
-
+    def queryNotificationF: Form[QueryNotification] = Form(
+      "queryNotification" -> mapping(
+        "operation" -> of[QueryNotificationOperation.Value],
+        "connectionId" -> nonEmptyText,
+        "startNotificationId" -> optional(number),
+        "endNotificationId" -> optional(number),
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> replyTo,
+        "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
+  }
 }

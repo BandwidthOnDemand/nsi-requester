@@ -1,5 +1,7 @@
 package models
 
+import java.net.URI
+
 object QueryOperation extends Enumeration {
   type QueryOperation = Value
   val Summary, SummarySync, Details, Recursive = Value
@@ -15,7 +17,7 @@ case class Query(
     connectionIds: List[String],
     globalReservationIds: List[String],
     correlationId: String,
-    replyTo: String,
+    replyTo: Option[URI],
     nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
   override def nsiV1SoapAction = ""

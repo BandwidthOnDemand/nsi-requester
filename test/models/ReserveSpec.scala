@@ -1,12 +1,11 @@
 package models
 
-import org.specs2.mutable.Specification
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.Period
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveSpec extends Specification {
+class ReserveSpec extends support.Specification {
 
   "reserves" should {
 
@@ -85,7 +84,7 @@ class ReserveSpec extends Specification {
 
   object DefaultReservation {
     def apply(description: Option[String] = None, start: Option[Date] = Some(new Date()), end: Either[Date, Period] = Left(new Date()), globalReservationId: Option[String] = Some("urn:surfnet:123456")) =
-      Reserve(description, start, end, "connection", Port("source", "1"), Port("dest", "2"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", "http://localhost", "nsa:surfnet.nl", globalReservationId)
+      Reserve(description, start, end, "connection", Port("source", "1"), Port("dest", "2"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "nsa:surfnet.nl", globalReservationId)
   }
 
 }

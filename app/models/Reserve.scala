@@ -1,10 +1,11 @@
 package models
 
+import java.net.URI
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.Period
-import scala.xml.Null
+import scala.xml.NodeSeq.Empty
 
 case class Reserve(
     description: Option[String],
@@ -15,7 +16,7 @@ case class Reserve(
     destination: Port,
     bandwidth: Int,
     correlationId: String,
-    replyTo: String,
+    replyTo: Option[URI],
     providerNsa: String,
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
@@ -80,17 +81,17 @@ case class Reserve(
 
   private def startTimeField = startDate match {
     case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
-    case None => Null
+    case None       => Empty
   }
 
   private def globalReservationIdField = globalReservationId match {
     case Some(g) => <globalReservationId>{ g }</globalReservationId>
-    case None => <globalReservationId/>
+    case None    => <globalReservationId/>
   }
 
   private def descriptionField = description match {
     case Some(d) => <description>{ d }</description>
-    case None => Null
+    case None    => Empty
   }
 
   private def endDateOrDuration() = {
@@ -117,6 +118,5 @@ case class Reserve(
         </guaranteed>
       </serviceAttributes>
     else
-      Null
-
+      Empty
 }

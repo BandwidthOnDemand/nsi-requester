@@ -1,10 +1,9 @@
 package models
 
-import org.specs2.mutable.Specification
 import QueryOperation._
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class QuerySpec extends Specification {
+class QuerySpec extends support.Specification {
 
   "NSI v1 queries" should {
 
@@ -86,7 +85,7 @@ class QuerySpec extends Specification {
         globalReservationIds = globalReservationIds,
         correlationId = "corr",
         operation = operation,
-        replyTo = "http://localhost",
+        replyTo = Some(uri("http://localhost")),
         nsaProvider = "nsa:surfnet.nl")
   }
 }

@@ -1,10 +1,9 @@
 package models
 
-import org.specs2.mutable.Specification
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ProvisionSpec extends Specification {
+class ProvisionSpec extends support.Specification {
 
   "NSI v1 provision" should {
 
@@ -31,7 +30,7 @@ class ProvisionSpec extends Specification {
   }
 
   object DefaultProvision {
-    def apply() = Provision("123-abc", "asdf-098", "http://localhost/reply", NsiRequest.RequesterNsa)
+    def apply() = Provision("123-abc", "asdf-098", Some(uri("http://localhost/reply")), NsiRequest.RequesterNsa)
   }
 
 }

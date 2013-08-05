@@ -1,6 +1,7 @@
 package models
 
-import scala.xml.Null
+import java.net.URI
+import scala.xml.NodeSeq.Empty
 
 object QueryNotificationOperation extends Enumeration {
   type QueryNotificationOperation = Value
@@ -15,7 +16,7 @@ case class QueryNotification(
   startNotificationId: Option[Int],
   endNotificationId: Option[Int],
   correlationId: String,
-  replyTo: String,
+  replyTo: Option[URI],
   nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
 
   override def nsiV1SoapAction = sys.error("QueryNotification is not a supported NSI v1 operation")
@@ -40,8 +41,8 @@ case class QueryNotification(
 
   private def queryBody = List(
     <connectionId>{ connectionId }</connectionId>,
-    { startNotificationId.map(id => <startNotificationId>{ id }</startNotificationId>).getOrElse(Null) },
-    { endNotificationId.map(id => <endNotificationId>{ id }</endNotificationId>).getOrElse(Null) })
+    { startNotificationId.map(id => <startNotificationId>{ id }</startNotificationId>).getOrElse(Empty) },
+    { endNotificationId.map(id => <endNotificationId>{ id }</endNotificationId>).getOrElse(Empty) })
 
 
   override def nsiV1Body = sys.error("QueryNotification is not a supported NSI v1 operation")
