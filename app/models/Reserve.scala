@@ -14,7 +14,7 @@ case class Reserve(
     connectionId: String,
     source: Port,
     destination: Port,
-    bandwidth: Int,
+    bandwidth: Long,
     correlationId: String,
     replyTo: Option[URI],
     providerNsa: String,
@@ -22,7 +22,7 @@ case class Reserve(
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   override def nsiV1SoapAction = ""
-  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/04/connection/service/reserve"
+  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/07/connection/service/reserve"
 
   override def nsiV2Body =
     <type:reserve>
@@ -33,9 +33,8 @@ case class Reserve(
           { startTimeField }
           { endDateOrDuration }
         </schedule>
-        <bandwidth>{ bandwidth }</bandwidth>
-        <serviceAttributes />
-        <path>
+        <p2p:p2ps xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
+          <capacity>{ bandwidth }</capacity>
           <directionality>Bidirectional</directionality>
           <sourceSTP>
             { source.xmlV2 }
@@ -43,7 +42,7 @@ case class Reserve(
           <destSTP>
             { destination.xmlV2 }
           </destSTP>
-        </path>
+        </p2p:p2ps>
       </criteria>
     </type:reserve>
 

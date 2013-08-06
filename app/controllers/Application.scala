@@ -232,7 +232,7 @@ object Application extends Controller {
         "connectionId" -> (if (nsiVersion == 1) nonEmptyText else text),
         "source" -> portMapping,
         "destination" -> portMapping,
-        "bandwidth" -> number(0, 100000),
+        "bandwidth" -> longNumber(0, 100000),
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
         "providerNsa" -> nonEmptyText,

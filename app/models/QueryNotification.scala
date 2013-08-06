@@ -25,7 +25,7 @@ case class QueryNotification(
       case Sync => "queryNotificationSync"
       case Async => "queryNotification"
     }
-    s"http://schemas.ogf.org/nsi/2013/04/connection/service/$action"
+    s"http://schemas.ogf.org/nsi/2013/07/connection/service/$action"
   }
 
   override def nsiV2Body = operation match {

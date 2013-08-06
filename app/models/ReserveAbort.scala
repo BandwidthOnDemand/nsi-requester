@@ -9,7 +9,7 @@ case class ReserveAbort(
     providerNsa: String) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
   override def nsiV1SoapAction = ""
-  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/04/connection/service/reserveAbort"
+  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/07/connection/service/reserveAbort"
 
   override def nsiV2Body =
     <type:reserveAbort>

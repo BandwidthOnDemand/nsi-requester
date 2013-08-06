@@ -62,8 +62,8 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:head="http://schemas.ogf.org/nsi/2013/04/framework/headers"
-      xmlns:type="http://schemas.ogf.org/nsi/2013/04/connection/types">
+      xmlns:head="http://schemas.ogf.org/nsi/2013/07/framework/headers"
+      xmlns:type="http://schemas.ogf.org/nsi/2013/07/connection/types">
       <soapenv:Header>
         { header }
       </soapenv:Header>
@@ -77,5 +77,5 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
 
 object NsiRequest {
   val RequesterNsa = "urn:ogf:network:nsa:surfnet-nsi-requester"
-  val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/04/connection/provider"
+  val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
 }
