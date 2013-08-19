@@ -147,7 +147,13 @@ object Application extends Controller {
 
   def validateProvider = Action(parse.json) { implicit request =>
 
-    def containsNsi2Schema(body: String) = body.contains(NsiRequest.NsiV2ProviderNamespace)
+    def determineNsiVersion(wsdl: String): Option[Int] =
+      if (wsdl.contains(NsiRequest.NsiV1ProviderNamespace))
+        Some(1)
+      else if (wsdl.contains(NsiRequest.NsiV2ProviderNamespace))
+        Some(2)
+      else
+        None
 
     val wsdlValid =
       for {
@@ -162,8 +168,8 @@ object Application extends Controller {
 
         wsdlRequest.get.map { wsdlResponse =>
           if (wsdlResponse.status == 200) {
-            val version = if (containsNsi2Schema(wsdlResponse.body)) 2 else 1
-            Ok(Json.obj("valid" -> true, "version" -> version))
+            val nsiVersion = determineNsiVersion(wsdlResponse.body)
+            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v)).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
           } else
             Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
         }

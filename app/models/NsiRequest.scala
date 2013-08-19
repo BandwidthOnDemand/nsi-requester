@@ -78,4 +78,5 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
 object NsiRequest {
   val RequesterNsa = "urn:ogf:network:nsa:surfnet-nsi-requester"
   val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
+  val NsiV1ProviderNamespace = "http://schemas.ogf.org/nsi/2011/10/connection/provider"
 }
