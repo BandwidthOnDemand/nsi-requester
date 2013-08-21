@@ -9,7 +9,7 @@ import java.net.URI
 object Defaults {
 
   val DefaultPortV1 = Port("urn:ogf:network:stp:surfnet.nl", "")
-  val DefaultPortV2 = Port("urn:ogf:network:surfnet.nl:1990", "")
+  val DefaultPortV2 = Port("urn:ogf:network:surfnet.nl:1990", "urn:ogf:network:surfnet.nl:1990:")
 
   private val DefaultProviderUrl = URI.create("https://bod.surfnet.nl/nsi/v1_sc/provider")
   private val DefaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
