@@ -78,7 +78,7 @@ class ReserveSpec extends support.Specification {
     "have a soap action" in {
       val res = DefaultReservation()
 
-      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/07/connection/service/reserve")
+      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/04/connection/service/reserve")
     }
   }
 
