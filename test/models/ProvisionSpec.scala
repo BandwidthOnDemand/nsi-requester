@@ -27,6 +27,12 @@ class ProvisionSpec extends support.Specification {
       envelope must \\("provision")
       envelope must \\("connectionId") \> "1234567890"
     }
+
+    "have a soap action" in {
+      val res = DefaultProvision()
+
+      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/04/connection/service/provision")
+    }
   }
 
   object DefaultProvision {

@@ -21,9 +21,6 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
 
-  override def nsiV1SoapAction = ""
-  override def nsiV2SoapAction = "http://schemas.ogf.org/nsi/2013/04/connection/service/reserve"
-
   override def nsiV2Body =
     <type:reserve>
       { globalReservationIdField }

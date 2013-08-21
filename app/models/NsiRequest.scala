@@ -6,9 +6,6 @@ import java.net.URI
 
 abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerNsa: String) {
 
-  def nsiV2SoapAction: String
-  def nsiV1SoapAction: String
-
   def nsiV1Body: Node
   def nsiV2Body: Node
 
@@ -16,6 +13,16 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
     case 1 => nsiV1SoapAction
     case 2 => nsiV2SoapAction
     case x => sys.error(s"Non supported NSI version $x")
+  }
+
+  private[models] def nsiV1SoapAction: String = ""
+  private[models] def nsiV2SoapAction: String = {
+    def deCapitalize(input: String): String = {
+      val chars = input.toCharArray
+      chars(0) = chars(0).toLower
+      new String(chars)
+    }
+    NsiRequest.SoapActionPrefix + deCapitalize(this.getClass().getSimpleName())
   }
 
   def toNsiEnvelope(version: Int = 1): Node = version match {
@@ -79,4 +86,5 @@ object NsiRequest {
   val RequesterNsa = "urn:ogf:network:nsa:surfnet-nsi-requester"
   val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
   val NsiV1ProviderNamespace = "http://schemas.ogf.org/nsi/2011/10/connection/provider"
+  val SoapActionPrefix = "http://schemas.ogf.org/nsi/2013/04/connection/service/"
 }
