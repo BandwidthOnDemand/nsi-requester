@@ -19,6 +19,8 @@ $(function() {
 
    var initNsiRequestSubmit = function() {
 
+      var lastHash = window.location.hash;
+
       var responseS = $("#responseS");
 
       if (!responseS.length) return;
@@ -38,6 +40,7 @@ $(function() {
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          hideQueryForm(correlationId);
          clearResponses();
+         document.location.hash = "request";
 
          $.ajax({
             data: $(event.target).serialize(),
@@ -49,6 +52,7 @@ $(function() {
             },
             error: function(err) {
                showQueryForm();
+               document.location.hash = "error";
                $('.control-group').removeClass('error');
                if (err.status === 400) { // BadRequest
                   var response = JSON.parse(err.responseText);
@@ -112,7 +116,7 @@ $(function() {
       }
 
       function clearResponses() {
-          responseS.find('div.xml-content').remove();
+         responseS.find('div.xml-content').remove();
       }
 
       function increaseResponses() {
@@ -120,6 +124,17 @@ $(function() {
          number.text(parseInt(number.text()) + 1);
       }
 
+      function checkLocation() {
+         if (window.location.hash != lastHash) {
+            if (lastHash == "#request") {
+               clearResponses();
+               showQueryForm();
+            }
+            lastHash = window.location.hash;
+         }
+      }
+
+      setInterval(checkLocation, 100);
    }
 
    var initValidateProviderUrl = function() {
