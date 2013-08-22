@@ -4,7 +4,7 @@ import scala.xml.NodeSeq
 import scala.xml.Elem
 import scala.xml.NodeSeq
 
-case class Port(networkId: String, localId: String, labels: Map[String, Seq[String]] = Map.empty) {
+case class Port(networkId: String, localId: String, vlan: Option[Int] = None, labels: Map[String, Seq[String]] = Map.empty) {
   def stpId = s"$networkId:$localId"
 
   def xmlV2: NodeSeq = {

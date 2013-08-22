@@ -57,11 +57,9 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-    @inputText(field("networkId"), '_label -> s"$name networkId", 'class -> "input-xlarge")
-    @inputText(field("localId"), '_label -> s"$name localId", 'class -> "input-xlarge")
+    @inputText(field("networkId"), '_label -> s"$name NetworkId", 'class -> "input-xlarge")
+    @inputText(field("localId"), '_label -> s"$name LocalId", 'class -> "input-xlarge")
     @if(provider.nsiVersion == 2) {
-        @repeat(field("labels"), min = 1) { label =>
-            @inputText(label, '_label -> s"$name label", 'class -> "input-xlarge", '_help -> "key: value, value, value")
-        }
+        @inputText(field("vlan"), '_label -> s"$name VLAN")
     }
 }

@@ -263,6 +263,7 @@ object Application extends Controller {
     def portMapping = mapping(
       "networkId" -> nonEmptyText,
       "localId" -> nonEmptyText,
+      "vlan" -> optional(number(1, 4095)),
       "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
 
     private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map(_.trim).filter(_.nonEmpty).map { label =>

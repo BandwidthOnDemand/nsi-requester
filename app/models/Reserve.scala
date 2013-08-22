@@ -30,16 +30,7 @@ case class Reserve(
           { startTimeField }
           { endDateOrDuration }
         </schedule>
-        <p2p:p2ps xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
-          <capacity>{ bandwidth }</capacity>
-          <directionality>Bidirectional</directionality>
-          <sourceSTP>
-            { source.xmlV2 }
-          </sourceSTP>
-          <destSTP>
-            { destination.xmlV2 }
-          </destSTP>
-        </p2p:p2ps>
+        { serviceType }
       </criteria>
     </type:reserve>
 
@@ -98,7 +89,34 @@ case class Reserve(
       duration => <duration>{ duration }</duration>)
   }
 
-  private def possibleUnprotected() =
+  private def serviceType =
+    if (source.vlan.isDefined && destination.vlan.isDefined) {
+      <p2p:evts xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
+        <capacity>{ bandwidth }</capacity>
+        <directionality>Bidirectional</directionality>
+        <sourceSTP>
+          { source.xmlV2 }
+        </sourceSTP>
+        <destSTP>
+          { destination.xmlV2 }
+        </destSTP>
+        <sourceVLAN>{ source.vlan.get }</sourceVLAN>
+        <destVLAN>{ destination.vlan.get }</destVLAN>
+      </p2p:evts>
+    } else {
+      <p2p:p2ps xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
+        <capacity>{ bandwidth }</capacity>
+        <directionality>Bidirectional</directionality>
+        <sourceSTP>
+          { source.xmlV2 }
+        </sourceSTP>
+        <destSTP>
+          { destination.xmlV2 }
+        </destSTP>
+      </p2p:p2ps>
+    }
+
+  private def possibleUnprotected =
     if (unprotected)
       <serviceAttributes>
         <guaranteed>

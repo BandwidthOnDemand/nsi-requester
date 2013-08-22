@@ -7,7 +7,7 @@ class PortSpec extends Specification {
 
   "Port" should {
     "contain labels for v2" in {
-      val port = Port("networkId", "localId", Map("vlan" -> Seq("1", "9")))
+      val port = Port("networkId", "localId", None, Map("vlan" -> Seq("1", "9")))
 
       val xml = port.xmlV2
 
