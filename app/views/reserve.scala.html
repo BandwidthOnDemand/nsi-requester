@@ -35,20 +35,20 @@
                   <input type="hidden" name="reservation.end.period" value="" />
                 }
 
-                @inputPort(field => requestForm("reservation.source." + field), "Source")
+                @inputPort(field => requestForm("reservation.source." + field), "source")
 
-                @inputPort(field => requestForm("reservation.destination." + field), "Destination")
+                @inputPort(field => requestForm("reservation.destination." + field), "destination")
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
                 @if(provider.nsiVersion == 1) {
-                  @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected path", '_showConstraints -> false)
+                  @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
                 }
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Reserve</button>
+                  <button type="submit" class="btn btn-primary">Reserve</button>
                 </div>
             }
         </div>
@@ -57,9 +57,15 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-    @inputText(field("networkId"), '_label -> s"$name NetworkId", 'class -> "input-xlarge")
-    @inputText(field("localId"), '_label -> s"$name LocalId", 'class -> "input-xlarge")
     @if(provider.nsiVersion == 2) {
-        @inputText(field("vlan"), '_label -> s"$name VLAN")
+      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xlarge")
+    } else {
+      <input type="hidden" name="@{s"reservation.$name.networkId"}" value="XXX" />
+    }
+    @defining(if (provider.nsiVersion == 2) "LocalId" else "STP id") { label =>
+      @inputText(field("localId"), '_label -> s"${name.capitalize} $label", 'class -> "input-xlarge")
+    }
+    @if(provider.nsiVersion == 2) {
+      @inputText(field("vlan"), '_label -> s"${name.capitalize} VLAN")
     }
 }

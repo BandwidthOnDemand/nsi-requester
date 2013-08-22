@@ -56,7 +56,7 @@ case class Reserve(
           <path>
             <directionality>Bidirectional</directionality>
             <sourceSTP>
-              <stpId>{ source.stpId }</stpId>
+              { source.xmlV1 }
             </sourceSTP>
             <destSTP>
               { destination.xmlV1 }

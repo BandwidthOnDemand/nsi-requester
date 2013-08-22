@@ -5,7 +5,6 @@ import scala.xml.Elem
 import scala.xml.NodeSeq
 
 case class Port(networkId: String, localId: String, vlan: Option[Int] = None, labels: Map[String, Seq[String]] = Map.empty) {
-  def stpId = s"$networkId:$localId"
 
   def xmlV2: NodeSeq = {
     <networkId>{ networkId }</networkId>
@@ -27,5 +26,5 @@ case class Port(networkId: String, localId: String, vlan: Option[Int] = None, la
   }
 
   def xmlV1: NodeSeq =
-    <stpId>{ s"$networkId:$localId" }</stpId>
+    <stpId>{ s"$localId" }</stpId>
 }
