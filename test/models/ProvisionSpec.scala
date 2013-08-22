@@ -31,7 +31,7 @@ class ProvisionSpec extends support.Specification {
     "have a soap action" in {
       val res = DefaultProvision()
 
-      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/04/connection/service/provision")
+      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/07/connection/service/provision")
     }
   }
 
