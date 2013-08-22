@@ -12,6 +12,7 @@ import org.joda.time.DateTime
 import scala.concurrent.stm.TMap
 import support.JsonResponse
 import scala.xml.NodeSeq
+import models.Ack
 
 object ResponseController extends Controller {
 
@@ -21,6 +22,7 @@ object ResponseController extends Controller {
 
   def reply = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
+    val providerNsa = parseProviderNsa(request.body)
 
     correlationId.foreach { id =>
       val clients = channels.get(id).map(Seq(_)).getOrElse {
@@ -33,17 +35,21 @@ object ResponseController extends Controller {
       }
     }
 
-    correlationId.fold(BadRequest)(_ => Ok)
+    correlationId.fold(BadRequest((<badRequest>Could not find a correlationId</badRequest>).asInstanceOf[NodeSeq])) { c =>
+      Ok(Ack(c, providerNsa.getOrElse("No provider NSA found")).toNsiV2Envelope)
+    }
   }
 
-  private def parseCorrelationId(xml: NodeSeq): Option[String] = {
+  private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>
       correlationId.text match {
         case CorrelationId(id) => Some(id)
         case _ => None
       }
     }
-  }
+
+  private def parseProviderNsa(xml: NodeSeq): Option[String] =
+    (xml \\ "providerNSA").headOption.map(n => n.text)
 
   def comet(id: String) = Action {
     val (enumerator, channel) = Concurrent.broadcast[String]
