@@ -1,4 +1,4 @@
-@(title: String, activeMenu: String, nsiVersion: Int)(content: Html)(implicit flash: Flash)
+@(title: String, activeMenu: String, nsiVersion: NsiVersion)(content: Html)(implicit flash: Flash)
 
 @import play.api.Play
 @import play.api.Mode
@@ -44,7 +44,7 @@
                     <div class="container">
                         <ul class="nav">
                             @menuItems.map {
-                                case (menu, href, versions) if versions contains nsiVersion => {
+                                case (menu, href, versions) if versions contains nsiVersion.value => {
                                     <li @if(activeMenu == menu) {class="active"} id="@menu">
                                         <a href="@href">@menu.capitalize</a>
                                     </li>

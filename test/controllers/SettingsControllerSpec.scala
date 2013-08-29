@@ -5,6 +5,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.data.Form
 import models.Provider
+import models.NsiVersion
 import play.api.test.WithApplication
 import play.api.mvc.Flash
 
@@ -79,7 +80,7 @@ class SettingsControllerSpec extends support.Specification {
   "The settings view" should {
     "contain the password when set in session" in new WithApplication {
       val settingsForm = SettingsController.settingsF.fill(
-        (Provider(uri("http://localhost"), 2, Some("John"), Some("secret"), None), (Some(uri("http://localhost/reply")), "urn:ogf:network:nsa:surnfet.nl"))
+        (Provider(uri("http://localhost"), NsiVersion.V2, Some("John"), Some("secret"), None), (Some(uri("http://localhost/reply")), "urn:ogf:network:nsa:surnfet.nl"))
       )
 
       val result = views.html.settings(settingsForm)(Flash())

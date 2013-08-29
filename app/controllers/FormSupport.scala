@@ -13,6 +13,7 @@ import play.api.data.Mapping
 import play.api.data.format.Formats.stringFormat
 import play.api.data.format.Formatter
 import scala.util.Try
+import models.NsiVersion
 
 object FormSupport {
 
@@ -72,7 +73,7 @@ object FormSupport {
 
   val providerMapping: Mapping[Provider] = mapping(
     "providerUrl" -> uri,
-    "nsiVersion" -> number,
+    "nsiVersion" -> number.transform[NsiVersion](NsiVersion.fromInt, _.value),
     "username" -> optional(text),
     "password" -> optional(text),
     "accessToken" -> optional(text)

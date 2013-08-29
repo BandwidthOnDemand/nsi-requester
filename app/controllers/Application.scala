@@ -41,8 +41,9 @@ object Application extends Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        source = if (defaultProvider.nsiVersion == 1)  DefaultPortV1 else DefaultPortV2,
-        destination = if (defaultProvider.nsiVersion == 1)  DefaultPortV1 else DefaultPortV2,
+        serviceType = defaultProvider.nsiVersion.fold(v1 = "", v2 = "http://services.ogf.org/nsi/2013/07/descriptions/EVTS.A-GOLE"),
+        source = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
+        destination = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
         bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
     )
 
@@ -51,8 +52,8 @@ object Application extends Controller {
 
   def reserve = Action { implicit request =>
     defaultProvider.reserveF.bindFromRequest.fold(
-      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
-      { case reservation => sendEnvelope(defaultProvider, reservation) })
+      formWithErrors => { println(formWithErrors); BadRequest(Json.toJson(formWithErrors.errors)) },
+      reservation => sendEnvelope(defaultProvider, reservation))
   }
 
   def reserveCommitForm = Action { implicit request =>
@@ -147,11 +148,11 @@ object Application extends Controller {
 
   def validateProvider = Action(parse.json) { implicit request =>
 
-    def determineNsiVersion(wsdl: String): Option[Int] =
+    def determineNsiVersion(wsdl: String): Option[NsiVersion] =
       if (wsdl.contains(NsiRequest.NsiV1ProviderNamespace))
-        Some(1)
+        Some(NsiVersion.V1)
       else if (wsdl.contains(NsiRequest.NsiV2ProviderNamespace))
-        Some(2)
+        Some(NsiVersion.V2)
       else
         None
 
@@ -169,7 +170,7 @@ object Application extends Controller {
         wsdlRequest.get.map { wsdlResponse =>
           if (wsdlResponse.status == 200) {
             val nsiVersion = determineNsiVersion(wsdlResponse.body)
-            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v)).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
+            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v.value)).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
           } else
             Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
         }
@@ -215,7 +216,7 @@ object Application extends Controller {
   private implicit class Mappings(provider: Provider) {
     private val nsiVersion = provider.nsiVersion
 
-    private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", _.isDefined || nsiVersion == 2)
+    private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", uri => nsiVersion.fold(v1 = uri.isDefined, v2 = true))
     private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
 
     private def endDateOrPeriod = tuple(
@@ -235,7 +236,8 @@ object Application extends Controller {
         "description" -> optional(text),
         "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
         "end" -> endDateOrPeriod,
-        "connectionId" -> (if (nsiVersion == 1) nonEmptyText else text),
+        "connectionId" -> nsiVersion.fold(v1 = nonEmptyText, v2 = text),
+        "serviceType" -> nsiVersion.fold(v1 = text, v2 = nonEmptyText),
         "source" -> portMapping,
         "destination" -> portMapping,
         "bandwidth" -> longNumber(0, 100000),

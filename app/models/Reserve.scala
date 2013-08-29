@@ -12,6 +12,7 @@ case class Reserve(
     startDate: Option[Date],
     end: Either[Date, Period],
     connectionId: String,
+    serviceType: String,
     source: Port,
     destination: Port,
     bandwidth: Long,
@@ -30,7 +31,8 @@ case class Reserve(
           { startTimeField }
           { endDateOrDuration }
         </schedule>
-        { serviceType }
+        <serviceType>{ serviceType }</serviceType>
+        { service }
       </criteria>
     </type:reserve>
 
@@ -89,7 +91,7 @@ case class Reserve(
       duration => <duration>{ duration }</duration>)
   }
 
-  private def serviceType =
+  private def service =
     if (source.vlan.isDefined && destination.vlan.isDefined) {
       <p2p:evts xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
         <capacity>{ bandwidth }</capacity>

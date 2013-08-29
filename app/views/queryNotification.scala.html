@@ -3,10 +3,10 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI v${provider.nsiVersion} Query Notification Request", "queryNotification", provider.nsiVersion) {
+@nsirequest(s"Make a NSI ${provider.nsiVersion} Query Notification Request", "queryNotification", provider.nsiVersion) {
 
     <section id="formS">
-        <h1>Make a NSI v@provider.nsiVersion Query Notification Request</h1>
+        <h1>Make a NSI @provider.nsiVersion Query Notification Request</h1>
         <div class="content">
              @form(action = routes.Application.queryNotification, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query Notification attributes</h3></div>

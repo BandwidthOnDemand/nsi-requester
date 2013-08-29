@@ -13,11 +13,11 @@ object Defaults {
 
   private val DefaultProviderUrl = URI.create("https://bod.surfnet.nl/nsi/v1_sc/provider")
   private val DefaultProviderNsaUri = "urn:ogf:network:nsa:surfnet.nl"
-  private val DefaultNsiVersion = 2
+  private val DefaultNsiVersion = NsiVersion.V2
 
   def defaultProvider(implicit request: Request[AnyContent]) = {
     val url = request.session.get("providerUrl").flatMap(s => Try(URI.create(s)).toOption).getOrElse(DefaultProviderUrl)
-    val nsiVersion = request.session.get("nsiVersion").map(_.toInt).getOrElse(DefaultNsiVersion)
+    val nsiVersion = request.session.get("nsiVersion").map(s => NsiVersion.fromInt(s.toInt)).getOrElse(DefaultNsiVersion)
     val user = request.session.get("username")
     val pass = request.session.get("password")
     val token = request.session.get("accessToken")

@@ -3,20 +3,23 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI v${provider.nsiVersion} Reserve Request", "reserve", provider.nsiVersion) {
+@nsirequest(s"Make a NSI ${provider.nsiVersion} Reserve Request", "reserve", provider.nsiVersion) {
 
     <section id="formS">
-        <h1>Make a NSI v@provider.nsiVersion Reserve Request</h1>
+        <h1>Make a NSI @provider.nsiVersion Reserve Request</h1>
 
         <div class="content">
             @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
 
-                @if(provider.nsiVersion == 1) {
-                  @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
-                } else {
-                  <input type="hidden" name="reservation.connectionId" value="" />
+                @provider.nsiVersion match {
+                  case NsiVersion.V1 => {
+                    @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                  }
+                  case NsiVersion.V2 => {
+                    <input type="hidden" name="reservation.connectionId" value="" />
+                  }
                 }
 
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
@@ -29,10 +32,15 @@
 
                 @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
 
-                @if(provider.nsiVersion == 1) {
-                  @inputText(requestForm("reservation.end.period"), '_label -> "Period")
-                } else {
-                  <input type="hidden" name="reservation.end.period" value="" />
+                @provider.nsiVersion match {
+                  case NsiVersion.V1 => {
+                    @inputText(requestForm("reservation.end.period"), '_label -> "Period")
+                    <input type="hidden" name="reservation.serviceType" value="" />
+                  }
+                  case NsiVersion.V2 => {
+                    <input type="hidden" name="reservation.end.period" value="" />
+                    @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xlarge")
+                  }
                 }
 
                 @inputPort(field => requestForm("reservation.source." + field), "source")
@@ -41,8 +49,12 @@
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
-                @if(provider.nsiVersion == 1) {
-                  @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
+                @provider.nsiVersion match {
+                  case NsiVersion.V1 => {
+                    @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
+                  }
+                  case NsiVersion.V2 => {
+                  }
                 }
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
@@ -57,15 +69,15 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-    @if(provider.nsiVersion == 2) {
-      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xlarge")
-    } else {
+  @provider.nsiVersion match {
+    case NsiVersion.V1 => {
       <input type="hidden" name="@{s"reservation.$name.networkId"}" value="XXX" />
+      @inputText(field("localId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xlarge")
     }
-    @defining(if (provider.nsiVersion == 2) "LocalId" else "STP id") { label =>
-      @inputText(field("localId"), '_label -> s"${name.capitalize} $label", 'class -> "input-xlarge")
-    }
-    @if(provider.nsiVersion == 2) {
+    case NsiVersion.V2 => {
+      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xlarge")
+      @inputText(field("localId"), '_label -> s"${name.capitalize} LocalId", 'class -> "input-xlarge")
       @inputText(field("vlan"), '_label -> s"${name.capitalize} VLAN")
     }
+  }
 }

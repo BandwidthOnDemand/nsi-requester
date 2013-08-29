@@ -10,7 +10,7 @@ class ReserveAbortSpec extends support.Specification {
     "have a SOAP action" in {
       val res = DefaultReserveAbort()
 
-      res.soapAction(2) must equalTo("http://schemas.ogf.org/nsi/2013/07/connection/service/reserveAbort")
+      res.soapAction(NsiVersion.V2) must equalTo("http://schemas.ogf.org/nsi/2013/07/connection/service/reserveAbort")
     }
   }
 

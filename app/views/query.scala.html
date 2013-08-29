@@ -3,15 +3,15 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI v${provider.nsiVersion} Query Request", "query", provider.nsiVersion) {
+@nsirequest(s"Make a NSI ${provider.nsiVersion} Query Request", "query", provider.nsiVersion) {
 
     <section id="formS">
-        <h1>Make a NSI v@provider.nsiVersion Query Request</h1>
+        <h1>Make a NSI @provider.nsiVersion Query Request</h1>
         <div class="content">
              @form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
-                @defining(if(provider.nsiVersion == 1) QueryOperation.operationsV1 else QueryOperation.operationsV2) { os =>
+                @defining(provider.nsiVersion.fold(v1 = QueryOperation.operationsV1, v2 = QueryOperation.operationsV2)) { os =>
                     @select(
                         queryForm("query.operation"),
                         options = options(os.map(_.toString).toList),

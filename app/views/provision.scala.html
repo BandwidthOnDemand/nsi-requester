@@ -3,10 +3,10 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI v${provider.nsiVersion} Provision Request", "provision", provider.nsiVersion) {
+@nsirequest(s"Make a NSI ${provider.nsiVersion} Provision Request", "provision", provider.nsiVersion) {
 
     <section id="formS">
-        <h1>Make a NSI v@provider.nsiVersion Provision Request</h1>
+        <h1>Make a NSI @{provider.nsiVersion} Provision Request</h1>
         <div class="content">
             @form(action = routes.Application.provision, 'class -> "form form-horizontal") {
 

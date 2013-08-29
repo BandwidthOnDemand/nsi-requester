@@ -9,11 +9,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
   def nsiV1Body: Node
   def nsiV2Body: Node
 
-  def soapAction(version: Int = 1): String = version match {
-    case 1 => nsiV1SoapAction
-    case 2 => nsiV2SoapAction
-    case x => sys.error(s"Non supported NSI version $x")
-  }
+  def soapAction(version: NsiVersion = NsiVersion.V1): String = version.fold(v1 = nsiV1SoapAction, v2 = nsiV2SoapAction)
 
   private[models] def nsiV1SoapAction: String = ""
   private[models] def nsiV2SoapAction: String = {
@@ -25,11 +21,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
     NsiRequest.SoapActionPrefix + deCapitalize(this.getClass().getSimpleName())
   }
 
-  def toNsiEnvelope(version: Int = 1): Node = version match {
-    case 1 => toNsiV1Envelope
-    case 2 => toNsiV2Envelope
-    case x => sys.error(s"Non supported NSI version $x")
-  }
+  def toNsiEnvelope(version: NsiVersion = NsiVersion.V1): Node = version.fold(v1 = toNsiV1Envelope, v2 = toNsiV2Envelope)
 
   def toNsiV1Envelope: Node = wrapNsiV1Envelope(nsiV1Body)
   def toNsiV2Envelope: Node = wrapNsiV2Envelope(nsiV2Header, nsiV2Body)
