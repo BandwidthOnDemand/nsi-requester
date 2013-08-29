@@ -170,7 +170,7 @@ object Application extends Controller {
         wsdlRequest.get.map { wsdlResponse =>
           if (wsdlResponse.status == 200) {
             val nsiVersion = determineNsiVersion(wsdlResponse.body)
-            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v.value)).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
+            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v.value, "providerNsa" -> Defaults.DefaultProviderNsa(v))).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
           } else
             Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
         }

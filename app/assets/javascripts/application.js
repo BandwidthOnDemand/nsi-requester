@@ -146,6 +146,7 @@ $(function() {
           usernameInput = $("#provider_username"),
           passwordInput = $("#provider_password"),
           nsiVersionInput = $("#provider_nsiVersion"),
+          providerNsaInput = $("#nsi_providerNsa"),
           tokenInput = $("#provider_accessToken");
 
       providerInput.closest('fieldset').find('input').on('change', function(event) {
@@ -184,6 +185,7 @@ $(function() {
       function validProviderUrl(data) {
           if (data.valid) {
               nsiVersionInput.find('option[value="'+data.version+'"]').prop("selected", true);
+              providerNsaInput.val(data.providerNsa);
               validIndicator.addClass("valid");
               validIndicator.text("Provider is valid, NSI version " + data.version + " detected");
           } else {
