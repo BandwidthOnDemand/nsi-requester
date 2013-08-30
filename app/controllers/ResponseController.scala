@@ -13,6 +13,8 @@ import scala.concurrent.stm.TMap
 import support.JsonResponse
 import scala.xml.NodeSeq
 import models.Ack
+import models.NsiVersion
+import models.NsiRequest
 
 object ResponseController extends Controller {
 
@@ -23,6 +25,7 @@ object ResponseController extends Controller {
   def reply = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
     val providerNsa = parseProviderNsa(request.body)
+    val nsiVersion = detectNsiVersion(request.body)
 
     correlationId.foreach { id =>
       val clients = channels.get(id).map(Seq(_)).getOrElse {
@@ -35,9 +38,25 @@ object ResponseController extends Controller {
       }
     }
 
-    correlationId.fold(BadRequest((<badRequest>Could not find a correlationId</badRequest>).asInstanceOf[NodeSeq])) { c =>
-      Ok(Ack(c, providerNsa.getOrElse("No provider NSA found")).toNsiV2Envelope)
+    correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
+      nsiVersion.fold(badRequest("Could not determine NSI version")) { version =>
+        Ok(Ack(id, providerNsa.getOrElse("No provider NSA found")).toNsiEnvelope(version))
+      }
     }
+  }
+
+  private def badRequest(message: String) =
+    BadRequest((<badRequest>{ message }</badRequest>).asInstanceOf[NodeSeq])
+
+  private def detectNsiVersion(xml: NodeSeq): Option[NsiVersion] = {
+    val bodyElements = (xml \\ "Body").headOption.map(_.nonEmptyChildren)
+
+    def hasNamespace(node: scala.xml.Node, namespace: String) = Option(node.namespace).map(_.startsWith(namespace)).getOrElse(false)
+
+    bodyElements.flatMap(_.collectFirst {
+      case n: scala.xml.Node if hasNamespace(n, "http://schemas.ogf.org/nsi/2011/10") => NsiVersion.V1
+      case n: scala.xml.Node if hasNamespace(n, "http://schemas.ogf.org/nsi/2013/07") => NsiVersion.V2
+    })
   }
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
