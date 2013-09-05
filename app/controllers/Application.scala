@@ -20,6 +20,7 @@ import FormSupport._
 import Defaults._
 import java.net.URI
 import scala.concurrent.Future
+import play.api.http.ContentTypeOf
 
 object Application extends Controller {
 
@@ -187,8 +188,10 @@ object Application extends Controller {
     val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
     val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
+    implicit val soapContentType = ContentTypeOf[scala.xml.Node](Some(withCharset("text/xml")))
+
     wsRequest.post(soapRequest).map { response =>
-      if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
+      if (response.header(CONTENT_TYPE).map(_ contains "text/xml").getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {
