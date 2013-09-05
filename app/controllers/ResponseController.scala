@@ -75,7 +75,7 @@ object ResponseController extends Controller {
 
     channels += (id -> channel)
 
-    Ok.stream(enumerator &> Comet(callback = "parent.message"))
+    Ok.chunked(enumerator &> Comet(callback = "parent.message"))
   }
 
 }
