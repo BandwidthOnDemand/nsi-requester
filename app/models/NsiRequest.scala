@@ -4,7 +4,7 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerNsa: String) {
+abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, providerNsa: String) {
 
   def nsiV1Body: Node
   def nsiV2Body: Node
@@ -27,7 +27,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
   def toNsiV2Envelope: Node = wrapNsiV2Envelope(nsiV2Header, nsiV2Body)
 
   private[models] def nsas = {
-    <requesterNSA>{ NsiRequest.RequesterNsa }</requesterNSA>
+    <requesterNSA>{ requesterNsa }</requesterNSA>
     <providerNSA>{ providerNsa }</providerNSA>
   }
 
@@ -40,7 +40,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
     <head:nsiHeader>
       <protocolVersion>application/vdn.ogf.nsi.cs.v2.provider+soap</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
-      <requesterNSA>{ NsiRequest.RequesterNsa }</requesterNSA>
+      <requesterNSA>{ requesterNsa }</requesterNSA>
       <providerNSA>{ providerNsa }</providerNSA>
       { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
     </head:nsiHeader>
@@ -74,7 +74,6 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], providerN
 }
 
 object NsiRequest {
-  val RequesterNsa = "urn:ogf:network:nsa:surfnet-nsi-requester"
   val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
   val NsiV1ProviderNamespace = "http://schemas.ogf.org/nsi/2011/10/connection/provider"
   val SoapActionPrefix = "http://schemas.ogf.org/nsi/2013/07/connection/service/"

@@ -17,7 +17,8 @@ case class QueryNotification(
   endNotificationId: Option[Int],
   correlationId: String,
   replyTo: Option[URI],
-  nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
+  requesterNsa: String,
+  providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
   override def nsiV1SoapAction = sys.error("QueryNotification is not a supported NSI v1 operation")
   override def nsiV2SoapAction = {

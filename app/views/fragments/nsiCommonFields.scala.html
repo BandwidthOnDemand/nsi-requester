@@ -14,5 +14,7 @@
         <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" @toHtmlArgs(args)>
     }
 
+    @inputText(formField("requesterNsa"), '_label -> "Requester NSA", 'class -> "input-xlarge")
+
     @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
 </fieldset>

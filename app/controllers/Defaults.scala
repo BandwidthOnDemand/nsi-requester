@@ -13,6 +13,7 @@ object Defaults {
 
   private val DefaultProviderUrl = URI.create("https://bod.surfnet.nl/nsi/v1_sc/provider")
   val DefaultProviderNsa: Map[NsiVersion, String] = Map(NsiVersion.V1 -> "urn:ogf:network:nsa:surfnet.nl", NsiVersion.V2 -> "urn:ogf:network:nsa:surfnet.nl:1990")
+  val DefaultRequesterNsa = "urn:ogf:network:nsa:surfnet-nsi-requester"
   private val DefaultNsiVersion = NsiVersion.V2
 
   def defaultProvider(implicit request: Request[AnyContent]) = {
@@ -30,6 +31,9 @@ object Defaults {
 
   def defaultProviderNsa(implicit request: Request[AnyContent]) =
     request.session.get("providerNsa").getOrElse(DefaultProviderNsa(defaultNsiVersion))
+
+  def defaultRequesterNsa(implicit request: Request[AnyContent]) =
+    request.session.get("requesterNsa").getOrElse(DefaultRequesterNsa)
 
   def defaultReplyToUrl(implicit request: Request[AnyContent]) =
     request.session.get("replyTo").filter(_.nonEmpty).orElse(Some("http://" + request.host + routes.ResponseController.reply)).flatMap(s => Try(URI.create(s)).toOption)

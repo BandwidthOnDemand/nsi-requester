@@ -1,6 +1,6 @@
 package models
 
-case class Ack(correlationId: String, providerNsa: String) extends NsiRequest(correlationId, None, providerNsa) {
+case class Ack(correlationId: String, requesterNsa: String, providerNsa: String) extends NsiRequest(correlationId, None, requesterNsa, providerNsa) {
 
   override def nsiV2Body =
     <type:acknowledgment />

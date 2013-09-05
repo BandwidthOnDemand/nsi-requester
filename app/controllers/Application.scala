@@ -46,7 +46,7 @@ object Application extends Controller {
         serviceType = defaultProvider.nsiVersion.fold(v1 = "", v2 = "http://services.ogf.org/nsi/2013/07/descriptions/EVTS.A-GOLE"),
         source = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
         destination = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
-        bandwidth = 100, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa)
+        bandwidth = 100, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa)
     )
 
     Ok(views.html.reserve(defaultForm, defaultProvider))
@@ -60,7 +60,7 @@ object Application extends Controller {
 
   def reserveCommitForm = Action { implicit request =>
     val defaultForm = defaultProvider.reserveCommitF.fill(
-      ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+      ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa))
 
     Ok(views.html.reserveCommit(defaultForm, defaultProvider))
   }
@@ -73,7 +73,7 @@ object Application extends Controller {
 
   def reserveAbortForm = Action { implicit request =>
     val defaultForm = defaultProvider.reserveAbortF.fill(
-      ReserveAbort(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+      ReserveAbort(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa))
 
     Ok(views.html.reserveAbort(defaultForm, defaultProvider))
   }
@@ -86,7 +86,7 @@ object Application extends Controller {
 
   def provisionForm = Action { implicit request =>
     val defaultForm = defaultProvider.provisionF.fill(
-      Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+      Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa))
 
     Ok(views.html.provision(defaultForm, defaultProvider))
   }
@@ -99,7 +99,7 @@ object Application extends Controller {
 
   def terminateForm = Action { implicit request =>
     val defaultForm = defaultProvider.terminateF.fill(
-      Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+      Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa))
 
     Ok(views.html.terminate(defaultForm, defaultProvider))
   }
@@ -112,7 +112,7 @@ object Application extends Controller {
 
   def releaseForm = Action { implicit request =>
     val defaultForm = defaultProvider.releaseF.fill(
-      Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, providerNsa = defaultProviderNsa))
+      Release(connectionId = "", correlationId = generateCorrelationId, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa))
 
     Ok(views.html.release(defaultForm, defaultProvider))
   }
@@ -125,7 +125,7 @@ object Application extends Controller {
 
   def queryForm = Action { implicit request =>
     val defaultForm = defaultProvider.queryF.fill(
-      Query(Summary, Nil, Nil, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+      Query(Summary, Nil, Nil, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
 
     Ok(views.html.query(defaultForm, defaultProvider))
   }
@@ -137,7 +137,7 @@ object Application extends Controller {
   }
 
   def queryNotificationForm = Action { implicit request =>
-    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, defaultProviderNsa))
+    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
 
     Ok(views.html.queryNotification(defaultForm, defaultProvider))
   }
@@ -247,6 +247,7 @@ object Application extends Controller {
         "bandwidth" -> longNumber(0, 100000),
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
+        "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText,
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean)(Reserve.apply)(Reserve.unapply))
@@ -277,11 +278,12 @@ object Application extends Controller {
       parts.head -> parts.tail.mkString(":").split(",").map(_.trim).toSeq
     }.toMap, ls => ls.map { case (key, values) => s"$key: " + values.mkString(", ") }.toList)
 
-    private def genericOperationMapping[R](apply: (String, String, Option[URI], String) => R)(unapply: R => Option[(String, String, Option[URI], String)]) =
+    private def genericOperationMapping[R](apply: (String, String, Option[URI], String, String) => R)(unapply: R => Option[(String, String, Option[URI], String, String)]) =
       mapping(
         "connectionId" -> nonEmptyText,
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
+        "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText)(apply)(unapply)
 
     import QueryOperation._
@@ -293,6 +295,7 @@ object Application extends Controller {
         "globalReservationIds" -> listWithoutEmptyStrings,
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
+        "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText) { Query.apply } { Query.unapply })
 
     def queryNotificationF: Form[QueryNotification] = Form(
@@ -303,6 +306,7 @@ object Application extends Controller {
         "endNotificationId" -> optional(number),
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
+        "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
   }
 }

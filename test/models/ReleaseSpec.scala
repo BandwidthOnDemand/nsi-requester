@@ -27,7 +27,7 @@ class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatch
   }
 
   object DefaultRelease {
-    def apply() = Release("123-abc", "asdf-1234", Some(uri("http://localhost")), NsiRequest.RequesterNsa)
+    def apply() = Release("123-abc", "asdf-1234", Some(uri("http://localhost")), "requesterNsa", "providerNsa")
   }
 
 }

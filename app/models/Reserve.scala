@@ -18,9 +18,10 @@ case class Reserve(
     bandwidth: Long,
     correlationId: String,
     replyTo: Option[URI],
+    requesterNsa: String,
     providerNsa: String,
     globalReservationId: Option[String] = None,
-    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, providerNsa) {
+    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
   override def nsiV2Body =
     <type:reserve>

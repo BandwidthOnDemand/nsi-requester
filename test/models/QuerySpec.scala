@@ -92,6 +92,7 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
         correlationId = "corr",
         operation = operation,
         replyTo = Some(uri("http://localhost")),
-        nsaProvider = "nsa:surfnet.nl")
+        requesterNsa = "requesterNsa",
+        providerNsa = "nsa:surfnet.nl")
   }
 }

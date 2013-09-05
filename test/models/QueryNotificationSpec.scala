@@ -11,7 +11,7 @@ class QueryNotificationSpec extends support.Specification with org.specs2.matche
   "QueryNotifications" should {
 
     "contain a start and end notification id" in {
-      val queryNotifiation = QueryNotification(Async, "connectionId", Some(2), Some(10), "correlationId", None, "nsaProvider")
+      val queryNotifiation = QueryNotification(Async, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", "nsaProvider")
 
       val body = queryNotifiation.nsiV2Body
 
@@ -22,7 +22,7 @@ class QueryNotificationSpec extends support.Specification with org.specs2.matche
     }
 
     "be a sync query" in {
-      val queryNotifiation = QueryNotification(Sync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaProvider")
+      val queryNotifiation = QueryNotification(Sync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", "nsaProvider")
 
       val body = queryNotifiation.nsiV2Body
 

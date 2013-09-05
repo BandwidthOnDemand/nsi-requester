@@ -25,6 +25,7 @@ object ResponseController extends Controller {
   def reply = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
     val providerNsa = parseProviderNsa(request.body)
+    val requesterNsa = parseRequesterNsa(request.body)
     val nsiVersion = detectNsiVersion(request.body)
 
     correlationId.foreach { id =>
@@ -40,7 +41,7 @@ object ResponseController extends Controller {
 
     correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
       nsiVersion.fold(badRequest("Could not determine NSI version")) { version =>
-        Ok(Ack(id, providerNsa.getOrElse("No provider NSA found")).toNsiEnvelope(version))
+        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope(version))
       }
     }
   }
@@ -67,8 +68,11 @@ object ResponseController extends Controller {
       }
     }
 
+  private def parseRequesterNsa(xml: NodeSeq): Option[String] =
+    (xml \\ "requesterNSA").headOption.map(_.text)
+
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
-    (xml \\ "providerNSA").headOption.map(n => n.text)
+    (xml \\ "providerNSA").headOption.map(_.text)
 
   def comet(id: String) = Action {
     val (enumerator, channel) = Concurrent.broadcast[String]

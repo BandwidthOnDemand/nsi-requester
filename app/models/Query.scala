@@ -18,7 +18,8 @@ case class Query(
     globalReservationIds: List[String],
     correlationId: String,
     replyTo: Option[URI],
-    nsaProvider: String) extends NsiRequest(correlationId, replyTo, nsaProvider) {
+    requesterNsa: String,
+    providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
   override def nsiV2SoapAction = {
     val action = operation match {

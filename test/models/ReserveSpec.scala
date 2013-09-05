@@ -84,7 +84,7 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
 
   object DefaultReservation {
     def apply(description: Option[String] = None, start: Option[Date] = Some(new Date()), end: Either[Date, Period] = Left(new Date()), globalReservationId: Option[String] = Some("urn:surfnet:123456")) =
-      Reserve(description, start, end, "connection", "", Port("source", "1"), Port("dest", "2"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "nsa:surfnet.nl", globalReservationId)
+      Reserve(description, start, end, "connection", "", Port("source", "1"), Port("dest", "2"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "requesterNsa", "providerNsa", globalReservationId)
   }
 
 }
