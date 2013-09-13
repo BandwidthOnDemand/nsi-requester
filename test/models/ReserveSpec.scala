@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import org.joda.time.Period
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReserveSpec extends support.Specification {
 
   "reserves" should {
 

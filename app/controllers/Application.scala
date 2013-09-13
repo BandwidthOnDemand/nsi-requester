@@ -10,7 +10,7 @@ import play.api.data.format.Formats._
 import play.api.libs.ws.{ WS, Response }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
-import play.api.mvc._
+import play.api.mvc.{ Response => _, _ }
 import play.api.http.HeaderNames.CONTENT_TYPE
 import play.api.http.MimeTypes
 import support.JsonResponse
@@ -19,8 +19,6 @@ import models.QueryOperation._
 import FormSupport._
 import Defaults._
 import java.net.URI
-import scala.concurrent.Future
-import play.api.http.ContentTypeOf
 
 object Application extends Controller {
 
@@ -52,9 +50,9 @@ object Application extends Controller {
     Ok(views.html.reserve(defaultForm, defaultProvider))
   }
 
-  def reserve = Action.async { implicit request =>
+  def reserve = Action { implicit request =>
     defaultProvider.reserveF.bindFromRequest.fold(
-      formWithErrors => { Future.successful(BadRequest(Json.toJson(formWithErrors.errors))) },
+      formWithErrors => { println(formWithErrors); BadRequest(Json.toJson(formWithErrors.errors)) },
       reservation => sendEnvelope(defaultProvider, reservation))
   }
 
@@ -65,9 +63,9 @@ object Application extends Controller {
     Ok(views.html.reserveCommit(defaultForm, defaultProvider))
   }
 
-  def reserveCommit = Action.async { implicit request =>
+  def reserveCommit = Action { implicit request =>
     defaultProvider.reserveCommitF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case reserveCommit => sendEnvelope(defaultProvider, reserveCommit) })
   }
 
@@ -78,9 +76,9 @@ object Application extends Controller {
     Ok(views.html.reserveAbort(defaultForm, defaultProvider))
   }
 
-  def reserveAbort = Action.async { implicit request =>
+  def reserveAbort = Action { implicit request =>
     defaultProvider.reserveAbortF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case reserveAbort => sendEnvelope(defaultProvider, reserveAbort) })
   }
 
@@ -91,9 +89,9 @@ object Application extends Controller {
     Ok(views.html.provision(defaultForm, defaultProvider))
   }
 
-  def provision = Action.async { implicit request =>
+  def provision = Action { implicit request =>
     defaultProvider.provisionF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case provision => sendEnvelope(defaultProvider, provision) })
   }
 
@@ -104,9 +102,9 @@ object Application extends Controller {
     Ok(views.html.terminate(defaultForm, defaultProvider))
   }
 
-  def terminate = Action.async { implicit request =>
+  def terminate = Action { implicit request =>
     defaultProvider.terminateF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case terminate => sendEnvelope(defaultProvider, terminate) })
   }
 
@@ -117,9 +115,9 @@ object Application extends Controller {
     Ok(views.html.release(defaultForm, defaultProvider))
   }
 
-  def release = Action.async { implicit request =>
+  def release = Action { implicit request =>
     defaultProvider.releaseF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case release => sendEnvelope(defaultProvider, release) })
   }
 
@@ -130,9 +128,9 @@ object Application extends Controller {
     Ok(views.html.query(defaultForm, defaultProvider))
   }
 
-  def query = Action.async { implicit request =>
+  def query = Action { implicit request =>
     defaultProvider.queryF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case query => sendEnvelope(defaultProvider, query) })
   }
 
@@ -142,13 +140,13 @@ object Application extends Controller {
     Ok(views.html.queryNotification(defaultForm, defaultProvider))
   }
 
-  def queryNotification = Action.async { implicit request =>
+  def queryNotification = Action { implicit request =>
     defaultProvider.queryNotificationF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      formWithErrors => BadRequest(Json.toJson(formWithErrors.errors)),
       { case queryNotification => sendEnvelope(defaultProvider, queryNotification) })
   }
 
-  def validateProvider = Action.async(parse.json) { implicit request =>
+  def validateProvider = Action(parse.json) { implicit request =>
 
     def determineNsiVersion(wsdl: String): Option[NsiVersion] =
       if (wsdl.contains(NsiRequest.NsiV1ProviderNamespace))
@@ -161,7 +159,7 @@ object Application extends Controller {
     val wsdlValid =
       for {
         url <- (request.body \ "url").asOpt[String] if !url.isEmpty()
-      } yield {
+      } yield Async {
         val authenticated = addAuthenticationHeader(
           (request.body \ "username").asOpt[String],
           (request.body \ "password").asOpt[String],
@@ -178,20 +176,18 @@ object Application extends Controller {
         }
       }
 
-    wsdlValid.getOrElse(Future.successful(BadRequest))
+    wsdlValid.getOrElse(BadRequest)
   }
 
-  private def sendEnvelope(provider: Provider, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[SimpleResult] = {
+  private def sendEnvelope(provider: Provider, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]) = Async {
     val soapRequest = nsiRequest.toNsiEnvelope(provider.nsiVersion)
     val requestTime = DateTime.now()
 
     val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
     val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
-    implicit val soapContentType = ContentTypeOf[scala.xml.Node](Some(withCharset("text/xml")))
-
     wsRequest.post(soapRequest).map { response =>
-      if (response.header(CONTENT_TYPE).map(_ contains "text/xml").getOrElse(false)) {
+      if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {

@@ -3,7 +3,7 @@ package models
 import QueryOperation._
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class QuerySpec extends support.Specification {
 
   "NSI v1 queries" should {
 

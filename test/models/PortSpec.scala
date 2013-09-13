@@ -1,7 +1,9 @@
 package models
 
+import org.specs2.mutable.Specification
+
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class PortSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class PortSpec extends Specification {
 
   "Port" should {
     "contain labels for v2" in {

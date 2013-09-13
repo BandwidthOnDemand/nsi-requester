@@ -8,7 +8,6 @@ import play.api.data.Forms._
 import models.Provider
 import Defaults._
 import FormSupport._
-import play.api.mvc.SimpleResult
 
 object SettingsController extends Controller {
 
@@ -19,7 +18,7 @@ object SettingsController extends Controller {
   }
 
   def settings = Action { implicit request =>
-    settingsF.bindFromRequest.fold[SimpleResult](
+    settingsF.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.settings(formWithErrors)),
       {
         case (provider, (replyTo, requesterNsa, providerNsa)) =>

@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReleaseSpec extends support.Specification {
 
   "NSI v1 terminate" should {
 
