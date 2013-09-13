@@ -18,6 +18,7 @@ class SettingsControllerSpec extends support.Specification {
       "provider.providerUrl" -> "http://someurl.nl",
       "provider.nsiVersion" -> "2",
       "nsi.replyTo" -> "http://localhost:9000/reply",
+      "nsi.requesterNsa" -> "urn:ogf:network:nsi-requester",
       "nsi.providerNsa" -> "urn:ogf:network:nsa:surfnet.nl"
     )
 
