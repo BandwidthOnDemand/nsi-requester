@@ -39,7 +39,7 @@
                   }
                   case NsiVersion.V2 => {
                     <input type="hidden" name="reservation.end.period" value="" />
-                    @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xlarge")
+                    @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xxlarge")
                   }
                 }
 
@@ -75,8 +75,8 @@
       @inputText(field("localId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xlarge")
     }
     case NsiVersion.V2 => {
-      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xlarge")
-      @inputText(field("localId"), '_label -> s"${name.capitalize} LocalId", 'class -> "input-xlarge")
+      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xxlarge")
+      @inputText(field("localId"), '_label -> s"${name.capitalize} LocalId", 'class -> "input-xxlarge")
       @inputText(field("vlan"), '_label -> s"${name.capitalize} VLAN")
     }
   }
