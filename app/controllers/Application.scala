@@ -19,6 +19,7 @@ import models.QueryOperation._
 import FormSupport._
 import Defaults._
 import java.net.URI
+import play.api.Logger
 
 object Application extends Controller {
 
@@ -187,6 +188,7 @@ object Application extends Controller {
     val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
+      Logger.debug(s"Provider (${provider.providerUrl}) response: ${response.status}, ${response.statusText}")
       if (response.header(CONTENT_TYPE).map(_ contains MimeTypes.XML).getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
@@ -195,7 +197,9 @@ object Application extends Controller {
         BadRequest(JsonResponse.failure(soapRequest, requestTime, message))
       }
     }.recover {
-      case e => BadRequest(Json.obj("message" -> e.getMessage()))
+      case e =>
+        Logger.info("Could not send soap request", e)
+        BadRequest(Json.obj("message" -> e.getMessage()))
     }
   }
 
