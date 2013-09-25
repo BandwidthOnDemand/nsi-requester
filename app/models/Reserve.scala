@@ -97,6 +97,7 @@ case class Reserve(
       <p2p:evts xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
         <capacity>{ bandwidth }</capacity>
         <directionality>Bidirectional</directionality>
+        <symmetricPath>true</symmetricPath>
         <sourceSTP>
           { source.xmlV2 }
         </sourceSTP>
@@ -110,6 +111,7 @@ case class Reserve(
       <p2p:p2ps xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
         <capacity>{ bandwidth }</capacity>
         <directionality>Bidirectional</directionality>
+        <symmetricPath>true</symmetricPath>
         <sourceSTP>
           { source.xmlV2 }
         </sourceSTP>
