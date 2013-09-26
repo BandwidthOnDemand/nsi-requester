@@ -1,1 +1,1 @@
-web: target/start -Dhttp.port=${PORT} ${JAVA_OPTS} -Dgoogle.analytics.code=${ANALYTICS_CODE}
+web: target/universal/stage/bin/nsi-requester -Dhttp.port=${PORT} -Dgoogle.analytics.code=${ANALYTICS_CODE}
