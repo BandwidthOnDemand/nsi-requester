@@ -12,7 +12,6 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
 import play.api.http.HeaderNames.CONTENT_TYPE
-import play.api.http.MimeTypes
 import support.JsonResponse
 import models._
 import models.QueryOperation._
@@ -21,9 +20,8 @@ import Defaults._
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future
-import play.api.http.ContentTypeOf
 
-object Application extends Controller {
+object Application extends Controller with Soap11Controller {
 
   implicit object FormErrorWrites extends Writes[FormError] {
     def writes(error: FormError) = Json.toJson(
@@ -189,11 +187,9 @@ object Application extends Controller {
     val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
     val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
-    implicit val soapContentType = ContentTypeOf[scala.xml.Node](Some(withCharset("text/xml")))
-
     wsRequest.post(soapRequest).map { response =>
       Logger.debug(s"Provider (${provider.providerUrl}) response: ${response.status}, ${response.statusText}")
-      if (response.header(CONTENT_TYPE).map(_ contains "text/xml").getOrElse(false)) {
+      if (response.header(CONTENT_TYPE).map(_ contains ContentTypeSoap11).getOrElse(false)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {

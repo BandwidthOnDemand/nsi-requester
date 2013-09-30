@@ -16,7 +16,7 @@ import models.Ack
 import models.NsiVersion
 import models.NsiRequest
 
-object ResponseController extends Controller {
+object ResponseController extends Controller with Soap11Controller {
 
   private val channels: TMap.View[String, Channel[String]] = TMap().single
 
@@ -41,7 +41,7 @@ object ResponseController extends Controller {
 
     correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
       nsiVersion.fold(badRequest("Could not determine NSI version")) { version =>
-        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope(version))
+        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope(version)).as(ContentTypeSoap11)
       }
     }
   }
