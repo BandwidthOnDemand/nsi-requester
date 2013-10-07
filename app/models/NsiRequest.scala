@@ -4,7 +4,7 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, providerNsa: String) {
+abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, providerNsa: String, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion) {
 
   def nsiV1Body: Node
   def nsiV2Body: Node
@@ -38,7 +38,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
 
   private def nsiV2Header = {
     <head:nsiHeader>
-      <protocolVersion>application/vnd.ogf.nsi.cs.v2.provider+soap</protocolVersion>
+      <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
       <requesterNSA>{ requesterNsa }</requesterNSA>
       <providerNSA>{ providerNsa }</providerNSA>
@@ -74,7 +74,11 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
 }
 
 object NsiRequest {
-  val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
   val NsiV1ProviderNamespace = "http://schemas.ogf.org/nsi/2011/10/connection/provider"
+
+  val NsiV2ProviderProtocolVersion = "application/vnd.ogf.nsi.cs.v2.provider+soap"
+  val NsiV2RequesterProtocolVersion = "application/vnd.ogf.nsi.cs.v2.requester+soap"
+  val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
+
   val SoapActionPrefix = "http://schemas.ogf.org/nsi/2013/07/connection/service/"
 }

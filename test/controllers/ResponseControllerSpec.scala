@@ -43,6 +43,7 @@ class ResponseControllerSpec extends Specification {
       val result = ResponseController.reply()(FakeXmlRequest(body))
 
       contentAsString(result) must contain("http://schemas.ogf.org/nsi/2013/07")
+      contentAsString(result) must contain("<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>")
       status(result) must equalTo(200)
     }
 
