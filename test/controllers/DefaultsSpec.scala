@@ -36,7 +36,7 @@ class DefaultsSpec extends support.Specification {
     "be filled without a session" in {
       val providerNsa = Defaults.defaultProviderNsa(FakeRequest())
 
-      providerNsa must equalTo("urn:ogf:network:nsa:surfnet.nl:1990")
+      providerNsa must equalTo("urn:ogf:network:surfnet.nl:1990:nsa:bod")
     }
 
     "be filled from the session" in new WithApplication {
