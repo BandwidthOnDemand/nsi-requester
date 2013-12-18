@@ -61,30 +61,23 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
       res.toNsiV2Envelope must \("Header") \("nsiHeader") \("correlationId") \> "urn:uuid:FD5C4151-F980-410A-8565-5E8EDCE880F1"
     }
 
-    "have a STP id split up by network and local id" in {
-      val res = DefaultReservation().copy(source = Port("urn:ogf:network:stp:surfnet.nl", "22"))
-
-      res.toNsiV2Envelope must \\("sourceSTP") \("networkId") \> "urn:ogf:network:stp:surfnet.nl"
-      res.toNsiV2Envelope must \\("sourceSTP") \("localId") \> "22"
-    }
-
     "have a source and destination STP id" in {
-      val res = DefaultReservation().copy(source = Port("source", "port"), destination = Port("destination", "port"))
+      val res = DefaultReservation().copy(source = Port("source"), destination = Port("destination"))
 
-      res.toNsiV2Envelope must \\("sourceSTP") \("networkId") \> "source"
-      res.toNsiV2Envelope must \\("destSTP") \("networkId") \> "destination"
+      res.toNsiV2Envelope must \\("sourceSTP") \> "source"
+      res.toNsiV2Envelope must \\("destSTP") \> "destination"
     }
 
     "have a soap action" in {
       val res = DefaultReservation()
 
-      res.soapAction(NsiVersion.V2) must equalTo("http://schemas.ogf.org/nsi/2013/07/connection/service/reserve")
+      res.soapAction(NsiVersion.V2) must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/reserve")
     }
   }
 
   object DefaultReservation {
     def apply(description: Option[String] = None, start: Option[Date] = Some(new Date()), end: Either[Date, Period] = Left(new Date()), globalReservationId: Option[String] = Some("urn:surfnet:123456")) =
-      Reserve(description, start, end, "connection", "", Port("source", "1"), Port("dest", "2"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "requesterNsa", "providerNsa", globalReservationId)
+      Reserve(description, start, end, "connection", "", Port("source"), Port("dest"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "requesterNsa", "providerNsa", globalReservationId)
   }
 
 }

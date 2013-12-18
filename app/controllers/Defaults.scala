@@ -8,8 +8,8 @@ import java.net.URI
 
 object Defaults {
 
-  val DefaultPortV1 = Port("", "urn:ogf:network:stp:surfnet.nl:", None)
-  val DefaultPortV2 = Port("urn:ogf:network:surfnet.nl:1990:topology:surfnet6:testbed", "urn:ogf:network:surfnet.nl:1990:port:surfnet6:testbed:", None)
+  val DefaultPortV1 = Port("urn:ogf:network:stp:surfnet.nl:")
+  val DefaultPortV2 = Port("urn:ogf:network:surfnet.nl:1990:topology:surfnet6:testbed:")
 
   private val DefaultProviderUrl = URI.create("https://bod.surfnet.nl/nsi/v1_sc/provider")
   val DefaultProviderNsa: Map[NsiVersion, String] = Map(NsiVersion.V1 -> "urn:ogf:network:nsa:surfnet.nl", NsiVersion.V2 -> "urn:ogf:network:surfnet.nl:1990:nsa:bod")

@@ -26,7 +26,7 @@ case class QueryNotification(
       case Sync => "queryNotificationSync"
       case Async => "queryNotification"
     }
-    s"${NsiRequest.SoapActionPrefix}$action"
+    s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
   }
 
   override def nsiV2Body = operation match {

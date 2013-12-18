@@ -5,6 +5,7 @@ import scala.xml.NodeSeq
 import java.net.URI
 
 abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, providerNsa: String, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion) {
+  import NsiRequest._
 
   def nsiV1Body: Node
   def nsiV2Body: Node
@@ -18,7 +19,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
       chars(0) = chars(0).toLower
       new String(chars)
     }
-    NsiRequest.SoapActionPrefix + deCapitalize(this.getClass().getSimpleName())
+    s"$NsiV2SoapActionPrefix/${deCapitalize(this.getClass().getSimpleName())}"
   }
 
   def toNsiEnvelope(version: NsiVersion = NsiVersion.V1): Node = version.fold(v1 = toNsiV1Envelope, v2 = toNsiV2Envelope)
@@ -61,8 +62,8 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:head="http://schemas.ogf.org/nsi/2013/07/framework/headers"
-      xmlns:type="http://schemas.ogf.org/nsi/2013/07/connection/types">
+      xmlns:head={ NsiV2FrameworkHeadersNamespace }
+      xmlns:type={ NsiV2ConnectionTypesNamespace }>
       <soapenv:Header>
         { header }
       </soapenv:Header>
@@ -78,7 +79,11 @@ object NsiRequest {
 
   val NsiV2ProviderProtocolVersion = "application/vnd.ogf.nsi.cs.v2.provider+soap"
   val NsiV2RequesterProtocolVersion = "application/vnd.ogf.nsi.cs.v2.requester+soap"
-  val NsiV2ProviderNamespace = "http://schemas.ogf.org/nsi/2013/07/connection/provider"
 
-  val SoapActionPrefix = "http://schemas.ogf.org/nsi/2013/07/connection/service/"
+  private val NsiV2NamespacePrefix = "http://schemas.ogf.org/nsi/2013/12"
+  val NsiV2ProviderNamespace = s"$NsiV2NamespacePrefix/connection/provider"
+  val NsiV2ConnectionTypesNamespace = s"$NsiV2NamespacePrefix/connection/types"
+  val NsiV2FrameworkHeadersNamespace = s"$NsiV2NamespacePrefix/framework/headers"
+  val NsiV2Point2PointNamespace = s"$NsiV2NamespacePrefix/services/point2point"
+  val NsiV2SoapActionPrefix = s"$NsiV2NamespacePrefix/connection/service"
 }

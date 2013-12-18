@@ -53,8 +53,7 @@
                   case NsiVersion.V1 => {
                     @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
                   }
-                  case NsiVersion.V2 => {
-                  }
+                  case NsiVersion.V2 => { }
                 }
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
@@ -69,15 +68,5 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-  @provider.nsiVersion match {
-    case NsiVersion.V1 => {
-      <input type="hidden" name="@{s"reservation.$name.networkId"}" value="XXX" />
-      @inputText(field("localId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xlarge")
-    }
-    case NsiVersion.V2 => {
-      @inputText(field("networkId"), '_label -> s"${name.capitalize} NetworkId", 'class -> "input-xxlarge")
-      @inputText(field("localId"), '_label -> s"${name.capitalize} LocalId", 'class -> "input-xxlarge")
-      @inputText(field("vlan"), '_label -> s"${name.capitalize} VLAN")
-    }
-  }
+  @inputText(field("stpId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xxlarge")
 }

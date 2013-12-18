@@ -23,6 +23,8 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
+  import NsiRequest._
+
   override def nsiV2Body =
     <type:reserve>
       { globalReservationIdField }
@@ -58,12 +60,8 @@ case class Reserve(
           </serviceParameters>
           <path>
             <directionality>Bidirectional</directionality>
-            <sourceSTP>
-              { source.xmlV1 }
-            </sourceSTP>
-            <destSTP>
-              { destination.xmlV1 }
-            </destSTP>
+            <sourceSTP>{ source.xmlV1 }</sourceSTP>
+            <destSTP>{ destination.xmlV1 }</destSTP>
           </path>
         </reservation>
       </type:reserve>
@@ -93,33 +91,13 @@ case class Reserve(
   }
 
   private def service =
-    if (source.vlan.isDefined && destination.vlan.isDefined) {
-      <p2p:evts xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
-        <capacity>{ bandwidth }</capacity>
-        <directionality>Bidirectional</directionality>
-        <symmetricPath>true</symmetricPath>
-        <sourceSTP>
-          { source.xmlV2 }
-        </sourceSTP>
-        <destSTP>
-          { destination.xmlV2 }
-        </destSTP>
-        <sourceVLAN>{ source.vlan.get }</sourceVLAN>
-        <destVLAN>{ destination.vlan.get }</destVLAN>
-      </p2p:evts>
-    } else {
-      <p2p:p2ps xmlns:p2p="http://schemas.ogf.org/nsi/2013/07/services/point2point">
-        <capacity>{ bandwidth }</capacity>
-        <directionality>Bidirectional</directionality>
-        <symmetricPath>true</symmetricPath>
-        <sourceSTP>
-          { source.xmlV2 }
-        </sourceSTP>
-        <destSTP>
-          { destination.xmlV2 }
-        </destSTP>
-      </p2p:p2ps>
-    }
+    <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>
+      <capacity>{ bandwidth }</capacity>
+      <directionality>Bidirectional</directionality>
+      <symmetricPath>true</symmetricPath>
+      <sourceSTP>{ source.stpId }</sourceSTP>
+      <destSTP>{ destination.stpId }</destSTP>
+    </p2p:p2ps>
 
   private def possibleUnprotected =
     if (unprotected)

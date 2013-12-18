@@ -267,11 +267,7 @@ object Application extends Controller with Soap11Controller {
     def releaseF: Form[Release] = Form(
       "release" -> genericOperationMapping(Release.apply)(Release.unapply))
 
-    def portMapping = mapping(
-      "networkId" -> nonEmptyText,
-      "localId" -> nonEmptyText,
-      "vlan" -> optional(number(1, 4095)),
-      "labels" -> portLabelsMap)(Port.apply)(Port.unapply)
+    def portMapping = mapping("stpId" -> nonEmptyText)(Port.apply)(Port.unapply)
 
     private def portLabelsMap: Mapping[Map[String, Seq[String]]] = list(text).transform(ls => ls.map(_.trim).filter(_.nonEmpty).map { label =>
       val parts = label.split(":")

@@ -27,7 +27,7 @@ case class Query(
       case SummarySync => "querySummarySync"
       case Recursive => "queryRecursive"
     }
-   s"${NsiRequest.SoapActionPrefix}$action"
+   s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
   }
 
   override def nsiV2Body = operation match {
