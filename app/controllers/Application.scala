@@ -42,7 +42,7 @@ object Application extends Controller with Soap11Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
         connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        serviceType = defaultProvider.nsiVersion.fold(v1 = "", v2 = "http://services.ogf.org/nsi/2013/07/descriptions/EVTS.A-GOLE"),
+        serviceType = defaultProvider.nsiVersion.fold(v1 = "", v2 = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"),
         source = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
         destination = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
         bandwidth = 100, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa)

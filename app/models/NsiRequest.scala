@@ -75,12 +75,13 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
 }
 
 object NsiRequest {
-  val NsiV1ProviderNamespace = "http://schemas.ogf.org/nsi/2011/10/connection/provider"
+  val NsiV1NamespacePrefix = "http://schemas.ogf.org/nsi/2011/10"
+  val NsiV1ProviderNamespace = s"$NsiV1NamespacePrefix/connection/provider"
 
   val NsiV2ProviderProtocolVersion = "application/vnd.ogf.nsi.cs.v2.provider+soap"
   val NsiV2RequesterProtocolVersion = "application/vnd.ogf.nsi.cs.v2.requester+soap"
 
-  private val NsiV2NamespacePrefix = "http://schemas.ogf.org/nsi/2013/12"
+  val NsiV2NamespacePrefix = "http://schemas.ogf.org/nsi/2013/12"
   val NsiV2ProviderNamespace = s"$NsiV2NamespacePrefix/connection/provider"
   val NsiV2ConnectionTypesNamespace = s"$NsiV2NamespacePrefix/connection/types"
   val NsiV2FrameworkHeadersNamespace = s"$NsiV2NamespacePrefix/framework/headers"

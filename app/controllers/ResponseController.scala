@@ -55,8 +55,8 @@ object ResponseController extends Controller with Soap11Controller {
     def hasNamespace(node: scala.xml.Node, namespace: String) = Option(node.namespace).map(_.startsWith(namespace)).getOrElse(false)
 
     bodyElements.flatMap(_.collectFirst {
-      case n: scala.xml.Node if hasNamespace(n, "http://schemas.ogf.org/nsi/2011/10") => NsiVersion.V1
-      case n: scala.xml.Node if hasNamespace(n, "http://schemas.ogf.org/nsi/2013/07") => NsiVersion.V2
+      case n: scala.xml.Node if hasNamespace(n, NsiRequest.NsiV1NamespacePrefix) => NsiVersion.V1
+      case n: scala.xml.Node if hasNamespace(n, NsiRequest.NsiV2NamespacePrefix) => NsiVersion.V2
     })
   }
 

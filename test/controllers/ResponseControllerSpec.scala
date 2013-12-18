@@ -36,7 +36,7 @@ class ResponseControllerSpec extends Specification {
             <correlationId>{ "urn:uuid:1234" }</correlationId>
           </header>
           <Body>
-            <ns:request xmlns:ns="http://schemas.ogf.org/nsi/2013/07/interface" />
+            <ns:request xmlns:ns="http://schemas.ogf.org/nsi/2013/12/interface" />
           </Body>
         </Envelope>
 
