@@ -292,17 +292,17 @@ object Application extends Controller with Soap11Controller {
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
         "requesterNsa" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText) { Query.apply } { Query.unapply })
+        "providerNsa" -> nonEmptyText)(Query.apply)(Query.unapply))
 
     def queryNotificationF: Form[QueryNotification] = Form(
       "queryNotification" -> mapping(
         "operation" -> of[QueryNotificationOperation.Value],
         "connectionId" -> nonEmptyText,
-        "startNotificationId" -> optional(number),
-        "endNotificationId" -> optional(number),
+        "startNotificationId" -> optional(of[Long]),
+        "endNotificationId" -> optional(of[Long]),
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
         "requesterNsa" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText) { QueryNotification.apply } { QueryNotification.unapply })
+        "providerNsa" -> nonEmptyText)(QueryNotification.apply)(QueryNotification.unapply))
   }
 }

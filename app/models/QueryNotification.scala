@@ -13,8 +13,8 @@ import QueryNotificationOperation._
 case class QueryNotification(
   operation: QueryNotificationOperation,
   connectionId: String,
-  startNotificationId: Option[Int],
-  endNotificationId: Option[Int],
+  startNotificationId: Option[Long],
+  endNotificationId: Option[Long],
   correlationId: String,
   replyTo: Option[URI],
   requesterNsa: String,
