@@ -209,7 +209,7 @@ $(function() {
        key('r', function() { clickMenu("release") });
        key('t', function() { clickMenu("terminate") });
        key('q', function() { clickMenu("query") });
-       key('n', function() { clickMenu("queryNotification") });
+       key('m', function() { clickMenu("queryMessage") });
        key('s', function() { clickMenu("settings") });
 
        function clickMenu(menuId) {
