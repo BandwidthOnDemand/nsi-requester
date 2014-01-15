@@ -2,7 +2,7 @@ package controllers
 
 import org.junit.runner.RunWith
 import org.specs2.mutable.Specification
-import models.QueryNotificationOperation
+import models.QueryOperationMode
 import models.QueryOperation
 import play.api.data.FormError
 
@@ -12,12 +12,12 @@ class FormSupportSpec extends Specification {
   import FormSupport._
 
   "QueryNotificationOperationFormat" should {
-    import QueryNotificationOperation._
+    import QueryOperationMode._
 
     "parse Sync operation" in {
       val operation = queryNotificationOperationFormat.bind("operation", Map("operation" -> "Sync"))
 
-      operation must beRight(QueryNotificationOperation.Sync)
+      operation must beRight(QueryOperationMode.Sync)
     }
 
     "give formError when parsing 'asdfasfasfd' as an operation" in {

@@ -237,7 +237,7 @@ object Application extends Controller with Soap11Controller {
 
     private def endDateOrPeriod = tuple(
       "date" -> optional(date("yyyy-MM-dd HH:mm")),
-      "period" -> optional(of[Period])).verifying("Either end date or period is required", {
+      "period" -> optional(of[Period])).verifying("Either end date or period is required", t => t match {
       case (None, None) => false
       case _ => true
     }).transform[Either[Date, Period]](
