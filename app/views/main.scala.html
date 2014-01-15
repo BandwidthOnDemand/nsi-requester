@@ -5,15 +5,14 @@
 
 @menuItems = @{
   List(
-    ("reserve", routes.Application.reserveForm, Seq(1, 2)),
-    ("reserveCommit", routes.Application.reserveCommitForm, Seq(2)),
-    ("reserveAbort", routes.Application.reserveAbortForm, Seq(2)),
-    ("provision", routes.Application.provisionForm, Seq(1, 2)),
-    ("release", routes.Application.releaseForm, Seq(1, 2)),
-    ("terminate", routes.Application.terminateForm, Seq(1, 2)),
-    ("query", routes.Application.queryForm, Seq(1, 2)),
-    ("queryN", routes.Application.queryNotification, Seq(2)),
-    ("queryR", routes.Application.queryResult, Seq(2))
+    ("reserve", routes.Application.reserveForm, Seq(NsiVersion.V1, NsiVersion.V2)),
+    ("reserveCommit", routes.Application.reserveCommitForm, Seq(NsiVersion.V2)),
+    ("reserveAbort", routes.Application.reserveAbortForm, Seq(NsiVersion.V2)),
+    ("provision", routes.Application.provisionForm, Seq(NsiVersion.V1, NsiVersion.V2)),
+    ("release", routes.Application.releaseForm, Seq(NsiVersion.V1, NsiVersion.V2)),
+    ("terminate", routes.Application.terminateForm, Seq(NsiVersion.V1, NsiVersion.V2)),
+    ("query", routes.Application.queryForm, Seq(NsiVersion.V1, NsiVersion.V2)),
+    ("queryMessage", routes.Application.queryMessage, Seq(NsiVersion.V2))
   )
 }
 
@@ -45,7 +44,7 @@
                     <div class="container">
                         <ul class="nav">
                             @menuItems.map {
-                                case (menu, href, versions) if versions contains nsiVersion.value => {
+                                case (menu, href, versions) if versions contains nsiVersion => {
                                     <li @if(activeMenu == menu) {class="active"} id="@menu">
                                         <a href="@href">@menu.capitalize</a>
                                     </li>

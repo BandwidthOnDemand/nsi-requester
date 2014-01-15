@@ -135,28 +135,16 @@ object Application extends Controller with Soap11Controller {
       { case query => sendEnvelope(defaultProvider, query) })
   }
 
-  def queryNotificationForm = Action { implicit request =>
-    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryOperationMode.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
+  def queryMessageForm = Action { implicit request =>
+    val defaultForm = defaultProvider.queryMessageF.fill(QueryMessage(QueryMessageMode.ResultAsync, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
 
-    Ok(views.html.queryNotification(defaultForm, defaultProvider))
+    Ok(views.html.queryMessage(defaultForm, defaultProvider))
   }
 
-  def queryNotification = Action.async { implicit request =>
-    defaultProvider.queryNotificationF.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case queryNotification => sendEnvelope(defaultProvider, queryNotification) })
-  }
-
-  def queryResultForm = Action { implicit request =>
-    val defaultForm = defaultProvider.queryResultF.fill(QueryResult(QueryOperationMode.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
-
-    Ok(views.html.queryResult(defaultForm, defaultProvider))
-  }
-
-  def queryResult = Action.async { implicit request =>
-    defaultProvider.queryResultF.bindFromRequest.fold(
-    formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-    { case queryResult => sendEnvelope(defaultProvider, queryResult) })
+  def queryMessage = Action.async { implicit request =>
+    defaultProvider.queryMessageF.bindFromRequest.fold(
+      formWithErrors => { println(s"Errors $formWithErrors"); Future.successful(BadRequest(Json.toJson(formWithErrors.errors))) },
+      { case queryMessage => sendEnvelope(defaultProvider, queryMessage) })
   }
 
   def validateProvider = Action.async(parse.json) { implicit request =>
@@ -294,8 +282,6 @@ object Application extends Controller with Soap11Controller {
         "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText)(apply)(unapply)
 
-    import QueryOperation._
-
     def queryF: Form[Query] = Form(
       "query" -> mapping(
         "operation" -> of[QueryOperation],
@@ -306,26 +292,16 @@ object Application extends Controller with Soap11Controller {
         "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText)(Query.apply)(Query.unapply))
 
-    def queryNotificationF: Form[QueryNotification] = Form(
-      "queryNotification" -> mapping(
-        "operation" -> of[QueryOperationMode.Value],
+    def queryMessageF: Form[QueryMessage] = Form(
+      "queryMessage" -> mapping(
+        "operation" -> of[QueryMessageMode.Value],
         "connectionId" -> nonEmptyText,
-        "startNotificationId" -> optional(of[Long]),
-        "endNotificationId" -> optional(of[Long]),
+        "startId" -> optional(of[Long]),
+        "endId" -> optional(of[Long]),
         "correlationId" -> nonEmptyText,
         "replyTo" -> replyTo,
         "requesterNsa" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText)(QueryNotification.apply)(QueryNotification.unapply))
+        "providerNsa" -> nonEmptyText)(QueryMessage.apply)(QueryMessage.unapply))
 
-    def queryResultF: Form[QueryResult] = Form(
-      "queryResult" -> mapping(
-        "operation" -> of[QueryOperationMode.Value],
-        "connectionId" -> nonEmptyText,
-        "startResultId" -> optional(of[Long]),
-        "endResultId" -> optional(of[Long]),
-        "correlationId" -> nonEmptyText,
-        "replyTo" -> replyTo,
-        "requesterNsa" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText)(QueryResult.apply)(QueryResult.unapply))
   }
 }

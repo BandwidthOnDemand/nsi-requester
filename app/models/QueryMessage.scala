@@ -1,0 +1,75 @@
+package models
+
+import java.net.URI
+import scala.xml.NodeSeq.Empty
+
+object QueryMessageMode extends Enumeration {
+  type QueryMessageMode = Value
+  val NotificationSync, NotificationAsync, ResultSync, ResultAsync = Value
+}
+
+import QueryMessageMode._
+
+case class QueryMessage(
+  operation: QueryMessageMode,
+  connectionId: String,
+  startId: Option[Long],
+  endId: Option[Long],
+  correlationId: String,
+  replyTo: Option[URI],
+  requesterNsa: String,
+  providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
+
+  override def nsiV1SoapAction = sys.error("QueryNotification is not a supported NSI v1 operation")
+  override def nsiV2SoapAction = {
+    val action = operation match {
+      case NotificationSync => "queryNotificationSync"
+      case NotificationAsync => "queryNotification"
+      case ResultSync => "queryResultSync"
+      case ResultAsync => "queryResult"
+    }
+    s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
+  }
+
+  override def nsiV2Body =
+    operation match {
+      case NotificationAsync =>
+        <type:queryNotification>
+           { queryBody }
+         </type:queryNotification>
+      case NotificationSync =>
+        <type:queryNotificationSync>
+           { queryBody }
+        </type:queryNotificationSync>
+      case ResultAsync =>
+        <type:queryResult>
+           { queryBody }
+        </type:queryResult>
+      case ResultSync =>
+        <type:queryResultSync>
+           { queryBody }
+        </type:queryResultSync>
+  }
+
+  private def queryBody = List(
+    <connectionId>{ connectionId }</connectionId>,
+    { startIdTag },
+    { endIdTag }
+  )
+
+  private def startIdTag = operation match {
+    case NotificationSync | NotificationAsync => startId.map(id => <startNotificationId>{ id }</startNotificationId>).getOrElse(Empty)
+    case ResultSync | ResultAsync             => startId.map(id => <startResultId>{ id }</startResultId>).getOrElse(Empty)
+  }
+
+  private def endIdTag = operation match {
+    case NotificationSync | NotificationAsync => endId.map(id => <endNotificationId>{ id }</endNotificationId>).getOrElse(Empty)
+    case ResultSync | ResultAsync             => endId.map(id => <endResultId>{ id }</endResultId>).getOrElse(Empty)
+  }
+
+  override def nsiV1Body = operation match {
+    case NotificationSync | NotificationAsync => sys.error("QueryNotification is not a supported NSI v1 operation")
+    case ResultSync | ResultAsync =>  sys.error("QueryResult is not a supported NSI v1 operation")
+  }
+
+}
