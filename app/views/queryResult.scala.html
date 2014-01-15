@@ -1,0 +1,34 @@
+@(queryResultForm: Form[QueryResult], provider: Provider)(implicit flash: Flash)
+
+@import helper._
+@import views.helper.MyHelpers._
+
+@nsirequest(s"Make a NSI ${provider.nsiVersion} Query Result Request", "queryResult", provider.nsiVersion) {
+
+    <section id="formS">
+        <h1>Make a NSI @provider.nsiVersion Query Result Request</h1>
+        <div class="content">
+             @form(action = routes.Application.queryResult, 'class -> "form form-horizontal") {
+                <div class="message"><h3>Query Result attributes</h3></div>
+
+                @select(
+                    queryResultForm("queryResult.operation"),
+                    options = options(QueryOperationMode.values.map(_.toString).toList),
+                    '_label -> "Operation",
+                    '_showConstraints -> false
+                )
+
+                @inputText(queryResultForm("queryResult.connectionId"), 'class -> "input-xlarge", '_label -> "ConnectionId")
+                @inputText(queryResultForm("queryResult.startResultId"), '_label -> "Start id", '_showConstraints -> false)
+                @inputText(queryResultForm("queryResult.endResultId"), '_label -> "End id", '_showConstraints -> false)
+
+                @fragments.nsiCommonFields(name => queryResultForm("queryResult." + name))
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Query Result</button>
+                </div>
+            }
+        </div>
+
+    </section>
+}

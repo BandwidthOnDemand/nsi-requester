@@ -1,8 +1,8 @@
 package controllers
 
 import java.net.URI
-import models.{Provider, QueryNotificationOperation}
-import models.QueryNotificationOperation.QueryNotificationOperation
+import models.{Provider, QueryOperationMode}
+import models.QueryOperationMode.QueryOperationMode
 import models.QueryOperation
 import models.QueryOperation.QueryOperation
 import org.joda.time.Period
@@ -45,17 +45,17 @@ object FormSupport {
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
   }
 
-  implicit def queryNotificationOperationFormat: Formatter[QueryNotificationOperation] = new Formatter[QueryNotificationOperation] {
-    override val format = Some((s"Allowed values: ${QueryNotificationOperation.values.mkString(", ")}", Nil))
+  implicit def queryNotificationOperationFormat: Formatter[QueryOperationMode] = new Formatter[QueryOperationMode] {
+    override val format = Some((s"Allowed values: ${QueryOperationMode.values.mkString(", ")}", Nil))
 
-    def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryNotificationOperation] =
+    def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryOperationMode] =
       stringFormat.bind(key, data).right.flatMap { s =>
-        scala.util.control.Exception.allCatch[QueryNotificationOperation]
-          .either(QueryNotificationOperation.withName(s))
+        scala.util.control.Exception.allCatch[QueryOperationMode]
+          .either(QueryOperationMode.withName(s))
           .left.map(e => Seq(FormError(key, "error.queryNotificationOperation", Nil)))
       }
 
-    def unbind(key: String, value: QueryNotificationOperation) = Map(key -> value.toString)
+    def unbind(key: String, value: QueryOperationMode) = Map(key -> value.toString)
   }
 
   implicit def queryOperationFormat: Formatter[QueryOperation] = new Formatter[QueryOperation] {

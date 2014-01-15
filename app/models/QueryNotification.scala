@@ -2,16 +2,10 @@ package models
 
 import java.net.URI
 import scala.xml.NodeSeq.Empty
-
-object QueryNotificationOperation extends Enumeration {
-  type QueryNotificationOperation = Value
-  val Sync, Async = Value
-}
-
-import QueryNotificationOperation._
+import models.QueryOperationMode._
 
 case class QueryNotification(
-  operation: QueryNotificationOperation,
+  operation: QueryOperationMode,
   connectionId: String,
   startNotificationId: Option[Long],
   endNotificationId: Option[Long],

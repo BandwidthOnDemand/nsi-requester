@@ -20,6 +20,9 @@ GET    /query               controllers.Application.queryForm
 POST   /query               controllers.Application.query
 GET    /queryNotification   controllers.Application.queryNotificationForm
 POST   /queryNotification   controllers.Application.queryNotification
+GET    /queryResult         controllers.Application.queryResultForm
+POST   /queryResult         controllers.Application.queryResult
+
 POST   /validateProvider    controllers.Application.validateProvider
 
 GET    /settings            controllers.SettingsController.settingsForm

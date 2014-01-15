@@ -136,7 +136,7 @@ object Application extends Controller with Soap11Controller {
   }
 
   def queryNotificationForm = Action { implicit request =>
-    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryNotificationOperation.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
+    val defaultForm = defaultProvider.queryNotificationF.fill(QueryNotification(QueryOperationMode.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
 
     Ok(views.html.queryNotification(defaultForm, defaultProvider))
   }
@@ -145,6 +145,18 @@ object Application extends Controller with Soap11Controller {
     defaultProvider.queryNotificationF.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
       { case queryNotification => sendEnvelope(defaultProvider, queryNotification) })
+  }
+
+  def queryResultForm = Action { implicit request =>
+    val defaultForm = defaultProvider.queryResultF.fill(QueryResult(QueryOperationMode.Async, "", None, None, generateCorrelationId, defaultReplyToUrl, requesterNsa = defaultRequesterNsa, defaultProviderNsa))
+
+    Ok(views.html.queryResult(defaultForm, defaultProvider))
+  }
+
+  def queryResult = Action.async { implicit request =>
+    defaultProvider.queryResultF.bindFromRequest.fold(
+    formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+    { case queryResult => sendEnvelope(defaultProvider, queryResult) })
   }
 
   def validateProvider = Action.async(parse.json) { implicit request =>
@@ -189,7 +201,7 @@ object Application extends Controller with Soap11Controller {
 
     wsRequest.post(soapRequest).map { response =>
       Logger.debug(s"Provider (${provider.providerUrl}) response: ${response.status}, ${response.statusText}")
-      if (response.header(CONTENT_TYPE).map(_ contains ContentTypeSoap11).getOrElse(false)) {
+      if (response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)
       } else {
@@ -199,12 +211,12 @@ object Application extends Controller with Soap11Controller {
     }.recover {
       case e =>
         Logger.info("Could not send soap request", e)
-        BadRequest(Json.obj("message" -> e.getMessage()))
+        BadRequest(Json.obj("message" -> e.getMessage))
     }
   }
 
   private[controllers] def addAuthenticationHeader(username: Option[String], password: Option[String], token: Option[String]): WS.WSRequestHolder => WS.WSRequestHolder =
-    addBasicAuth(username, password) _ andThen addOAuthToken(token) _
+    addBasicAuth(username, password) _ andThen addOAuthToken(token)
 
   private def addOAuthToken(token: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
     token.filterNot(_.isEmpty).fold(request)(t => request.withHeaders("Authorization" -> s"bearer $t"))
@@ -225,10 +237,10 @@ object Application extends Controller with Soap11Controller {
 
     private def endDateOrPeriod = tuple(
       "date" -> optional(date("yyyy-MM-dd HH:mm")),
-      "period" -> optional(of[Period])).verifying("Either end date or period is required", t => t match {
-        case (None, None) => false
-        case _            => true
-      }).transform[Either[Date, Period]](
+      "period" -> optional(of[Period])).verifying("Either end date or period is required", {
+      case (None, None) => false
+      case _ => true
+    }).transform[Either[Date, Period]](
         tuple => if (tuple._1.isDefined) Left(tuple._1.get) else Right(tuple._2.get),
         {
           case Left(date)    => (Some(date), None)
@@ -296,7 +308,7 @@ object Application extends Controller with Soap11Controller {
 
     def queryNotificationF: Form[QueryNotification] = Form(
       "queryNotification" -> mapping(
-        "operation" -> of[QueryNotificationOperation.Value],
+        "operation" -> of[QueryOperationMode.Value],
         "connectionId" -> nonEmptyText,
         "startNotificationId" -> optional(of[Long]),
         "endNotificationId" -> optional(of[Long]),
@@ -304,5 +316,16 @@ object Application extends Controller with Soap11Controller {
         "replyTo" -> replyTo,
         "requesterNsa" -> nonEmptyText,
         "providerNsa" -> nonEmptyText)(QueryNotification.apply)(QueryNotification.unapply))
+
+    def queryResultF: Form[QueryResult] = Form(
+      "queryResult" -> mapping(
+        "operation" -> of[QueryOperationMode.Value],
+        "connectionId" -> nonEmptyText,
+        "startResultId" -> optional(of[Long]),
+        "endResultId" -> optional(of[Long]),
+        "correlationId" -> nonEmptyText,
+        "replyTo" -> replyTo,
+        "requesterNsa" -> nonEmptyText,
+        "providerNsa" -> nonEmptyText)(QueryResult.apply)(QueryResult.unapply))
   }
 }
