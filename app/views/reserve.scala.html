@@ -49,12 +49,7 @@
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
-                @provider.nsiVersion match {
-                  case NsiVersion.V1 => {
-                    @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
-                  }
-                  case NsiVersion.V2 => { }
-                }
+                @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
 

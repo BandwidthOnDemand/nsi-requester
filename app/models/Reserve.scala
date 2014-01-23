@@ -97,6 +97,12 @@ case class Reserve(
       <symmetricPath>true</symmetricPath>
       <sourceSTP>{ source.stpId }</sourceSTP>
       <destSTP>{ destination.stpId }</destSTP>
+      {
+        if (unprotected)
+          <parameter type="protection">UNPROTECTED</parameter>
+        else
+          <parameter type="protection">PROTECTED</parameter>
+      }
     </p2p:p2ps>
 
   private def possibleUnprotected =
