@@ -40,11 +40,11 @@ object Application extends Controller with Soap11Controller {
 
     val defaultForm = defaultProvider.reserveF.fill(
       Reserve(
-        description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), end = Left(endDate.toDate),
-        connectionId = generateConnectionId, correlationId = generateCorrelationId,
-        serviceType = defaultProvider.nsiVersion.fold(v1 = "", v2 = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"),
-        source = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
-        destination = defaultProvider.nsiVersion.fold(v1 = DefaultPortV1, v2 = DefaultPortV2),
+        description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), endDate = endDate.toDate,
+        correlationId = generateCorrelationId,
+        serviceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE",
+        source = DefaultPortV2,
+        destination = DefaultPortV2,
         bandwidth = 100, replyTo = defaultReplyToUrl, requesterNsa = defaultRequesterNsa, providerNsa = defaultProviderNsa)
     )
 
@@ -149,14 +149,6 @@ object Application extends Controller with Soap11Controller {
 
   def validateProvider = Action.async(parse.json) { implicit request =>
 
-    def determineNsiVersion(wsdl: String): Option[NsiVersion] =
-      if (wsdl.contains(NsiRequest.NsiV1ProviderNamespace))
-        Some(NsiVersion.V1)
-      else if (wsdl.contains(NsiRequest.NsiV2ProviderNamespace))
-        Some(NsiVersion.V2)
-      else
-        None
-
     val wsdlValid =
       for {
         url <- (request.body \ "url").asOpt[String] if !url.isEmpty()
@@ -169,11 +161,8 @@ object Application extends Controller with Soap11Controller {
         val wsdlRequest = authenticated(WS.url(s"$url?wsdl"))
 
         wsdlRequest.get.map { wsdlResponse =>
-          if (wsdlResponse.status == 200) {
-            val nsiVersion = determineNsiVersion(wsdlResponse.body)
-            Ok(nsiVersion.map(v => Json.obj("valid" -> true, "version" -> v.value)).getOrElse(Json.obj("valid" -> false, "message" -> "unknown NSI version")))
-          } else
-            Ok(Json.obj("valid" -> false, "message" -> wsdlResponse.status))
+          val response = if (wsdlResponse.status == 200) Json.obj("valid" -> true) else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
+          Ok(response)
         }
       }
 
@@ -181,10 +170,10 @@ object Application extends Controller with Soap11Controller {
   }
 
   private def sendEnvelope(provider: Provider, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[SimpleResult] = {
-    val soapRequest = nsiRequest.toNsiEnvelope(provider.nsiVersion)
+    val soapRequest = nsiRequest.toNsiEnvelope()
     val requestTime = DateTime.now()
 
-    val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction(provider.nsiVersion))
+    val addHeaders = addAuthenticationHeader(provider.username, provider.password, provider.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction())
     val wsRequest = addHeaders(WS.url(provider.providerUrl.toString).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
@@ -214,34 +203,19 @@ object Application extends Controller with Soap11Controller {
 
   private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> s""""$action"""")
 
-  private def generateConnectionId = UUID.randomUUID.toString
-  private def generateCorrelationId = generateConnectionId
+  private def generateCorrelationId = UUID.randomUUID.toString
 
   private implicit class Mappings(provider: Provider) {
-    private val nsiVersion = provider.nsiVersion
 
-    private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", uri => nsiVersion.fold(v1 = uri.isDefined, v2 = true))
+    private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", uri => true)
     private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
-
-    private def endDateOrPeriod = tuple(
-      "date" -> optional(date("yyyy-MM-dd HH:mm")),
-      "period" -> optional(of[Period])).verifying("Either end date or period is required", t => t match {
-      case (None, None) => false
-      case _ => true
-    }).transform[Either[Date, Period]](
-        tuple => if (tuple._1.isDefined) Left(tuple._1.get) else Right(tuple._2.get),
-        {
-          case Left(date)    => (Some(date), None)
-          case Right(period) => (None, Some(period))
-        })
 
     def reserveF: Form[Reserve] = Form(
       "reservation" -> mapping(
         "description" -> optional(text),
         "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
-        "end" -> endDateOrPeriod,
-        "connectionId" -> nsiVersion.fold(v1 = nonEmptyText, v2 = text),
-        "serviceType" -> nsiVersion.fold(v1 = text, v2 = nonEmptyText),
+        "end" -> date("yyyy-MM-dd HH:mm"),
+        "serviceType" -> nonEmptyText,
         "source" -> portMapping,
         "destination" -> portMapping,
         "bandwidth" -> longNumber(0, 100000),

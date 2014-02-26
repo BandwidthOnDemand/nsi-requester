@@ -6,8 +6,4 @@ case class Ack(correlationId: String, requesterNsa: String, providerNsa: String)
   override def nsiV2Body =
     <type:acknowledgment />
 
-  override def nsiV1Body =
-    <int:acknowledgment>
-      <int:correlationId>{ "urn:uuid:" + correlationId }</int:correlationId>
-    </int:acknowledgment>
 }

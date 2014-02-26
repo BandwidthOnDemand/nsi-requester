@@ -9,13 +9,4 @@ case class Release(connectionId: String, correlationId: String, replyTo: Option[
     <type:release>
       <connectionId>{ connectionId }</connectionId>
     </type:release>
-
-  override def nsiV1Body =
-    <int:releaseRequest>
-      { nsiRequestFields }
-      <type:release>
-        { nsas }
-        <connectionId>{ connectionId }</connectionId>
-      </type:release>
-    </int:releaseRequest>
 }

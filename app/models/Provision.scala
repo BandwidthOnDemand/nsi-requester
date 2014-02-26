@@ -10,13 +10,4 @@ case class Provision(connectionId: String, correlationId: String, replyTo: Optio
       <connectionId>{ connectionId }</connectionId>
     </type:provision>
 
-  override def nsiV1Body =
-    <int:provisionRequest>
-       { nsiRequestFields }
-       <type:provision>
-          { nsas }
-          <connectionId>{ connectionId }</connectionId>
-       </type:provision>
-    </int:provisionRequest>
-
 }

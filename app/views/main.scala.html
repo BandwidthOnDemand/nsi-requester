@@ -1,18 +1,18 @@
-@(title: String, activeMenu: String, nsiVersion: NsiVersion)(content: Html)(implicit flash: Flash)
+@(title: String, activeMenu: String)(content: Html)(implicit flash: Flash)
 
 @import play.api.Play
 @import play.api.Mode
 
 @menuItems = @{
   List(
-    ("reserve", routes.Application.reserveForm, Seq(NsiVersion.V1, NsiVersion.V2)),
-    ("reserveCommit", routes.Application.reserveCommitForm, Seq(NsiVersion.V2)),
-    ("reserveAbort", routes.Application.reserveAbortForm, Seq(NsiVersion.V2)),
-    ("provision", routes.Application.provisionForm, Seq(NsiVersion.V1, NsiVersion.V2)),
-    ("release", routes.Application.releaseForm, Seq(NsiVersion.V1, NsiVersion.V2)),
-    ("terminate", routes.Application.terminateForm, Seq(NsiVersion.V1, NsiVersion.V2)),
-    ("query", routes.Application.queryForm, Seq(NsiVersion.V1, NsiVersion.V2)),
-    ("queryMessage", routes.Application.queryMessage, Seq(NsiVersion.V2))
+    ("reserve", routes.Application.reserveForm),
+    ("reserveCommit", routes.Application.reserveCommitForm),
+    ("reserveAbort", routes.Application.reserveAbortForm),
+    ("provision", routes.Application.provisionForm),
+    ("release", routes.Application.releaseForm),
+    ("terminate", routes.Application.terminateForm),
+    ("query", routes.Application.queryForm),
+    ("queryMessage", routes.Application.queryMessage)
   )
 }
 
@@ -44,12 +44,11 @@
                     <div class="container">
                         <ul class="nav">
                             @menuItems.map {
-                                case (menu, href, versions) if versions contains nsiVersion => {
+                                case (menu, href) => {
                                     <li @if(activeMenu == menu) {class="active"} id="@menu">
                                         <a href="@href">@menu.capitalize</a>
                                     </li>
                                 }
-                                case _ => { }
                             }
                             @if(activeMenu == "response") {
                                 <li class="active"><a href="#">Response</a></li>

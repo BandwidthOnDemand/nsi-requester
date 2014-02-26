@@ -3,48 +3,23 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI ${provider.nsiVersion} Reserve Request", "reserve", provider.nsiVersion) {
+@nsirequest(s"Make a NSI Reserve Request", "reserve") {
 
     <section id="formS">
-        <h1>Make a NSI @provider.nsiVersion Reserve Request</h1>
+        <h1>Make a NSI Reserve Request</h1>
 
         <div class="content">
             @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
 
-                @provider.nsiVersion match {
-                  case NsiVersion.V1 => {
-                    @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
-                  }
-                  case NsiVersion.V2 => {
-                    <input type="hidden" name="reservation.connectionId" value="" />
-                  }
-                }
-
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
-
-                @requestForm.error("reservation.end").map { error =>
-                  <div class="alert alert-error">@error.message</div>
-                }
-
                 @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
-
-                @provider.nsiVersion match {
-                  case NsiVersion.V1 => {
-                    @inputText(requestForm("reservation.end.period"), '_label -> "Period")
-                    <input type="hidden" name="reservation.serviceType" value="" />
-                  }
-                  case NsiVersion.V2 => {
-                    <input type="hidden" name="reservation.end.period" value="" />
-                    @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xxlarge")
-                  }
-                }
+                @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xxlarge")
 
                 @inputPort(field => requestForm("reservation.source." + field), "source")
-
                 @inputPort(field => requestForm("reservation.destination." + field), "destination")
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")

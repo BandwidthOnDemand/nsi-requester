@@ -5,20 +5,10 @@ import org.junit.runner.RunWith
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
 
-  "NSI v1 terminate" should {
+  "NSI terminate" should {
 
     "give valid xml for provision" in {
-      val envelope = DefaultTerminate().copy(connectionId = "12345").toNsiV1Envelope
-
-      envelope must \\("terminate")
-      envelope must \\("connectionId") \> "12345"
-    }
-  }
-
-  "NSI v2 terminate" should {
-
-    "give valid xml for provision" in {
-      val envelope = DefaultTerminate().copy(connectionId = "12345").toNsiV2Envelope
+      val envelope = DefaultTerminate().copy(connectionId = "12345").toNsiEnvelope
 
       envelope must \\("terminate")
       envelope must \\("connectionId") \> "12345"

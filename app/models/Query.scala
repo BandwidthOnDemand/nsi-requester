@@ -21,7 +21,7 @@ case class Query(
     requesterNsa: String,
     providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
-  override def nsiV2SoapAction = {
+  override def soapAction() = {
     val action = operation match {
       case Summary => "querySummary"
       case SummarySync => "querySummarySync"
@@ -49,19 +49,6 @@ case class Query(
     case _ =>
       sys.error(s"Unsupported NSI v2 query type '$operation'")
   }
-
-  override def nsiV1Body =
-    <int:queryRequest>
-      { nsiRequestFields }
-      <type:query>
-        { nsas }
-        <operation>{ operation }</operation>
-        <queryFilter>
-          { connectionIdTags }
-          { globalReservationIdTags }
-        </queryFilter>
-      </type:query>
-    </int:queryRequest>
 
   private def connectionIdTags =
     connectionIds.map(id => <connectionId>{ id }</connectionId>)

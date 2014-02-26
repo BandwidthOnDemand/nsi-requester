@@ -13,13 +13,4 @@ case class Terminate(
     <type:terminate>
       <connectionId>{ connectionId }</connectionId>
     </type:terminate>
-
-  override def nsiV1Body =
-    <int:terminateRequest>
-      { nsiRequestFields }
-      <type:terminate>
-        { nsas }
-        <connectionId>{ connectionId }</connectionId>
-      </type:terminate>
-    </int:terminateRequest>
 }
