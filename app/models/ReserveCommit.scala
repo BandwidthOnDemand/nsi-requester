@@ -14,8 +14,4 @@ case class ReserveCommit(
       <connectionId>{ connectionId }</connectionId>
     </type:reserveCommit>
 
-  override def nsiV1Body = sys.error("ReserveCommit is not a supported NSI v1 operation")
-
-  override def nsiV1SoapAction = sys.error("ReserveCommit is not a supported NSI v1 operation")
-
 }

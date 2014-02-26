@@ -10,8 +10,7 @@ import scala.xml.NodeSeq.Empty
 case class Reserve(
     description: Option[String],
     startDate: Option[Date],
-    end: Either[Date, Period],
-    connectionId: String,
+    endDate: Date,
     serviceType: String,
     source: Port,
     destination: Port,
@@ -32,40 +31,12 @@ case class Reserve(
       <criteria version="0">
         <schedule>
           { startTimeField }
-          { endDateOrDuration }
+          { endTimeField }
         </schedule>
         <serviceType>{ serviceType }</serviceType>
         { service }
       </criteria>
     </type:reserve>
-
-  override def nsiV1Body =
-    <int:reserveRequest>
-      { nsiRequestFields }
-      <type:reserve>
-        { nsas }
-        <reservation>
-          { globalReservationIdField }
-          { descriptionField }
-          <connectionId>{ connectionId }</connectionId>
-          <serviceParameters>
-            <schedule>
-              { startTimeField }
-              { endDateOrDuration }
-            </schedule>
-            <bandwidth>
-              <desired>{ bandwidth }</desired>
-            </bandwidth>
-            { possibleUnprotected }
-          </serviceParameters>
-          <path>
-            <directionality>Bidirectional</directionality>
-            <sourceSTP>{ source.xmlV1 }</sourceSTP>
-            <destSTP>{ destination.xmlV1 }</destSTP>
-          </path>
-        </reservation>
-      </type:reserve>
-    </int:reserveRequest>
 
   private def startTimeField = startDate match {
     case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
@@ -82,13 +53,8 @@ case class Reserve(
     case None    => Empty
   }
 
-  private def endDateOrDuration() = {
-    val dateTimeFormat = ISODateTimeFormat.dateTime()
-
-    end.fold(
-      date => <endTime>{ dateTimeFormat.print(new DateTime(date)) }</endTime>,
-      duration => <duration>{ duration }</duration>)
-  }
+  private def endTimeField =
+    <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(endDate)) }</endTime>
 
   private def service =
     <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>

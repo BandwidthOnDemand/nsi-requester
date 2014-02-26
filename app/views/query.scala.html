@@ -3,22 +3,20 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI ${provider.nsiVersion} Query Request", "query", provider.nsiVersion) {
+@nsirequest(s"Make a NSI Query Request", "query") {
 
     <section id="formS">
-        <h1>Make a NSI @provider.nsiVersion Query Request</h1>
+        <h1>Make a NSI Query Request</h1>
         <div class="content">
              @form(action = routes.Application.query, 'class -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
-                @defining(provider.nsiVersion.fold(v1 = QueryOperation.operationsV1, v2 = QueryOperation.operationsV2)) { os =>
-                    @select(
-                        queryForm("query.operation"),
-                        options = options(os.map(_.toString).toList),
-                        '_label -> "Operation",
-                        '_showConstraints -> false
-                    )
-                }
+                @select(
+                   queryForm("query.operation"),
+                   options = options(QueryOperation.operationsV2.map(_.toString).toList),
+                   '_label -> "Operation",
+                   '_showConstraints -> false
+                )
 
                 <fieldset id="connectionIds" style="position: relative">
                     <a href="#" id="plus-connection" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>

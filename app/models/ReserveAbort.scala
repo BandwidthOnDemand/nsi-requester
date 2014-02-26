@@ -14,7 +14,4 @@ case class ReserveAbort(
       <connectionId>{ connectionId }</connectionId>
     </type:reserveAbort>
 
-  override def nsiV1Body = sys.error("ReserveAbort is not a supported NSI v1 operation")
-
-  override def nsiV1SoapAction = sys.error("ReserveAbort is not a supported NSI v1 operation")
 }

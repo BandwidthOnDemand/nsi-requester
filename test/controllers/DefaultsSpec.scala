@@ -4,7 +4,6 @@ import play.api.test.FakeRequest
 import play.api.test.WithApplication
 import play.api.test.WithApplication
 import play.api.test.WithApplication
-import models.NsiVersion
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class DefaultsSpec extends support.Specification {
@@ -24,7 +23,6 @@ class DefaultsSpec extends support.Specification {
       val provider = Defaults.defaultProvider(FakeRequest())
 
       provider.providerUrl must equalTo(uri("https://bod.surfnet.nl/nsi/v1_sc/provider"))
-      provider.nsiVersion must equalTo(NsiVersion.V2)
       provider.accessToken must beNone
       provider.password must beNone
       provider.username must beNone

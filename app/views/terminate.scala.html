@@ -3,10 +3,10 @@
 @import helper._
 @import views.helper.MyHelpers._
 
-@nsirequest(s"Make a NSI ${provider.nsiVersion} Terminate Request", "terminate", provider.nsiVersion) {
+@nsirequest(s"Make a NSI Terminate Request", "terminate") {
 
     <section id="formS">
-        <h1>Make a NSI @provider.nsiVersion Terminate Request</h1>
+        <h1>Make a NSI Terminate Request</h1>
         <div class="content">
              @form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
 

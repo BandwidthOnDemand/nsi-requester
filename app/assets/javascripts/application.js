@@ -145,7 +145,6 @@ $(function() {
       var validIndicator = $("#valid-indicator"),
           usernameInput = $("#provider_username"),
           passwordInput = $("#provider_password"),
-          nsiVersionInput = $("#provider_nsiVersion"),
           providerNsaInput = $("#nsi_providerNsa"),
           tokenInput = $("#provider_accessToken");
 
@@ -184,9 +183,8 @@ $(function() {
 
       function validProviderUrl(data) {
           if (data.valid) {
-              nsiVersionInput.find('option[value="'+data.version+'"]').prop("selected", true);
               validIndicator.addClass("valid");
-              validIndicator.text("Provider is valid, NSI version " + data.version + " detected");
+              validIndicator.text("Provider is valid");
           } else {
               validIndicator.removeClass("valid");
               validIndicator.text("Could not verify the provider, " + data.message);

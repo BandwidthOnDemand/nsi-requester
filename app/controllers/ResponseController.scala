@@ -13,7 +13,6 @@ import scala.concurrent.stm.TMap
 import support.JsonResponse
 import scala.xml.NodeSeq
 import models.Ack
-import models.NsiVersion
 import models.NsiRequest
 
 object ResponseController extends Controller with Soap11Controller {
@@ -26,7 +25,6 @@ object ResponseController extends Controller with Soap11Controller {
     val correlationId = parseCorrelationId(request.body)
     val providerNsa = parseProviderNsa(request.body)
     val requesterNsa = parseRequesterNsa(request.body)
-    val nsiVersion = detectNsiVersion(request.body)
 
     correlationId.foreach { id =>
       val clients = channels.get(id).map(Seq(_)).getOrElse {
@@ -40,25 +38,12 @@ object ResponseController extends Controller with Soap11Controller {
     }
 
     correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
-      nsiVersion.fold(badRequest("Could not determine NSI version")) { version =>
-        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope(version)).as(ContentTypeSoap11)
-      }
+      Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope()).as(ContentTypeSoap11)
     }
   }
 
   private def badRequest(message: String) =
     BadRequest((<badRequest>{ message }</badRequest>).asInstanceOf[NodeSeq])
-
-  private def detectNsiVersion(xml: NodeSeq): Option[NsiVersion] = {
-    val bodyElements = (xml \\ "Body").headOption.map(_.nonEmptyChildren)
-
-    def hasNamespace(node: scala.xml.Node, namespace: String) = Option(node.namespace).map(_.startsWith(namespace)).getOrElse(false)
-
-    bodyElements.flatMap(_.collectFirst {
-      case n: scala.xml.Node if hasNamespace(n, NsiRequest.NsiV1NamespacePrefix) => NsiVersion.V1
-      case n: scala.xml.Node if hasNamespace(n, NsiRequest.NsiV2NamespacePrefix) => NsiVersion.V2
-    })
-  }
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>

@@ -5,24 +5,12 @@ import org.junit.runner.RunWith
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
 
-  "NSI v1 provision" should {
+  "NSI provision" should {
 
     "give valid xml for provision" in {
       val provision = DefaultProvision().copy(connectionId = "1234567890")
 
-      val envelope = provision.toNsiV1Envelope
-
-      envelope must \\("provision")
-      envelope must \\("connectionId") \> "1234567890"
-    }
-  }
-
-  "NSI v2 provision" should {
-
-    "give valid xml for provision" in {
-      val provision = DefaultProvision().copy(connectionId = "1234567890")
-
-      val envelope = provision.toNsiV2Envelope
+      val envelope = provision.toNsiEnvelope
 
       envelope must \\("provision")
       envelope must \\("connectionId") \> "1234567890"
@@ -31,7 +19,7 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
     "have a soap action" in {
       val res = DefaultProvision()
 
-      res.soapAction(NsiVersion.V2) must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/provision")
+      res.soapAction() must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/provision")
     }
   }
 

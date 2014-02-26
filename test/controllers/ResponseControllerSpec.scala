@@ -12,24 +12,7 @@ class ResponseControllerSpec extends Specification {
 
   "The response controllers" should {
 
-    "respond with an NSI V1 Ok" in new WithApplication {
-      val body =
-        <Envelope>
-          <header>
-            <correlationId>{ "urn:uuid:1234" }</correlationId>
-          </header>
-          <Body>
-            <ns:request xmlns:ns="http://schemas.ogf.org/nsi/2011/10/interface" />
-          </Body>
-        </Envelope>
-
-      val result = ResponseController.reply()(FakeXmlRequest(body))
-
-      contentAsString(result) must contain("http://schemas.ogf.org/nsi/2011/10")
-      status(result) must equalTo(200)
-    }
-
-    "respond with an NSI V2 Ok" in new WithApplication {
+    "respond with an NSI Ok" in new WithApplication {
       val body =
         <Envelope>
           <header>

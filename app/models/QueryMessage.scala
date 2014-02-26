@@ -20,8 +20,7 @@ case class QueryMessage(
   requesterNsa: String,
   providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
 
-  override def nsiV1SoapAction = sys.error("QueryNotification is not a supported NSI v1 operation")
-  override def nsiV2SoapAction = {
+  override def soapAction = {
     val action = operation match {
       case NotificationSync => "queryNotificationSync"
       case NotificationAsync => "queryNotification"
@@ -65,11 +64,6 @@ case class QueryMessage(
   private def endIdTag = operation match {
     case NotificationSync | NotificationAsync => endId.map(id => <endNotificationId>{ id }</endNotificationId>).getOrElse(Empty)
     case ResultSync | ResultAsync             => endId.map(id => <endResultId>{ id }</endResultId>).getOrElse(Empty)
-  }
-
-  override def nsiV1Body = operation match {
-    case NotificationSync | NotificationAsync => sys.error("QueryNotification is not a supported NSI v1 operation")
-    case ResultSync | ResultAsync =>  sys.error("QueryResult is not a supported NSI v1 operation")
   }
 
 }
