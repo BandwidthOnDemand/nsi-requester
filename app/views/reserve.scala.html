@@ -16,7 +16,7 @@
                 @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
-                @inputText(requestForm("reservation.end.date"), '_label -> "End Date")
+                @inputText(requestForm("reservation.endDate"), '_label -> "End Date")
                 @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xxlarge")
 
                 @inputPort(field => requestForm("reservation.source." + field), "source")
