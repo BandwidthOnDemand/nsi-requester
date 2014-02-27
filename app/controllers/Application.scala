@@ -42,8 +42,8 @@ object Application extends Controller with Soap11Controller {
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), endDate = endDate.toDate,
         correlationId = generateCorrelationId,
         serviceType = DefaultServiceType,
-        source = DefaultPortPrefix,
-        destination = DefaultPortPrefix,
+        source = Port(DefaultPortPrefix),
+        destination = Port(DefaultPortPrefix),
         bandwidth = 100,
         replyTo = Some(ReplyToUrl),
         requesterNsa = RequesterNsa,
@@ -203,7 +203,7 @@ object Application extends Controller with Soap11Controller {
 
   private def generateCorrelationId = UUID.randomUUID.toString
 
-  private implicit class Mappings(endPoint: EndPoint) {
+  private implicit class Mappings(endPoint: EndPoint)(implicit request: Request[AnyContent]) {
 
     private def replyTo: Mapping[Option[URI]] = optional(uri).verifying("replyTo address is required for NSIv1", uri => true)
     private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
@@ -212,7 +212,7 @@ object Application extends Controller with Soap11Controller {
       "reservation" -> mapping(
         "description" -> optional(text),
         "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
-        "end" -> date("yyyy-MM-dd HH:mm"),
+        "endDate" -> date("yyyy-MM-dd HH:mm"),
         "serviceType" -> nonEmptyText,
         "source" -> portMapping,
         "destination" -> portMapping,
@@ -221,7 +221,7 @@ object Application extends Controller with Soap11Controller {
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean)
         ((desc, start, end, serviceType, source, dest, bandwidth, correlationId, globalReservationId, unProtected) =>
-          Reserve(desc, start, end, serviceType, source, dest, bandwidth, correlationId, Some(???), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
+          Reserve(desc, start, end, serviceType, source, dest, bandwidth, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
         (reserve =>
           Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.bandwidth, reserve.correlationId, reserve.globalReservationId, reserve.unprotected))))
 
@@ -251,10 +251,9 @@ object Application extends Controller with Soap11Controller {
       mapping(
         "connectionId" -> nonEmptyText,
         "correlationId" -> nonEmptyText,
-        "replyTo" -> replyTo,
-        "requesterNsa" -> nonEmptyText)((connectionId, correlationId, replyTo, requesterNsa) => apply(connectionId, correlationId, replyTo, requesterNsa, endPoint.provider)){ go =>
+        "requesterNsa" -> nonEmptyText)((connectionId, correlationId, requesterNsa) => apply(connectionId, correlationId, Some(ReplyToUrl), requesterNsa, endPoint.provider)){ go =>
           val tuple = unapply(go).get
-          Some((tuple._1, tuple._2, tuple._3, tuple._4))
+          Some((tuple._1, tuple._2, tuple._4))
         }
 
     def queryF: Form[Query] = Form(
@@ -262,7 +261,7 @@ object Application extends Controller with Soap11Controller {
         "operation" -> of[QueryOperation.Value],
         "connectionIds" -> listWithoutEmptyStrings,
         "globalReservationIds" -> listWithoutEmptyStrings,
-        "correlationId" -> nonEmptyText)((operation, connectionIds, globalReservationIds, correlationId) => Query(operation, connectionIds, globalReservationIds, correlationId, None, RequesterNsa, endPoint.provider)){ query =>
+        "correlationId" -> nonEmptyText)((operation, connectionIds, globalReservationIds, correlationId) => Query(operation, connectionIds, globalReservationIds, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ query =>
           Some((query.operation, query.connectionIds, query.globalReservationIds, query.correlationId))
         }
       )
@@ -273,7 +272,7 @@ object Application extends Controller with Soap11Controller {
         "connectionId" -> nonEmptyText,
         "startId" -> optional(of[Long]),
         "endId" -> optional(of[Long]),
-        "correlationId" -> nonEmptyText)((operation, connectionId, startId, endId, correlationId) => QueryMessage(operation, connectionId, startId, endId, correlationId, None, RequesterNsa, endPoint.provider)){ queryMessage =>
+        "correlationId" -> nonEmptyText)((operation, connectionId, startId, endId, correlationId) => QueryMessage(operation, connectionId, startId, endId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ queryMessage =>
           Some((queryMessage.operation, queryMessage.connectionId, queryMessage.startId, queryMessage.endId, queryMessage.correlationId))
         }
       )
