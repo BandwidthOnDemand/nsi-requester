@@ -155,7 +155,7 @@ object Application extends Controller with Soap11Controller {
     val wsdlValid =
       for {
         nsaId <- (request.body \ "nsa-id").asOpt[String]
-        provider <- Provider.find(nsaId)
+        provider <- Configuration.findProvider(nsaId)
       } yield {
         val authenticated = addAuthenticationHeader((request.body \ "token").asOpt[String])
 
