@@ -18,9 +18,9 @@ case class Reserve(
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    providerNsa: String,
+    provider: Provider,
     globalReservationId: Option[String] = None,
-    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
+    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
   import NsiRequest._
 

@@ -5,7 +5,9 @@ import play.api.mvc.Controller
 import play.api.mvc.Action
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.format.Formats._
 import models.Provider
+import models.EndPoint
 import Defaults._
 import FormSupport._
 import play.api.mvc.SimpleResult
@@ -13,7 +15,7 @@ import play.api.mvc.SimpleResult
 object SettingsController extends Controller {
 
   def settingsForm = Action { implicit request =>
-    val defaultForm = settingsF.fill((defaultProvider, (defaultReplyToUrl, defaultRequesterNsa, defaultProviderNsa)))
+    val defaultForm = settingsF.fill(currentEndPoint)
 
     Ok(views.html.settings(defaultForm))
   }
@@ -22,28 +24,18 @@ object SettingsController extends Controller {
     settingsF.bindFromRequest.fold[SimpleResult](
       formWithErrors => BadRequest(views.html.settings(formWithErrors)),
       {
-        case (provider, (replyTo, requesterNsa, providerNsa)) =>
-          Redirect(routes.Application.reserveForm).flashing("success" -> "Settings changed for this session")
+        case endPoint =>
+          Redirect(routes.Application.reserveForm)
+            .flashing("success" -> "Settings changed for this session")
             .withSession(
-              "providerUrl" -> provider.providerUrl.toString,
-              "username" -> provider.username.getOrElse(""),
-              "password" -> provider.password.getOrElse(""),
-              "accessToken" -> provider.accessToken.getOrElse(""),
-              "replyTo" -> replyTo.map(_.toString).getOrElse(""),
-              "requesterNsa" -> requesterNsa,
-              "providerNsa" -> providerNsa)
+              "accessToken" -> endPoint.accessToken.getOrElse(""),
+              "providerNsa" -> endPoint.provider.nsaId)
       })
   }
 
-  def resetSettings = Action { implicit request =>
-    Redirect(routes.SettingsController.settingsForm).withNewSession.flashing("success" -> "Settings have been reset")
-  }
-
-  private[controllers] val settingsF: Form[(Provider, (Option[URI], String, String))] = Form(
-    tuple(
-      "provider" -> providerMapping,
-      "nsi" -> tuple(
-        "replyTo" -> optional(uri),
-        "requesterNsa" -> nonEmptyText,
-        "providerNsa" -> nonEmptyText)))
+  private[controllers] val settingsF: Form[EndPoint] = Form(
+    mapping(
+      "provider" -> mapping("id" -> nonEmptyText)(id => Provider.find(id).get)(provider => Some(provider.nsaId)),
+      "accessToken" -> optional(of[String]))(EndPoint.apply)(EndPoint.unapply)
+  )
 }

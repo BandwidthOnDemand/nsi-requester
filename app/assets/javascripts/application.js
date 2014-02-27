@@ -137,33 +137,29 @@ $(function() {
       setInterval(checkLocation, 100);
    }
 
-   var initValidateProviderUrl = function() {
-      var providerInput = $("#providerUrl");
-
-      if (!providerInput.length) return;
+   var initValidateProvider = function() {
+      var providerSelect = $("#provider_id");
 
       var validIndicator = $("#valid-indicator"),
-          usernameInput = $("#provider_username"),
-          passwordInput = $("#provider_password"),
-          providerNsaInput = $("#nsi_providerNsa"),
-          tokenInput = $("#provider_accessToken");
+          tokenInput = $("#accessToken");
 
-      providerInput.closest('fieldset').find('input').on('change', function(event) {
+      providerSelect.on('change', function(event) {
           validateProviderUrl();
-      });
+      })
+      tokenInput.on('change', function(event) {
+          validateProviderUrl();
+      })
 
-      function validateProviderUrl(providerUrl) {
+      function validateProviderUrl() {
           providerUrlChecking();
 
           var data = {
-              url: providerInput.val(),
-              username: usernameInput.val(),
-              password: passwordInput.val(),
-              token: tokenInput.val()
+              "nsa-id": providerSelect.val(),
+              "token": tokenInput.val()
           };
 
           $.ajax({
-              url: providerInput.attr("data-validate"),
+              url: providerSelect.attr("data-validate-url"),
               type: 'POST',
               data: JSON.stringify(data),
               dataType: 'json',
@@ -191,7 +187,7 @@ $(function() {
           }
       }
 
-      validateProviderUrl(providerInput.val());
+      validateProviderUrl();
    }
 
    var initSelectInput = function() {
@@ -216,7 +212,7 @@ $(function() {
 
    initExtraFields();
    initNsiRequestSubmit();
-   initValidateProviderUrl();
+   initValidateProvider();
    initSelectInput();
    initKeymaster();
 

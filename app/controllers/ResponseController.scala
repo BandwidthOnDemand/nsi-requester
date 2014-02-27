@@ -13,6 +13,7 @@ import scala.concurrent.stm.TMap
 import support.JsonResponse
 import scala.xml.NodeSeq
 import models.Ack
+import models.Provider
 import models.NsiRequest
 
 object ResponseController extends Controller with Soap11Controller {
@@ -38,7 +39,7 @@ object ResponseController extends Controller with Soap11Controller {
     }
 
     correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
-      Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.getOrElse("not.found.in.request")).toNsiEnvelope()).as(ContentTypeSoap11)
+      Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.flatMap(id => Provider.find(id)).get).toNsiEnvelope()).as(ContentTypeSoap11)
     }
   }
 

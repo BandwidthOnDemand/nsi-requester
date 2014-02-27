@@ -69,11 +69,11 @@ object FormSupport {
     def unbind(key: String, value: QueryOperation) = Map(key -> value.toString)
   }
 
-  val providerMapping: Mapping[Provider] = mapping(
-    "providerUrl" -> uri,
-    "username" -> optional(text),
-    "password" -> optional(text),
-    "accessToken" -> optional(text)
-  ){ Provider.apply } { Provider.unapply }
+//  val providerMapping: Mapping[Provider] = mapping(
+//    "providerUrl" -> uri,
+//    "username" -> optional(text),
+//    "password" -> optional(text),
+//    "accessToken" -> optional(text)
+//  ){ Provider.apply } { Provider.unapply }
 
 }

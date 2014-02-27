@@ -1,4 +1,4 @@
-@(settingsF: Form[(Provider, (Option[java.net.URI], String, String))])(implicit flash: Flash)
+@(settingsF: Form[EndPoint])(implicit flash: Flash)
 
 @import helper._
 @import views.helper.MyHelpers._
@@ -10,13 +10,24 @@
         <div class="content">
 
             @form(action = routes.SettingsController.settings, 'class -> "form form-horizontal") {
-                @fragments.providerFields(name => settingsF("provider." + name), false)
+                <div class="message">
+                    <h3>Provider attributes</h3>
+                </div>
 
-                @fragments.nsiCommonFields(name => settingsF("nsi." + name), false)
+                @select(
+                   settingsF("provider.id"),
+                   options = options(Provider.all.map(_.nsaId)),
+                   '_label -> "Provider",
+                   '_showConstraints -> false,
+                   Symbol("data-validate-url") -> routes.Application.validateProvider
+                )
+
+                @inputText(settingsF("accessToken"), '_label -> "Oauth2 Access Token", 'class -> "input-xlarge")
+
+                <div id="valid-indicator">Checking...</div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Use settings</button>
-                    <a href="@routes.SettingsController.resetSettings" class="btn">Reset settings</a>
                 </div>
             }
         </div>
