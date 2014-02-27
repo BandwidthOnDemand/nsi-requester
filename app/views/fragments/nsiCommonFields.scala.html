@@ -7,14 +7,7 @@
 <div class="message@if(showCollapse){ extra-fields}">
     <h3>@if(showCollapse){<i class="icon-minus-sign"></i><i class="icon-plus-sign"></i> }NSI common attributes</h3>
 </div>
+
 <fieldset @if(showCollapse){class="extra-fields"}>
     @if(showCollapse){@inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")}
-
-    @helper.input(formField("replyTo"), '_label -> "Reply to URL", 'class -> "input-xlarge") { (id, name, value, args) =>
-        <input type="url" name="@name" id="@id" value="@value" pattern="https?://.+" @toHtmlArgs(args)>
-    }
-
-    @inputText(formField("requesterNsa"), '_label -> "Requester NSA", 'class -> "input-xlarge")
-
-    @inputText(formField("providerNsa"), '_label -> "Provider NSA", 'class -> "input-xlarge")
 </fieldset>

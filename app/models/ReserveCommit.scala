@@ -7,7 +7,7 @@ case class ReserveCommit(
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    providerNsa: String) extends NsiRequest(correlationId, replyTo, requesterNsa, providerNsa) {
+    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
   override def nsiV2Body =
     <type:reserveCommit>

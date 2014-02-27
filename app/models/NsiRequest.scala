@@ -4,7 +4,7 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, providerNsa: String, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion) {
+abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, provider: Provider, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion) {
   import NsiRequest._
 
   def nsiV2Body: Node
@@ -22,7 +22,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
 
   private[models] def nsas = {
     <requesterNSA>{ requesterNsa }</requesterNSA>
-    <providerNSA>{ providerNsa }</providerNSA>
+    <providerNSA>{ provider.nsaId }</providerNSA>
   }
 
   private[models] def nsiRequestFields = {
@@ -35,7 +35,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
       <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
       <requesterNSA>{ requesterNsa }</requesterNSA>
-      <providerNSA>{ providerNsa }</providerNSA>
+      <providerNSA>{ provider.nsaId }</providerNSA>
       { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
     </head:nsiHeader>
   }
