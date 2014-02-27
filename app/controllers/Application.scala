@@ -15,7 +15,7 @@ import play.api.http.HeaderNames.CONTENT_TYPE
 import support.JsonResponse
 import models._
 import FormSupport._
-import Defaults._
+import Configuration._
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future

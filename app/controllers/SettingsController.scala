@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import play.api.data.format.Formats._
 import models.Provider
 import models.EndPoint
-import Defaults._
+import Configuration._
 import FormSupport._
 import play.api.mvc.SimpleResult
 
