@@ -35,7 +35,7 @@ object SettingsController extends Controller {
 
   private[controllers] val settingsF: Form[EndPoint] = Form(
     mapping(
-      "provider" -> mapping("id" -> nonEmptyText)(id => Provider.find(id).get)(provider => Some(provider.nsaId)),
+      "provider" -> mapping("id" -> nonEmptyText)(id => Configuration.findProvider(id).get)(provider => Some(provider.nsaId)),
       "accessToken" -> optional(of[String]))(EndPoint.apply)(EndPoint.unapply)
   )
 }
