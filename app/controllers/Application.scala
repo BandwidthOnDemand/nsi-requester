@@ -55,7 +55,7 @@ object Application extends Controller with Soap11Controller {
 
   def reserve = Action.async { implicit request =>
     currentEndPoint.reserveF.bindFromRequest.fold(
-      formWithErrors => { Future.successful(BadRequest(Json.toJson(formWithErrors.errors))) },
+      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
       reservation => sendEnvelope(currentEndPoint, reservation))
   }
 
@@ -146,7 +146,7 @@ object Application extends Controller with Soap11Controller {
 
   def queryMessage = Action.async { implicit request =>
     currentEndPoint.queryMessageF.bindFromRequest.fold(
-      formWithErrors => { println(s"Errors $formWithErrors"); Future.successful(BadRequest(Json.toJson(formWithErrors.errors))) },
+      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
       { case queryMessage => sendEnvelope(currentEndPoint, queryMessage) })
   }
 
@@ -250,10 +250,9 @@ object Application extends Controller with Soap11Controller {
     private def genericOperationMapping[R](apply: (String, String, Option[URI], String, Provider) => R)(unapply: R => Option[(String, String, Option[URI], String, Provider)]) =
       mapping(
         "connectionId" -> nonEmptyText,
-        "correlationId" -> nonEmptyText,
-        "requesterNsa" -> nonEmptyText)((connectionId, correlationId, requesterNsa) => apply(connectionId, correlationId, Some(ReplyToUrl), requesterNsa, endPoint.provider)){ go =>
+        "correlationId" -> nonEmptyText)((connectionId, correlationId) => apply(connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ go =>
           val tuple = unapply(go).get
-          Some((tuple._1, tuple._2, tuple._4))
+          Some((tuple._1, tuple._2))
         }
 
     def queryF: Form[Query] = Form(
