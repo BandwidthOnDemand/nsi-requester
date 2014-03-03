@@ -4,19 +4,23 @@ import models._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import play.api.Play.current
+import play.api.Play
 import java.net.URI
 import scala.collection.JavaConversions._
 import com.typesafe.config.ConfigObject
 
-object Configuration {
+object RequesterSession {
+
+  val ProviderNsaSessionField = "nsaId"
+  val AccessTokenSessionField = "accessToken"
 
   val DefaultPortPrefix = "urn:ogf:network:surfnet.nl:1990:testbed:"
-  val DefaultProvider = allProviders.head
+  def DefaultProvider = allProviders.head
   val DefaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
   val RequesterNsa = current.configuration.getString("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
   def currentEndPoint(implicit request: Request[AnyContent]) = {
-    val provider = request.session.get("nsaId").flatMap(id => findProvider(id)).getOrElse(DefaultProvider)
+    val provider = request.session.get(ProviderNsaSessionField).flatMap(id => findProvider(id)).getOrElse(DefaultProvider)
     val token = request.session.get("accessToken")
 
     EndPoint(provider, token)
@@ -24,7 +28,8 @@ object Configuration {
 
   def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create("http://" + request.host + routes.ResponseController.reply)
 
-  lazy val allProviders: Seq[Provider] = {
+  // is not a lazy val, because some tests will break (object will only be initialized once during tests
+  def allProviders: Seq[Provider] = {
     def toProvider(providerObject: ConfigObject): Provider =
       Provider(
         providerObject.get("id").unwrapped().asInstanceOf[String],

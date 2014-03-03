@@ -15,7 +15,7 @@ import play.api.http.HeaderNames.CONTENT_TYPE
 import support.JsonResponse
 import models._
 import FormSupport._
-import Configuration._
+import RequesterSession._
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future
@@ -155,7 +155,7 @@ object Application extends Controller with Soap11Controller {
     val wsdlValid =
       for {
         nsaId <- (request.body \ "nsa-id").asOpt[String]
-        provider <- Configuration.findProvider(nsaId)
+        provider <- findProvider(nsaId)
       } yield {
         val authenticated = addAuthenticationHeader((request.body \ "token").asOpt[String])
 

@@ -16,7 +16,7 @@
 
                 @select(
                    settingsF("provider.id"),
-                   options = options(Configuration.allProviders.map(_.nsaId).toList),
+                   options = options(RequesterSession.allProviders.map(_.nsaId).toList),
                    '_label -> "Provider",
                    '_showConstraints -> false,
                    'class -> "input-xxlarge",

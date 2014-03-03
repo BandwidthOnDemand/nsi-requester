@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import play.api.data.format.Formats._
 import models.Provider
 import models.EndPoint
-import Configuration._
+import RequesterSession._
 import FormSupport._
 import play.api.mvc.SimpleResult
 
@@ -28,14 +28,14 @@ object SettingsController extends Controller {
           Redirect(routes.Application.reserveForm)
             .flashing("success" -> "Settings changed for this session")
             .withSession(
-              "accessToken" -> endPoint.accessToken.getOrElse(""),
-              "providerNsa" -> endPoint.provider.nsaId)
+              AccessTokenSessionField -> endPoint.accessToken.getOrElse(""),
+              ProviderNsaSessionField -> endPoint.provider.nsaId)
       })
   }
 
   private[controllers] val settingsF: Form[EndPoint] = Form(
     mapping(
-      "provider" -> mapping("id" -> nonEmptyText)(id => Configuration.findProvider(id).get)(provider => Some(provider.nsaId)),
+      "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider => Some(provider.nsaId)),
       "accessToken" -> optional(of[String]))(EndPoint.apply)(EndPoint.unapply)
   )
 }

@@ -26,25 +26,19 @@ class ApplicationSpec extends support.Specification {
 
   "Adding Authorization" should {
 
-    "add no authorization header" in {
-      val holder = Application.addAuthenticationHeader(Some(""), None, Some(""))(WS.url("/"))
-
-      holder.headers must beEmpty
-      holder.auth must beNone
-    }
 
     "add a authorization header containing the OAuth token" in {
-      val holder = Application.addAuthenticationHeader(None, None, Some("token"))(WS.url("/"))
+      val holder = Application.addAuthenticationHeader(Some("token"))(WS.url("/"))
 
       holder.headers must havePair("Authorization" -> Seq("bearer token"))
       holder.auth must beNone
     }
 
-    "add a Basic Auth header" in {
-      val holder = Application.addAuthenticationHeader(Some("user"), Some("pass"), None)(WS.url("/"))
+    "add a no authorization header" in {
+      val holder = Application.addAuthenticationHeader(None)(WS.url("/"))
 
       holder.headers must beEmpty
-      holder.auth must beSome(("user", "pass", AuthScheme.BASIC))
+      holder.auth must beNone
     }
   }
 

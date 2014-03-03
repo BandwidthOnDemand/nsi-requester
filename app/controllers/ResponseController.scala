@@ -38,8 +38,10 @@ object ResponseController extends Controller with Soap11Controller {
       }
     }
 
-    correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
-      Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), providerNsa.flatMap(id => Configuration.findProvider(id)).get).toNsiEnvelope()).as(ContentTypeSoap11)
+    providerNsa.flatMap(RequesterSession.findProvider).fold(badRequest("Could not find provider nsa")) { provider =>
+      correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
+        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope()).as(ContentTypeSoap11)
+      }
     }
   }
 
