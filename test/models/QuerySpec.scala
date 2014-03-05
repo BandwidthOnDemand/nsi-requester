@@ -55,6 +55,6 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
         operation = operation,
         replyTo = Some(uri("http://localhost")),
         requesterNsa = "requesterNsa",
-        provider = Provider("nsa:surfnet.nl", uri("http://localhost")))
+        provider = Provider("nsa:surfnet.nl", uri("http://localhost"), false))
   }
 }
