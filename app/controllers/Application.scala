@@ -175,10 +175,11 @@ object Application extends Controller with Soap11Controller {
     val requestTime = DateTime.now()
 
     val addHeaders = addAuthenticationHeader(endPoint.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction())
-    val wsRequest = addHeaders(WS.url(endPoint.provider.providerUrl.toString).withFollowRedirects(false))
+    val wsRequest = addHeaders(WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
       Logger.debug(s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}")
+
       if (response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11)) {
         val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
         Ok(jsonResponse)

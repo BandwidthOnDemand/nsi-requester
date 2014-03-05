@@ -33,7 +33,8 @@ object RequesterSession {
     def toProvider(providerObject: ConfigObject): Provider =
       Provider(
         providerObject.get("id").unwrapped().asInstanceOf[String],
-        URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]))
+        URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
+        providerObject.get("2waytls").unwrapped().asInstanceOf[Boolean])
 
     current.configuration.getObjectList("requester.nsi.providers").map(_.map(toProvider)).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
   }

@@ -11,8 +11,8 @@ class RequesterSessionSpec extends support.Specification {
 
   val someFakeProviders: Map[String, _] = ConfigFactory.parseString("""
     requester.nsi.providers = [
-      { id = "testid", url = "http://localhost:9999" },
-      { id = "urn:ogf:network:nsa:some-network", url = "http://localhost:8888" }
+      { id = "testid", url = "http://localhost:9999", 2waytls = false },
+      { id = "urn:ogf:network:nsa:some-network", url = "http://localhost:8888", 2waytls = true }
     ]""").root().unwrapped().asScala.toMap
 
   "The configuration" should {
@@ -35,7 +35,7 @@ class RequesterSessionSpec extends support.Specification {
 
       val provider = RequesterSession.findProvider("testid")
 
-      provider must beSome(Provider("testid", uri("http://localhost:9999")))
+      provider must beSome(Provider("testid", uri("http://localhost:9999"), false))
     }
   }
 
