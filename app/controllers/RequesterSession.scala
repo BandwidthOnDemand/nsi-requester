@@ -13,18 +13,17 @@ object RequesterSession {
 
   val ProviderNsaSessionField = "nsaId"
   val AccessTokenSessionField = "accessToken"
+  val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
 
-  val DefaultPortPrefix = "urn:ogf:network:surfnet.nl:1990:testbed:"
-  def DefaultProvider = allProviders.head
-  val DefaultServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
   val RequesterNsa = current.configuration.getString("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
-  def currentEndPoint(implicit request: Request[AnyContent]) = {
-    val provider = request.session.get(ProviderNsaSessionField).flatMap(id => findProvider(id)).getOrElse(DefaultProvider)
-    val token = request.session.get("accessToken")
+  def currentPortPrefix(implicit request: Request[AnyContent]): String = currentProvider.portPrefix
 
-    EndPoint(provider, token)
-  }
+  def currentProvider(implicit request: Request[AnyContent]): Provider =
+    request.session.get(ProviderNsaSessionField) flatMap findProvider getOrElse allProviders.head
+
+  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint =
+    EndPoint(currentProvider, request.session.get("accessToken"))
 
   def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create("http://" + request.host + routes.ResponseController.reply)
 
@@ -34,6 +33,7 @@ object RequesterSession {
       Provider(
         providerObject.get("id").unwrapped().asInstanceOf[String],
         URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
+        providerObject.get("portPrefix").unwrapped().asInstanceOf[String],
         providerObject.get("2waytls").unwrapped().asInstanceOf[Boolean])
 
     current.configuration.getObjectList("requester.nsi.providers").map(_.map(toProvider)).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))

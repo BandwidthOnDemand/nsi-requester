@@ -41,9 +41,9 @@ object Application extends Controller with Soap11Controller {
       Reserve(
         description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), endDate = endDate.toDate,
         correlationId = generateCorrelationId,
-        serviceType = DefaultServiceType,
-        source = Port(DefaultPortPrefix),
-        destination = Port(DefaultPortPrefix),
+        serviceType = ServiceType,
+        source = Port(currentPortPrefix),
+        destination = Port(currentPortPrefix),
         bandwidth = 100,
         replyTo = Some(ReplyToUrl),
         requesterNsa = RequesterNsa,

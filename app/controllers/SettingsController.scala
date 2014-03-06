@@ -1,16 +1,13 @@
 package controllers
 
 import java.net.URI
-import play.api.mvc.Controller
-import play.api.mvc.Action
+import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import models.Provider
-import models.EndPoint
+import models._
 import RequesterSession._
 import FormSupport._
-import play.api.mvc.SimpleResult
 
 object SettingsController extends Controller {
 
