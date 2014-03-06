@@ -8,11 +8,11 @@ class QueryMessageSpec extends support.Specification with org.specs2.matcher.Xml
 
   import QueryMessageMode._
 
+  val queryNotifiation = QueryMessage(NotificationAsync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:", false))
+
   "QueryNotifications" should {
 
     "contain a start and end notification id" in {
-      val queryNotifiation = QueryMessage(NotificationAsync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", Provider("providerNsa", uri("http://localhost"), false))
-
       val body = queryNotifiation.nsiV2Body
 
       body must \\("queryNotification")
@@ -22,9 +22,7 @@ class QueryMessageSpec extends support.Specification with org.specs2.matcher.Xml
     }
 
     "be a sync query" in {
-      val queryNotifiation = QueryMessage(NotificationSync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", Provider("providerNsa", uri("http://localhost"), false))
-
-      val body = queryNotifiation.nsiV2Body
+      val body = queryNotifiation.copy(operation = NotificationSync).nsiV2Body
 
       body must \\("queryNotificationSync")
     }

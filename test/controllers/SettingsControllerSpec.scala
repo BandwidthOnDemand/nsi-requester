@@ -42,7 +42,7 @@ class SettingsControllerSpec extends support.Specification {
 
   "The settings view" should {
     "contain the password when set in session" in new WithApplication {
-      val settingsForm = SettingsController.settingsF.fill(EndPoint(Provider("urn:provider", uri("http://localhost"), false), Some("secrettoken")))
+      val settingsForm = SettingsController.settingsF.fill(EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:", false), Some("secrettoken")))
 
       val result = views.html.settings(settingsForm)(Flash())
 
