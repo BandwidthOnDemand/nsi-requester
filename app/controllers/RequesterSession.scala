@@ -14,7 +14,6 @@ object RequesterSession {
   val ProviderNsaSessionField = "nsaId"
   val AccessTokenSessionField = "accessToken"
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
-
   val RequesterNsa = current.configuration.getString("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
   def currentPortPrefix(implicit request: Request[AnyContent]): String = currentProvider.portPrefix
@@ -25,7 +24,9 @@ object RequesterSession {
   def currentEndPoint(implicit request: Request[AnyContent]): EndPoint =
     EndPoint(currentProvider, request.session.get("accessToken"))
 
-  def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create("http://" + request.host + routes.ResponseController.reply)
+  def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
+
+  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https")
 
   // is not a lazy val, because some tests will break (object will only be initialized once during tests
   def allProviders: Seq[Provider] = {
