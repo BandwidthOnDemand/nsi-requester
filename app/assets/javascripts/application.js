@@ -19,9 +19,8 @@ $(function() {
 
    var initNsiRequestSubmit = function() {
 
-      var lastHash = window.location.hash;
-
-      var responseS = $("#responseS");
+      var lastHash = window.location.hash,
+          responseS = $("#responseS");
 
       if (!responseS.length) return;
 
@@ -138,10 +137,11 @@ $(function() {
    }
 
    var initValidateProvider = function() {
-      var providerSelect = $("#provider_id");
-
-      var validIndicator = $("#valid-indicator"),
+      var providerSelect = $("#provider_id"),
+          validIndicator = $("#valid-indicator"),
           tokenInput = $("#accessToken");
+
+      if (!providerSelect.length) return;
 
       providerSelect.on('change', function(event) {
           validateProviderUrl();
