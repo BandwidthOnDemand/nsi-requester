@@ -15,6 +15,6 @@ class ReserveAbortSpec extends support.Specification {
   }
 
   object DefaultReserveAbort {
-    def apply() = ReserveAbort("connectionId", "correlationId", Some(uri("http://localhost/reply")), "requesterNsa", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:", false))
+    def apply() = ReserveAbort("connectionId", "correlationId", Some(uri("http://localhost/reply")), "requesterNsa", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
   }
 }

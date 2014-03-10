@@ -34,8 +34,7 @@ object RequesterSession {
       Provider(
         providerObject.get("id").unwrapped().asInstanceOf[String],
         URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
-        providerObject.get("portPrefix").unwrapped().asInstanceOf[String],
-        providerObject.get("2waytls").unwrapped().asInstanceOf[Boolean])
+        providerObject.get("portPrefix").unwrapped().asInstanceOf[String])
 
     current.configuration.getObjectList("requester.nsi.providers").map(_.map(toProvider)).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
   }

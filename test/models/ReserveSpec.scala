@@ -31,7 +31,7 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
 
   object DefaultReservation {
     def apply(description: Option[String] = None, start: Option[Date] = Some(new Date()), end: Date = new Date(), globalReservationId: Option[String] = Some("urn:surfnet:123456")) = {
-      val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:", false)
+      val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
       Reserve(description, start, end, "connection", Port("source"), Port("dest"), 10, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "requesterNsa", provider, globalReservationId)
     }
   }
