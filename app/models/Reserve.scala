@@ -28,7 +28,7 @@ case class Reserve(
     <type:reserve>
       { globalReservationIdField }
       { descriptionField }
-      <criteria version="0">
+      <criteria version="1">
         <schedule>
           { startTimeField }
           { endTimeField }
