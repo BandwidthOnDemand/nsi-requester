@@ -35,11 +35,13 @@ object Application extends Controller with Soap11Controller {
 
   def reserveForm = Action { implicit request =>
     val startDate = DateTime.now.plusMinutes(5)
-    val endDate = startDate.plusMinutes(10)
+    val endDate = startDate.plusMinutes(15)
 
     val defaultForm = currentEndPoint.reserveF.fill(
       Reserve(
-        description = Some("A NSI reserve test"), startDate = Some(startDate.toDate), endDate = endDate.toDate,
+        description = Some("A NSI reserve test"),
+        startDate = Some(startDate.toDate),
+        endDate = endDate.toDate,
         correlationId = generateCorrelationId,
         serviceType = ServiceType,
         source = Port(currentPortPrefix),
