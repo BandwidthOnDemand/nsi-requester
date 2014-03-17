@@ -17,7 +17,7 @@ class SettingsControllerSpec extends support.Specification {
       "provider.id" -> "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
     )
 
-    "store stettings in the session" in new WithApplication {
+    "store settings in the session" in new WithApplication {
 
       val result = SettingsController.settings()(FakeRequest().withFormUrlEncodedBody(basicSettings: _*))
 
@@ -30,23 +30,24 @@ class SettingsControllerSpec extends support.Specification {
     "store the access token in session" in new WithApplication {
 
       val data = basicSettings ++ Seq(
-        "accessToken" -> "secretToken"
+        "accessTokens[0]" -> "secretToken"
       )
 
       val result = SettingsController.settings()(FakeRequest().withFormUrlEncodedBody(data: _*))
 
-      session(result).get(RequesterSession.AccessTokenSessionField) must beSome("secretToken")
+      session(result).get(RequesterSession.AccessTokensSessionField) must beSome("secretToken")
     }
 
   }
 
   "The settings view" should {
-    "contain the password when set in session" in new WithApplication {
-      val settingsForm = SettingsController.settingsF.fill(EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"), Some("secrettoken")))
+    "contain the stored tokens that were previously set in session" in new WithApplication {
+      val endpoint = EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"), List("token1"))
+      val settingsForm = SettingsController.settingsF.fill(endpoint)
 
       val result = views.html.settings(settingsForm)(Flash())
 
-      contentAsString(result) must contain("""name="accessToken" value="secrettoken"""")
+      contentAsString(result) must contain("""name="accessTokens[0]" value="token1"""")
     }
   }
 }

@@ -18,7 +18,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
     s"$NsiV2SoapActionPrefix/${deCapitalize(this.getClass().getSimpleName())}"
   }
 
-  def toNsiEnvelope(): Node = wrapNsiV2Envelope(nsiV2Header, nsiV2Body)
+  def toNsiEnvelope(accessTokens: List[String] = Nil): Node = wrapNsiV2Envelope(nsiV2Header(accessTokens), nsiV2Body)
 
   private[models] def nsas = {
     <requesterNSA>{ requesterNsa }</requesterNSA>
@@ -30,13 +30,24 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
     <int:replyTo>{ replyTo.getOrElse(throw new IllegalStateException("replyTo is required for NSIv1")) }</int:replyTo>
   }
 
-  private def nsiV2Header = {
+  private def nsiV2Header(accessTokens: List[String] )= {
     <head:nsiHeader>
       <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
       <requesterNSA>{ requesterNsa }</requesterNSA>
       <providerNSA>{ provider.nsaId }</providerNSA>
       { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
+      { if (! accessTokens.isEmpty) {
+          <sessionSecurityAttr xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+            { accessTokens.map { token =>
+              <saml:Attribute Name="token">
+                <saml:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">{token}</saml:AttributeValue>
+              </saml:Attribute>
+            }
+          }
+          </sessionSecurityAttr>
+        }
+      }
     </head:nsiHeader>
   }
 

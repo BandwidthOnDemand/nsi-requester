@@ -21,10 +21,9 @@ class RequesterSessionSpec extends support.Specification {
       val endPoint = RequesterSession.currentEndPoint(FakeRequest())
 
       endPoint.provider.providerUrl must equalTo(uri("http://localhost:9999"))
-      endPoint.accessToken must beNone
     }
 
-    "have an end point for the session settings" in new WithApplication(FakeApplication(additionalConfiguration = someFakeProviders)) {
+    "have an endpoint for the session settings" in new WithApplication(FakeApplication(additionalConfiguration = someFakeProviders)) {
       val endPoint = RequesterSession.currentEndPoint(FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network"))
 
       endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")

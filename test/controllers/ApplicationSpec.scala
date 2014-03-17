@@ -24,24 +24,6 @@ class ApplicationSpec extends support.Specification {
     }
   }
 
-  "Adding Authorization" should {
-
-
-    "add a authorization header containing the OAuth token" in {
-      val holder = Application.addAuthenticationHeader(Some("token"))(WS.url("/"))
-
-      holder.headers must havePair("Authorization" -> Seq("bearer token"))
-      holder.auth must beNone
-    }
-
-    "add a no authorization header" in {
-      val holder = Application.addAuthenticationHeader(None)(WS.url("/"))
-
-      holder.headers must beEmpty
-      holder.auth must beNone
-    }
-  }
-
   object FakeJsonRequest {
     def apply(body: JsObject): FakeRequest[JsObject] = FakeRequest("POST", "/", FakeHeaders(), body)
   }

@@ -1,13 +1,10 @@
 package controllers
 
-import java.net.URI
 import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data.format.Formats._
 import models._
 import RequesterSession._
-import FormSupport._
 
 object SettingsController extends Controller {
 
@@ -21,18 +18,21 @@ object SettingsController extends Controller {
     settingsF.bindFromRequest.fold[SimpleResult](
       formWithErrors => BadRequest(views.html.settings(formWithErrors)),
       {
-        case endPoint =>
+        case endPoint =>{
           Redirect(routes.Application.reserveForm)
             .flashing("success" -> "Settings changed for this session")
             .withSession(
-              AccessTokenSessionField -> endPoint.accessToken.getOrElse(""),
+              AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
               ProviderNsaSessionField -> endPoint.provider.nsaId)
+
+        }
       })
   }
 
   private[controllers] val settingsF: Form[EndPoint] = Form(
     mapping(
       "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider => Some(provider.nsaId)),
-      "accessToken" -> optional(of[String]))(EndPoint.apply)(EndPoint.unapply)
+      "accessTokens" -> list(text)
+    )(EndPoint.apply)(EndPoint.unapply)
   )
 }

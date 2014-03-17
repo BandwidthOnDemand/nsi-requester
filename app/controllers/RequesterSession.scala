@@ -12,7 +12,7 @@ import com.typesafe.config.ConfigObject
 object RequesterSession {
 
   val ProviderNsaSessionField = "nsaId"
-  val AccessTokenSessionField = "accessToken"
+  val AccessTokensSessionField = "accessTokens"
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
   val RequesterNsa = current.configuration.getString("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
@@ -21,8 +21,12 @@ object RequesterSession {
   def currentProvider(implicit request: Request[AnyContent]): Provider =
     request.session.get(ProviderNsaSessionField) flatMap findProvider getOrElse allProviders.head
 
-  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint =
-    EndPoint(currentProvider, request.session.get("accessToken"))
+  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint = {
+    request.session.get("accessTokens") match {
+      case None => EndPoint(currentProvider, List())
+      case Some(commaSeparated) => EndPoint(currentProvider, commaSeparated.split(",").toList)
+    }
+  }
 
   def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 

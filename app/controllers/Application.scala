@@ -7,7 +7,7 @@ import com.ning.http.client.Realm.AuthScheme
 import play.api.data.{ Form, FormError, Mapping }
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import play.api.libs.ws.{ WS, Response }
+import play.api.libs.ws.{WS, Response}
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
@@ -159,9 +159,7 @@ object Application extends Controller with Soap11Controller {
         nsaId <- (request.body \ "nsa-id").asOpt[String]
         provider <- findProvider(nsaId)
       } yield {
-        val authenticated = addAuthenticationHeader((request.body \ "token").asOpt[String])
-
-        val wsdlRequest = authenticated(WS.url(s"${provider.providerUrl}?wsdl"))
+        val wsdlRequest = WS.url(s"${provider.providerUrl}?wsdl").withFollowRedirects(false)
 
         wsdlRequest.get.map { wsdlResponse =>
           val response = if (wsdlResponse.status == 200) Json.obj("valid" -> true) else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
@@ -173,12 +171,10 @@ object Application extends Controller with Soap11Controller {
   }
 
   private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[SimpleResult] = {
-    val soapRequest = nsiRequest.toNsiEnvelope()
+    val soapRequest = nsiRequest.toNsiEnvelope(endPoint.accessTokens)
     val requestTime = DateTime.now()
 
-    val addHeaders = addAuthenticationHeader(endPoint.accessToken) andThen addSoapActionHeader(nsiRequest.soapAction())
-    val wsRequest = addHeaders(WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
-
+    val wsRequest = addSoapActionHeader(nsiRequest.soapAction(), WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
     wsRequest.post(soapRequest).map { response =>
       Logger.debug(s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}")
 
@@ -196,13 +192,7 @@ object Application extends Controller with Soap11Controller {
     }
   }
 
-  private[controllers] def addAuthenticationHeader(token: Option[String]): WS.WSRequestHolder => WS.WSRequestHolder =
-    addOAuthToken(token) _
-
-  private def addOAuthToken(token: Option[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
-    token.filterNot(_.isEmpty).fold(request)(t => request.withHeaders("Authorization" -> s"bearer $t"))
-
-  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> s""""$action"""")
+  private def addSoapActionHeader(action: String, request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> s""""$action"""")
 
   private def generateCorrelationId = UUID.randomUUID.toString
 

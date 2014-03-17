@@ -23,7 +23,13 @@
                    Symbol("data-validate-url") -> routes.Application.validateProvider
                 )
 
-                @inputText(settingsF("accessToken"), '_label -> "Oauth2 Access Token", 'class -> "input-xlarge")
+                <fieldset id="tokens" style="position: relative">
+                  <a href="#" id="plus-token" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
+                  @repeat(settingsF("accessTokens"), min = 1) { tokenField =>
+                    @inputText(tokenField, '_label -> "Access Token", 'class -> "input-xlarge")
+                  }
+                </fieldset>
+
 
                 <div id="valid-indicator">Checking...</div>
 
@@ -32,5 +38,24 @@
                 </div>
             }
         </div>
+        <div id="template-token" class="template">
+          @inputText(settingsF("accessTokens[x]"), '_label -> "Access Token", 'class -> "input-xlarge")
+        </div>
     </section>
+    <script>
+    $(function() {
+      $("#plus-token").click(function(event) {
+        $("#template-token").children().clone().appendTo("#tokens");
+        reNumber($("#tokens input"));
+    });
+
+
+    function reNumber(elements) {
+      elements.each(function(i, input) {
+        var target = $(input);
+        target.attr('name', target.attr('name').replace(/\[.+\]/, '['+i+']'))
+      });
+     }
+    });
+    </script>
 }

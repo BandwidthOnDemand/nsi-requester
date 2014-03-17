@@ -8,7 +8,7 @@ class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMat
   "NSI terminate" should {
 
     "give valid xml for provision" in {
-      val envelope = DefaultTerminate().copy(connectionId = "12345").toNsiEnvelope
+      val envelope = DefaultTerminate().copy(connectionId = "12345").toNsiEnvelope()
 
       envelope must \\("terminate")
       envelope must \\("connectionId") \> "12345"

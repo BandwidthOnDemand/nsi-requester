@@ -8,7 +8,7 @@ class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatch
   "NSI terminate" should {
 
     "give valid xml for release" in {
-      val envelope = DefaultRelease().copy(connectionId = "12345").toNsiEnvelope
+      val envelope = DefaultRelease().copy(connectionId = "12345").toNsiEnvelope()
 
       envelope must \\("release")
       envelope must \\("connectionId") \> "12345"

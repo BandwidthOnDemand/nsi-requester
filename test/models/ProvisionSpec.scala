@@ -10,7 +10,7 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
     "give valid xml for provision" in {
       val provision = DefaultProvision().copy(connectionId = "1234567890")
 
-      val envelope = provision.toNsiEnvelope
+      val envelope = provision.toNsiEnvelope()
 
       envelope must \\("provision")
       envelope must \\("connectionId") \> "1234567890"
