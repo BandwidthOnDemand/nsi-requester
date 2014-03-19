@@ -174,7 +174,9 @@ object Application extends Controller with Soap11Controller {
     val soapRequest = nsiRequest.toNsiEnvelope(endPoint.accessTokens)
     val requestTime = DateTime.now()
 
-    val wsRequest = addSoapActionHeader(nsiRequest.soapAction(), WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
+    val addHeaders = addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction())
+    val wsRequest = addHeaders(WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
+
     wsRequest.post(soapRequest).map { response =>
       Logger.debug(s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}")
 
@@ -192,7 +194,11 @@ object Application extends Controller with Soap11Controller {
     }
   }
 
-  private def addSoapActionHeader(action: String, request: WS.WSRequestHolder): WS.WSRequestHolder = request.withHeaders("SOAPAction" -> s""""$action"""")
+  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder =
+    request.withHeaders("SOAPAction" -> s""""$action"""")
+
+  private def addOauth2Header(tokens: List[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
+    if (tokens.isEmpty) request else request.withHeaders("Authorization" -> s"bearer ${tokens.head}")
 
   private def generateCorrelationId = UUID.randomUUID.toString
 
