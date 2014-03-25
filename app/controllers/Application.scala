@@ -171,7 +171,8 @@ object Application extends Controller with Soap11Controller {
   }
 
   private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[SimpleResult] = {
-    val soapRequest = nsiRequest.toNsiEnvelope(endPoint.accessTokens)
+    val remoteUser = r.headers.get("X-REMOTE-USER")
+    val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
 
     val addHeaders = addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction())

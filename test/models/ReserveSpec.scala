@@ -31,14 +31,21 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
     "carry an oauth token in the soap headers" in {
       val res = DefaultReservation()
       val token = "foo"
-      res.toNsiEnvelope(List(token)) must \("Header") \("nsiHeader") \("sessionSecurityAttr") \\("AttributeValue") \>token
+      res.toNsiEnvelope(None, List(token)) must \("Header") \("nsiHeader") \("sessionSecurityAttr") \\("AttributeValue") \>token
     }
 
-    "not carry an sessionsecurityAttr element in soap headers when no token was specified" in {
+    "not carry an sessionsecurityAttr element in soap headers when no token and no remote user was specified" in {
       val res = DefaultReservation()
 
       res.toNsiEnvelope() must not \\("sessionSecurityAttr")
     }
+
+    "carry an remote user in the soap headers" in {
+      val res = DefaultReservation()
+      val user = "Chris"
+      res.toNsiEnvelope(Some(user)) must \("Header") \("nsiHeader") \("sessionSecurityAttr") \\("AttributeValue") \>user
+    }
+
   }
 
   object DefaultReservation {

@@ -18,44 +18,46 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
     s"$NsiV2SoapActionPrefix/${deCapitalize(this.getClass().getSimpleName())}"
   }
 
-  def toNsiEnvelope(accessTokens: List[String] = Nil): Node = wrapNsiV2Envelope(nsiV2Header(accessTokens), nsiV2Body)
+  def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node = wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)
 
   private[models] def nsas = {
     <requesterNSA>{ requesterNsa }</requesterNSA>
     <providerNSA>{ provider.nsaId }</providerNSA>
   }
 
-  private[models] def nsiRequestFields = {
-    <int:correlationId>{ "urn:uuid:" + correlationId }</int:correlationId>
-    <int:replyTo>{ replyTo.getOrElse(throw new IllegalStateException("replyTo is required for NSIv1")) }</int:replyTo>
-  }
-
-  private def nsiV2Header(accessTokens: List[String] )= {
+  private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String]) =
     <head:nsiHeader>
       <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
       <requesterNSA>{ requesterNsa }</requesterNSA>
       <providerNSA>{ provider.nsaId }</providerNSA>
       { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
-      { if (! accessTokens.isEmpty) {
-          <sessionSecurityAttr xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
-            { accessTokens.map { token =>
-              <saml:Attribute Name="token">
-                <saml:AttributeValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string">{token}</saml:AttributeValue>
-              </saml:Attribute>
+      { if (remoteUser.isDefined || !accessTokens.isEmpty) {
+          <sessionSecurityAttr>
+            { if (remoteUser.isDefined)
+                <saml:Attribute Name="user">
+                  <saml:AttributeValue xsi:type="xs:string">{ remoteUser.get }</saml:AttributeValue>
+                </saml:Attribute>
             }
-          }
+            { accessTokens.map { token =>
+                <saml:Attribute Name="token">
+                  <saml:AttributeValue xsi:type="xs:string">{ token }</saml:AttributeValue>
+                </saml:Attribute>
+              }
+            }
           </sessionSecurityAttr>
         }
       }
     </head:nsiHeader>
-  }
 
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:head={ NsiV2FrameworkHeadersNamespace }
-      xmlns:type={ NsiV2ConnectionTypesNamespace }>
+      xmlns:type={ NsiV2ConnectionTypesNamespace }
+      xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <soapenv:Header>
         { header }
       </soapenv:Header>
