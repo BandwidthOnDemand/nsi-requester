@@ -34,8 +34,7 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
 
    "give an exception for a not supported NSI 2 operation" in {
       val query = DefaultQuery(operation = Details)
-
-      query.toNsiEnvelope() must throwA[RuntimeException]("Unsupported NSI v2 query type 'Details'")
+      query.toNsiEnvelope() must throwA[RuntimeException]("Unsupported NSI v2 query type: 'Details'")
     }
 
     "have a soap action" in {

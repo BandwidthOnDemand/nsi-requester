@@ -26,6 +26,7 @@ case class Query(
       case Summary => "querySummary"
       case SummarySync => "querySummarySync"
       case Recursive => "queryRecursive"
+      case _ => sys.error(s"Unsupported NSI v2 query type: '$operation'")
     }
    s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
   }
@@ -46,8 +47,6 @@ case class Query(
         { connectionIdTags }
         { globalReservationIdTags }
       </type:queryRecursive>
-    case _ =>
-      sys.error(s"Unsupported NSI v2 query type '$operation'")
   }
 
   private def connectionIdTags =
