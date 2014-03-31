@@ -18,14 +18,21 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
     s"$NsiV2SoapActionPrefix/${deCapitalize(this.getClass().getSimpleName())}"
   }
 
-  def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node = wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)
+  def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node =
+    wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens, soapAction().endsWith("reserve")), nsiV2Body)
+
 
   private[models] def nsas = {
     <requesterNSA>{ requesterNsa }</requesterNSA>
     <providerNSA>{ provider.nsaId }</providerNSA>
   }
 
-  private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String]) =
+  /**
+   *
+   * @param addTrace trace element is only required for the 'reserve' message
+   * @return
+   */
+  private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String], addTrace: Boolean) =
     <head:nsiHeader>
       <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
@@ -48,6 +55,13 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
           </sessionSecurityAttr>
         }
       }
+      { if (addTrace)
+          <gns:ConnectionTrace>
+            <gns:Connection index="0">
+              {requesterNsa + ":noId"}
+            </gns:Connection>
+          </gns:ConnectionTrace>
+      }
     </head:nsiHeader>
 
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
@@ -56,6 +70,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
       xmlns:head={ NsiV2FrameworkHeadersNamespace }
       xmlns:type={ NsiV2ConnectionTypesNamespace }
       xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+      xmlns:gns="http://nordu.net/namespaces/2013/12/gnsbod"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <soapenv:Header>
