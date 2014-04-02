@@ -20,7 +20,7 @@ case class Reserve(
     requesterNsa: String,
     provider: Provider,
     globalReservationId: Option[String] = None,
-    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
 
   import NsiRequest._
 

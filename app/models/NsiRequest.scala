@@ -4,7 +4,7 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, provider: Provider, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion) {
+abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, provider: Provider, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion, addsTrace: Boolean = false) {
   import NsiRequest._
 
   def nsiV2Body: Node
@@ -19,7 +19,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
   }
 
   def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node =
-    wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens, soapAction().endsWith("reserve")), nsiV2Body)
+    wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)
 
 
   private[models] def nsas = {
@@ -27,12 +27,7 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
     <providerNSA>{ provider.nsaId }</providerNSA>
   }
 
-  /**
-   *
-   * @param addTrace trace element is only required for the 'reserve' message
-   * @return
-   */
-  private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String], addTrace: Boolean) =
+  private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String]) =
     <head:nsiHeader>
       <protocolVersion>{ protocolVersion }</protocolVersion>
       <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
@@ -55,11 +50,9 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
           </sessionSecurityAttr>
         }
       }
-      { if (addTrace)
+      { if (addsTrace)
           <gns:ConnectionTrace>
-            <gns:Connection index="0">
-              {requesterNsa + ":noId"}
-            </gns:Connection>
+            <Connection index="0">{requesterNsa + ":noId"}</Connection>
           </gns:ConnectionTrace>
       }
     </head:nsiHeader>

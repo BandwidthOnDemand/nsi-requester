@@ -5,13 +5,14 @@ import org.junit.runner.RunWith
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
 
-  "NSI terminate" should {
+  "NSI release" should {
 
-    "give valid xml for release" in {
+    "give valid xml for release that does not contain a connection trace element" in {
       val envelope = DefaultRelease().copy(connectionId = "12345").toNsiEnvelope()
 
       envelope must \\("release")
       envelope must \\("connectionId") \> "12345"
+      envelope must not \\("ConnectionTrace")
     }
 
   }
