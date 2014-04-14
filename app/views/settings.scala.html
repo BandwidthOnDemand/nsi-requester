@@ -1,4 +1,4 @@
-@(settingsF: Form[EndPoint])(implicit flash: Flash)
+@(settingsF: Form[EndPoint], version: String)(implicit flash: Flash)
 
 @import helper._
 @import views.helper.MyHelpers._
@@ -35,6 +35,14 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Use settings</button>
+                </div>
+
+                <div class="message">
+                    <h3>About</h3>
+                </div>
+                <div class="control-group">
+                  <label class="control-label"><strong>Version</strong></label>
+                  <div class="controls"><output style="color: gray">@version</output></div>
                 </div>
             }
         </div>
