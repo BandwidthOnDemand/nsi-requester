@@ -45,7 +45,7 @@ class SettingsControllerSpec extends support.Specification {
       val endpoint = EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"), List("token1"))
       val settingsForm = SettingsController.settingsF.fill(endpoint)
 
-      val result = views.html.settings(settingsForm)(Flash())
+      val result = views.html.settings(settingsForm, "version")(Flash())
 
       contentAsString(result) must contain("""name="accessTokens[0]" value="token1"""")
     }
