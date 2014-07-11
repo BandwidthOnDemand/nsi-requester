@@ -1,5 +1,18 @@
+@import "variables.less";
+@import "layout.less";
+@import "generic.less";
+@import "bootstrap-navbar.less";
+@import "bootstrap-generic.less";
+@import "bootstrap-table.less";
+@import "bootstrap-modal.less";
+@import "prettify.less";
+
 .form {
     max-width: 100%;
+    background-color: #fff;
+    border: 1px solid #bfbfbf;
+    margin: 0 0 18px;
+
     .message.expanded .icon-plus-sign,
     .message .icon-minus-sign {
         display: none;
@@ -9,20 +22,49 @@
         display: inline;
         position: absolute;
         left: 35px;
+        margin-top: 6px;
     }
 }
 
-.message.extra-fields { cursor: pointer; }
+.form:after {
+    clear: both;
+    content: "";
+    display: table;
+}
+
+.form-horizontal {
+    padding-top: 1.5em;
+}
+
+.message.extra-fields {
+    cursor: pointer;
+
+}
 
 .template, #responseS { display: none; }
 
 a i[class^="icon-"] { text-decoration: none; }
 
-.message .time {
-    float: right;
-    font-weight: normal;
-    color: #DC322F;
-    font-size: 0.8em;
+.message {
+    padding: .4em 40px;
+    margin-bottom: 1em;
+    background-color: #cae8f0;
+    font-weight: bold;
+    font-size: 1.1em;
+
+    .section-number {
+        float: left;
+        font-weight: normal;
+        margin-left: -1em;
+        margin-right: 1em;
+    }
+
+    .time {
+        float: right;
+        font-weight: normal;
+        color: @messageTime;
+        font-size: 0.8em;
+    }
 }
 
 .syserror {
@@ -74,6 +116,7 @@ a i[class^="icon-"] { text-decoration: none; }
 
 iframe { display: none; }
 
+/* Upper right hand settings option. */
 .user-box {
     .nav {
         li {

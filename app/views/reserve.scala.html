@@ -17,7 +17,7 @@
                 @inputText(requestForm("reservation.description"), '_label -> "Description")
                 @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
                 @inputText(requestForm("reservation.endDate"), '_label -> "End Date")
-                @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xxlarge")
+                @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xlarge")
 
                 @inputPort(field => requestForm("reservation.source." + field), "source")
                 @inputPort(field => requestForm("reservation.destination." + field), "destination")
@@ -38,5 +38,5 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-  @inputText(field("stpId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xxlarge")
+  @inputText(field("stpId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xlarge")
 }

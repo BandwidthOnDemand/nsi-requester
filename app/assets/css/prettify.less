@@ -1,10 +1,13 @@
+@import "variables.less";
+
+/* Control the color and layout of NSI messages. These elements are manipulated by prettify.min.js. */
 .lit, .atn { color: #195f91; }
 .com, .pun, .opn, .clo { color: #93a1a1; }
-.pln, .fun { color: #dc322f; }
+.pln, .fun { color: @messageElementContent; }
 .str { color: #D14; }
-.kwd, .linenums .tag { color: #1e347b; }
-.tag, .typ, .dec, .var { color: teal; }
-.atv { color: #48484c; }
+.kwd, .linenums .tag { color: @messageNsTag; }
+.tag, .typ, .dec, .var { color: @messageElementTag; }
+.atv { color: @messageNsContents; }
 
 .xml-content {
     background-color: #ffffff;
@@ -12,11 +15,13 @@
     padding-top: 1.5em;
     margin-bottom: 20px;
 }
+
 .xml-content .message {
     padding: .4em 40px;
     margin-bottom: 1em;
-    background-color: #CAE8F0;
+    background-color: @messageHeader;
 }
+
 .prettyprint {
     background-color: #ffffff;
     padding: 0 10px;
