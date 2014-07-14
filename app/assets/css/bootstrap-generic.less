@@ -45,16 +45,16 @@ section > div.content-dense > p
 }
 
 .btn-primary, .btn-primary:active, .btn-primary.active {
-    background-color: #0381a4;
-    background-image: -moz-linear-gradient(center top , #4fb3cf, #0381a4);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#4fb3cf), to(#0381a4));
-    background-image: -webkit-linear-gradient(top, #4fb3cf, #0381a4);
-    background-image: -o-linear-gradient(top, #4fb3cf, #0381a4);
-    background-image: linear-gradient(to bottom, #4fb3cf, #0381a4);
+    background-color: @buttonBackground;
+    background-image: -moz-linear-gradient(center top , @buttonColorStart, @buttonColorEnd);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@buttonColorStart), to(@buttonColorEnd));
+    background-image: -webkit-linear-gradient(top, @buttonColorStart, @buttonColorEnd);
+    background-image: -o-linear-gradient(top, @buttonColorStart, @buttonColorEnd);
+    background-image: linear-gradient(to bottom, @buttonColorStart, @buttonColorEnd);
 }
 
 .btn-primary:hover, .btn-primary:focus {
-    background-color: #0381a4;
+    background-color: @buttonBackground;
     color: #fff;
 }
 

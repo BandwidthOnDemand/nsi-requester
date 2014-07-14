@@ -48,7 +48,7 @@ a i[class^="icon-"] { text-decoration: none; }
 .message {
     padding: .4em 40px;
     margin-bottom: 1em;
-    background-color: #cae8f0;
+    background-color: @messageHeader;
     font-weight: bold;
     font-size: 1.1em;
 
@@ -89,7 +89,7 @@ a i[class^="icon-"] { text-decoration: none; }
 .syserror .message {
     padding: .4em 40px;
     margin-bottom: 1em;
-    background-color: #CAE8F0;
+    background-color: @messageHeader;
 }
 
 .timezone {
@@ -126,7 +126,7 @@ iframe { display: none; }
         }
         li a:hover,
         li.active a {
-          color: #002f3c;
+          color: @settingsTextActive;
           background-color: #f1f1f1;
         }
         li a:hover::after,
@@ -136,7 +136,7 @@ iframe { display: none; }
           left: 45%;
           width: 0;
           height: 0;
-          border-color: #002f3c transparent;
+          border-color: @settingsBeakActive transparent;
           border-style: solid;
           border-width: 0 12px 12px;
           content: "";
