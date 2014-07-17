@@ -30,7 +30,7 @@ object RequesterSession {
 
   def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 
-  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https")
+  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https") || current.configuration.getBoolean("requester.ssl") == Some(true)
 
   // is not a lazy val, because some tests will break (object will only be initialized once during tests
   def allProviders: Seq[Provider] = {
