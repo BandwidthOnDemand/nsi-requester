@@ -16,7 +16,7 @@ object SettingsController extends Controller {
   }
 
   def settings = Action { implicit request =>
-    settingsF.bindFromRequest.fold[SimpleResult](
+    settingsF.bindFromRequest.fold[Result](
       formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
       {
         case endPoint =>{

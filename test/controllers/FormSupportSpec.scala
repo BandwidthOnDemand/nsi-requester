@@ -12,7 +12,6 @@ class FormSupportSpec extends Specification {
   import FormSupport._
 
   "QueryNotificationOperationFormat" should {
-    import QueryMessageMode._
 
     "parse Sync operation" in {
       val operation = queryMessageModeFormat.bind("operation", Map("operation" -> "NotificationSync"))
@@ -23,16 +22,16 @@ class FormSupportSpec extends Specification {
     "give formError when parsing 'asdfasfasfd' as an operation" in {
       val operation = queryMessageModeFormat.bind("operation", Map("operation" -> "asdfasdfasfd"))
 
-      operation must beLeft(List(FormError("operation", "error.queryMessageMode", Nil)))
+      operation must beEqualTo(Left(List(FormError("operation", "error.queryMessageMode", List()))))
     }
   }
 
   "QueryOperationFormat" should {
-    import QueryOperation._
 
     "parse Summary operation" in {
       val operation = queryOperationFormat.bind("operation", Map("operation" -> "Summary"))
 
+      println("2222222 " + operation);
       operation must beRight(QueryOperation.Summary)
     }
   }
