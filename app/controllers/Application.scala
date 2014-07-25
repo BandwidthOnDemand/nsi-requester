@@ -1,17 +1,15 @@
 package controllers
 
-import java.util.{ Date, UUID }
-import scala.util.{ Success, Failure }
-import org.joda.time.{ DateTime, Period }
-import com.ning.http.client.Realm.AuthScheme
+import java.util.UUID
+import org.joda.time.DateTime
 import play.api.data.{ Form, FormError, Mapping }
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import play.api.libs.ws.{WS, Response}
+import play.api.libs.ws.{WS, WSRequestHolder}
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
-import play.api.http.HeaderNames.CONTENT_TYPE
+import play.api.Play.current
 import support.JsonResponse
 import models._
 import FormSupport._
@@ -170,7 +168,7 @@ object Application extends Controller with Soap11Controller {
     wsdlValid.getOrElse(Future.successful(BadRequest))
   }
 
-  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[SimpleResult] = {
+  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[Result] = {
     val remoteUser = r.headers.get("X-REMOTE-USER")
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
@@ -195,10 +193,10 @@ object Application extends Controller with Soap11Controller {
     }
   }
 
-  private def addSoapActionHeader(action: String)(request: WS.WSRequestHolder): WS.WSRequestHolder =
+  private def addSoapActionHeader(action: String)(request: WSRequestHolder): WSRequestHolder =
     request.withHeaders("SOAPAction" -> s""""$action"""")
 
-  private def addOauth2Header(tokens: List[String])(request: WS.WSRequestHolder): WS.WSRequestHolder =
+  private def addOauth2Header(tokens: List[String])(request: WSRequestHolder): WSRequestHolder =
     if (tokens.isEmpty) request else request.withHeaders("Authorization" -> s"bearer ${tokens.head}")
 
   private def generateCorrelationId = UUID.randomUUID.toString
