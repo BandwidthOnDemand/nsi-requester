@@ -28,37 +28,64 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+          <h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>The NSI Requester (nsi-requester) is an Open Grid Forum Network Service Interface Connection Service version 2 (OGF NSI CS v2) compliant web-based client application (a uRA in NSI speak).  All operations specified in the <a href="http://www.ogf.org/documents/GFD.212.pdf">OGF NSI CS v2 specification</a> are supported by this application making it the perfect interface for testing an NSI deployment.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>The nsi-requester can be deployed in a number of configurations, each achieving an NSI compliant deployment.  Choosing the correct options may take some trial and error, but using the information held within this wiki should reduce your time to deployment considerably.</p>
+
+<h2>
+<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>Contents</h2>
+
+<ul>
+<li><a href="https://github.com/BandwidthOnDemand/nsi-requester/wiki/Quick-Start">Quick Start</a></li>
+<li><a href="https://github.com/BandwidthOnDemand/nsi-requester/wiki/Integrated-Development-Environments">Integrated Development Environments</a></li>
+</ul><h2>
+<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
+
+<p>The nsi-requester utilizes the <a href="http://www.playframework.com">Play Framework</a> as a runtime environment.  This will require Java to be installed on your platform of choice (Java 1.8 is preferred), and as a minimum either Play 2.3.1 or SBT 0.13.5.  We recommend installing SBT since it will pull in the required Play Framework dependencies.  Instructions for SBT download and installation can be found <a href="http://www.scala-sbt.org/download.html">here</a>.</p>
+
+<p>For a Mac you can use either of <code>brew</code> or <code>port</code> to do the installation:</p>
+
+<pre><code>$ brew install sbt
 </code></pre>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>or</p>
+
+<pre><code>$ port install sbt
+</code></pre>
+
+<p>To download, build, and run the vanilla default configuration perform the following commands:</p>
+
+<pre><code>git clone https://github.com/BandwidthOnDemand/nsi-requester.git
+cd nsi-requester
+sbt run
+</code></pre>
+
+<p>The nsi-requester application will be accessible by bowser at the default location <a href="http://localhost:9000">http://localhost:9000</a>.</p>
+
+<p>Tailor your installation by choosing a deployment option, configure the application <code>conf/application.conf</code>, logging <code>conf/application-logger.xml</code>, build a production load <code>sbt stage</code>, and use either upstart or a customized shell script <code>scripts/</code> to start the application.</p>
+
+<h2>
+<a name="integrated-development-environments" class="anchor" href="#integrated-development-environments"><span class="octicon octicon-link"></span></a>Integrated Development Environments</h2>
+
+<p>The nsi-requester application is written in Scala utilizing the Play Framework.  If you are looking for an Integrated Development Environments (IDE) to modify the code we recommend one of the following.</p>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="eclipse" class="anchor" href="#eclipse"><span class="octicon octicon-link"></span></a>Eclipse</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>For editing in Eclipse the <a href="http://scala-ide.org/">Scala IDE</a> is very usefull.</p>
 
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<p>Eclipse Juno users please use the follwoing update site:
+<a href="http://download.scala-ide.org/releases-juno-29/milestone/site">Eclipse IDE 2.1 milestones</a></p>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+<p>Generating the Eclipse project files can be done by running <code>eclipse with-source=true</code> in the sbt console.</p>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a name="intellij-community-edition" class="anchor" href="#intellij-community-edition"><span class="octicon octicon-link"></span></a>IntelliJ Community Edition</h3>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>The <a href="http://www.jetbrains.com/idea/download/">IntelliJ IDE</a> is an extremely popular IDE for Java, and now it is becoming increasingly popular for Scala development as well through an <a href="http://plugins.jetbrains.com/plugin/?id=1347&amp;_ga=1.31920766.1378817622.1369841145">add-on plugin</a> and direct SBT integration.  For information on IntelliJ Scala support and tutorials can be found <a href="http://www.jetbrains.com/idea/features/scala.html">here</a>.</p>
         </section>
 
         <aside id="sidebar">
