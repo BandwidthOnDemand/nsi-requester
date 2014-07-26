@@ -2,17 +2,17 @@
 title: Tags
 layout: default
 ---
+# Overview
 
-The NSI Requester (nsi-requester) is an Open Grid Forum Network Service Interface Connection Service version 2 (OGF NSI CS v2) compliant web-based client application (a uRA in NSI speak) written in Scala within the Play Framework.  All operations specified in the [OGF NSI CS v2 specification](http://www.ogf.org/documents/GFD.212.pdf) are supported by this application making it the perfect interface for testing an NSI deployment.
+The NSI Requester (nsi-requester) is a web-based client application implementing the Open Grid Forum Network Service Interface Connection Service version 2 (OGF NSI CS v2) protocol.  It is considered an NSI compliant Network Service Agent (NSA), or more specifically, an Ultimate Requester Agent (uRA) which only initiates NSI service requests.  All operations specified in the [OGF NSI CS v2 specification](http://www.ogf.org/documents/GFD.212.pdf) are supported by this application making it the perfect interface for testing an NSI deployment.
 
-The nsi-requester can be deployed in a number of configurations, each achieving an NSI compliant deployment.  Choosing the correct options may take some trial and error, but using the information held within this documentation should reduce your time to successful deployment considerably.
+![Example software stack](diagrams/example-stack.png)
 
-# On This Page
-{:toc}
+The nsi-requester can be deployed in a number of configurations, each achieving an NSI compliant deployment.  Choosing the correct options may take some trial and error, but using the information held within this documentation should reduce your time to successful deployment considerably.  Please see the documentation page on production deployments for more information on a deployment option that can meet your needs. 
 
-# Quick Start
+## Quick Start
 
-The nsi-requester utilizes the [Play Framework](http://www.playframework.com) as a runtime environment.  This will require Java to be installed on your platform of choice (Java 1.8 is preferred), and as a minimum either Play 2.3.1 or SBT 0.13.5.  We recommend installing SBT since it will pull in the required Play Framework dependencies.  Instructions for SBT download and installation can be found [here](http://www.scala-sbt.org/download.html).
+The nsi-requester is written in Scala and utilizes the [Play Framework](http://www.playframework.com) as a runtime environment.  This will require Java to be installed on your platform of choice (Java 1.8 is preferred), and as a minimum either Play 2.3.1 or SBT 0.13.5.  We recommend installing SBT since it will pull in the required Play Framework dependencies.  Instructions for SBT download and installation can be found [here](http://www.scala-sbt.org/download.html).
 
 For a Mac you can use either of `brew` or `port` to do the installation:
 
@@ -20,7 +20,9 @@ For a Mac you can use either of `brew` or `port` to do the installation:
 $ brew install sbt
 ```
 or
-```$ port install sbt
+
+```
+$ port install sbt
 ```
 
 To download, build, and run the vanilla default configuration perform the following commands:
@@ -35,11 +37,11 @@ The nsi-requester application will be accessible by browser at the default locat
 
 Tailor your installation by choosing a deployment option, configure the application `conf/application.conf`, logging `conf/application-logger.xml`, build a production load `sbt stage`, and use either upstart or a customized shell script `scripts/` to start the application.
 
-# Integrated Development Environments
+## Choosing an IDE
 
-The nsi-requester application is written in Scala utilizing the Play Framework.  If you are looking for an Integrated Development Environments (IDE) to modify the code we recommend one of the following.
+If you are looking for an Integrated Development Environments (IDE) to view or modify the code we recommend one of the following.
 
-## Eclipse
+### Eclipse
 
 For editing in Eclipse the [Scala IDE](http://scala-ide.org/) is very usefull.
 
@@ -47,7 +49,7 @@ Eclipse Juno users please use the follwoing update site: [Eclipse IDE 2.1 milest
 
 Generating the Eclipse project files can be done by running `eclipse with-source=true` in the sbt console.
 
-## IntelliJ Community Edition
+### IntelliJ Community Edition
 
 The [IntelliJ IDE](http://www.jetbrains.com/idea/download/) is an extremely popular IDE for Java, and now it is becoming increasingly popular for Scala development as well through an [add-on plugin](http://plugins.jetbrains.com/plugin/?id=1347&_ga=1.31920766.1378817622.1369841145) and direct SBT integration.  For information on IntelliJ Scala support and tutorials can be found [here](http://www.jetbrains.com/idea/features/scala.html).
 
