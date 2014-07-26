@@ -1,3 +1,8 @@
+---
+title: Tags
+layout: default
+---
+
 The NSI Requester (nsi-requester) is an Open Grid Forum Network Service Interface Connection Service version 2 (OGF NSI CS v2) compliant web-based client application (a uRA in NSI speak) written in Scala within the Play Framework.  All operations specified in the [OGF NSI CS v2 specification](http://www.ogf.org/documents/GFD.212.pdf) are supported by this application making it the perfect interface for testing an NSI deployment.
 
 The nsi-requester can be deployed in a number of configurations, each achieving an NSI compliant deployment.  Choosing the correct options may take some trial and error, but using the information held within this documentation should reduce your time to successful deployment considerably.
