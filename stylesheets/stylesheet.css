@@ -98,6 +98,7 @@ header h2 {
 #content-wrapper {
   border-top: solid 1px #fff;
   padding-top: 30px;
+  padding-left: 40px;
 }
 
 #main-content {
