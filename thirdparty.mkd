@@ -14,11 +14,11 @@ These steps were designed based on a *CentOS release 6.5 (Final)* OS release, bu
 <hr>
 ## Page Contents
 
-- [Update your OS](update-your-os)
-- [Install Java Runtime](install-java-runtime)
-- [Install Apache httpd](install-apache-httpd)
-- [Install sbt](install-sbt)
-- [Install git](install-git)
+- [Update your OS](#update-your-os)
+- [Install Java Runtime](#install-java-runtime)
+- [Install Apache httpd](#install-apache-httpd)
+- [Install sbt](#install-sbt)
+- [Install git](#install-git)
 <hr>
 * auto-gen TOC:
 {:toc}
