@@ -6,20 +6,22 @@ layout: default
 # Installing Software dependencies
 This documentation gives a overview of the software dependencies for the following configurations:
 
-1. Production deployment with a **reverse proxy**.
-2. Production deployment **standalone**.
+- Production deployment with a **reverse proxy**.
+- Production deployment **standalone**.
 
 These steps were designed based on a *CentOS release 6.5 (Final)* OS release, but can be tailored specifically for you production environment using the OS specific installation instructions for each piece of software.
 
 <hr>
 ## Page Contents
 
-- [Update your OS]()
-- [Install Java Runtime]()
-- [Install Apache httpd]()
-- [Install sbt]()
-- [Install git]()
+- [Update your OS](update-your-os)
+- [Install Java Runtime](install-java-runtime)
+- [Install Apache httpd](install-apache-httpd)
+- [Install sbt](install-sbt)
+- [Install git](install-git)
 <hr>
+* auto-gen TOC:
+{:toc}
 
 ## Update your OS
 Deployment: **reverse proxy**, **standalone**
