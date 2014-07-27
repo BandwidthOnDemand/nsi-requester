@@ -1,0 +1,49 @@
+---
+title: Production Deployment
+layout: default
+---
+
+# Production Deployments
+This documentation gives an overview of two possible production deployment configuration for the *nsi-requester* application.  Other deployment options do exist, however, it is recommended that the **reverse proxy** solution be used as it provided the most secure solution available with the current *nsi-requester* code base.
+
+In either of these deployment scenarios it is highly recommended that the *nsi-requester* is installed and run from a **non-privileged user** in a **non-privileged group**.  The Play Framework utilized by the *nsi-requester* requires **write access** to the application installation directory, so please take this into consideration when choosing an installation directory.
+
+## Reverse proxy
+The recommended configuration for the *nsi-requester* in a production deployment is to utilize a **reverse proxy** such as Apache httpd's `mod_proxy` with `mod_ssl` in front of the *nsi-requester* for a secure production grade solution.  For this deployment we utilize the Play Framework's `WS Client` configured with SSL (Java SSL) out the back end.  The following figure illustrates this deployment option.
+
+->![Production deployment with reverse proxy](diagrams/deployment-reverse-proxy.png)<-
+
+In this deployment option we utilize the **reverse proxy** to terminate web broweser SSL sessions, remapping the request through to an internal HTTP port on the *nsi-requester*.  In the case of Apache httpd, we utilize the `mod_proxy` capabilities to manage the URL mapping, and `mod_ssl` to manage the SSL/TLS sessions.  In addition, your desired client authentication mechanisms can be configured in Apache httpd without needing integrated support directly in the *nsi-requester* application.
+
+This production option is also favourable if you plan on deploying both *nsi-requester* and *nsi-safnari* on the same server instance with a single SSL port fronting both applications. For this option, `mod_proxy` is configured to map application URLs through to the specific internal ports for *nsi-requester* and *nsi-safnari* processes.
+
+### Installation and Configurations Steps
+These are an example set of steps for building and installing the *nsi-requester* application for a production **reverse proxy** deployment.  There are many variations that can be used, including centrally building a generic *nsi-requester* load once, before deploying it to each target server.  For this example, we will download and build the *nsi-requester* software on the server from the source.
+
+1. Install third-party software dependencies (Java 1.8, Apache httpd, sbt, and git).
+2. Download *nsi-requester* source from GitHub.
+3. Tailor *nsi-requester* look and feel to your specific needs.
+4. Build a production *nsi-requester* load.
+5. Install and configure the *nsi-requester* runtime.
+6. Configure the Apache httpd instance.
+7. Set up NSA peerings for **reverse proxy** configuration.
+
+## Standalone process
+In some cases you may need to deploy a **standalone** instance of *nsi-requester* into a production environment, or more specifically, into a secure environment that cannot be achieved by deploying the unsecure development version.  It is highly recommended that the *reverse proxy* mechanism be used, however, if you are willing to restrict  access through client certificates, then this mechanism can be used to deploy a relatively secure solution.  The following figure illustrates this deployment option.
+
+->![Production deployment standalone](diagrams/deployment-standalone.png)<-
+
+In this deployment option we exclusively use the Java SSL/TLS security solution and the built in HTTP server within the Play Framework to provide a standalone application.  Within the Play configuration we disable the local HTTP port, open the HTTPS port, and use the Java key and trust stores to administer X.509 certificates for web browser and peer NSA access to the *nsi-requester*.  No other securty is provideded, so we recommend using self signed certificates or a local certificate signing authority to reduce access to only trusted clients.
+
+### Installation and Configurations Steps
+These are an example set of steps for building and installing the *nsi-requester* application for a production **standalone** deployment.  There are many variations that can be used, including centrally building a generic *nsi-requester* load once, before deploying it to each target server.  For this example, we will download and build the *nsi-requester* software on the server from the source.
+
+1. Install third-party software dependencies (Java 1.8, sbt, and git).
+2. Download *nsi-requester* source from GitHub.
+3. Tailor *nsi-requester* look and feel to your specific needs.
+4. Build a production *nsi-requester* load.
+5. Install and configure the *nsi-requester* runtime.
+7. Set up NSA peerings for **standalone** configuration.
+
+
+

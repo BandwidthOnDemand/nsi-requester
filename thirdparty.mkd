@@ -1,0 +1,125 @@
+---
+title: Third-party software dependencies
+layout: default
+---
+
+# Installing Software dependencies
+This documentation gives a overview of the software dependencies for the following configurations:
+
+1. Production deployment with a **reverse proxy**.
+2. Production deployment **standalone**.
+
+These steps were designed based on a *CentOS release 6.5 (Final)* OS release, but can be tailored specifically for you production environment using the OS specific installation instructions for each piece of software.
+
+<hr>
+## Page Contents
+
+- [Update your OS]()
+- [Install Java Runtime]()
+- [Install Apache httpd]()
+- [Install sbt]()
+- [Install git]()
+<hr>
+
+## Update your OS
+Deployment: **reverse proxy**, **standalone**
+
+As always it is a good practice to make sure your production system OS and supporting thrid-party software modules are up-to-date with the most recent patches.  As **root** execute your OS update (in this case *yum* for CentOS):
+
+    $ yum update
+
+## Install Java Runtime
+Deployment: **reverse proxy**, **standalone**
+
+The [Play Framework 2.3.x](http://www.playframework.com) and [sbt 0.13.5](http://www.scala-sbt.org/) have a runtime dependency on Java ([Oracle-JDK](https://jdk8.java.net/download.html) or OpenJDK), with a recommended version of 1.8 or later.  If the system does not contain the correct version of Java then a supported version needs to be installed.  This procedure needs to be performed with **root** privilege.
+
+a) Verify no other Java packages are installed:
+
+    $ rpm -qa | grep -E '^open[jre|jdk]|j[re|dk]'
+
+If there is one that is not the desired release you need to remove it with:
+
+    $ yum remove <package name>
+
+b) Download the newest Java JDK for your server target architecture (x86_64):
+
+    $ wget --no-cookies \
+        --no-check-certificate \
+        --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+        "http://download.oracle.com/otn-pub/java/jdk/8-b132/jdk-8-linux-x64.rpm" \
+        -O /opt/jdk-8-linux-x64.rpm
+
+c) Install Java on the system:
+
+    $ rpm -Uvh /opt/jdk-8-linux-x64.rpm
+
+d) Set the alternatives for the Java instance just installed:
+
+    $ alternatives --install /usr/bin/java java /usr/java/jdk1.8.0/jre/bin/java 20000
+    $ alternatives --install /usr/bin/jar jar /usr/java/jdk1.8.0/bin/jar 20000
+    $ alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0/bin/javac 20000
+    $ alternatives --install /usr/bin/javaws javaws /usr/java/jdk1.8.0/jre/bin/javaws 20000
+    $ alternatives --set java /usr/java/jdk1.8.0/jre/bin/java
+    $ alternatives --set javaws /usr/java/jdk1.8.0/jre/bin/javaws
+    $ alternatives --set javac /usr/java/jdk1.8.0/bin/javac
+    $ alternatives --set jar /usr/java/jdk1.8.0/bin/jar
+
+Verify the proper links were created:
+
+    $ ls -lA /etc/alternatives/{jar,java*}
+
+    lrwxrwxrwx 1 root users 26 May  6 13:36 /etc/alternatives/jar -> /usr/java/jdk1.8.0/bin/jar
+    lrwxrwxrwx 1 root users 31 May  6 13:36 /etc/alternatives/java -> /usr/java/jdk1.8.0/jre/bin/java
+    lrwxrwxrwx 1 root users 28 May  6 13:36 /etc/alternatives/javac -> /usr/java/jdk1.8.0/bin/javac
+    lrwxrwxrwx 1 root users 33 May  6 13:36 /etc/alternatives/javaws -> /usr/java/jdk1.8.0/jre/bin/javaws
+
+e) Set **$JAVA_HOME** in the system profiles:
+
+    $ echo "export JAVA_HOME=/usr/java/default/" > /etc/profile.d/java_home.sh
+    $ echo "setenv JAVA_HOME /usr/java/default/" > /etc/profile.d/java_home.csh
+
+Log out and back in to refresh your profile.
+
+f) Finally, verify the installed version of Java:
+
+    $ java -version
+
+    java version "1.8.0"
+    Java(TM) SE Runtime Environment (build 1.8.0-b132)
+    Java HotSpot(TM) 64-Bit Server VM (build 25.0-b70, mixed mode)
+
+## Install Apache httpd
+Deployment: **reverse proxy**
+
+Although any **reverse proxy** could be used to front the *nsi-requester* application, Apache's [`httpd`](https://httpd.apache.org) has all the required featues and will be the reference **reverse proxy** within documentation.  At the moment,  `httpd-2.2.15` and supporting modules has been verified against the *nsi-requester*.
+
+If the system does not contain a correct version of both `httpd` and `mod_ssl` then a supported version needs to be installed.  This procedure needs to be performed with **root** privilege.
+
+    $ yum install httpd
+    $ yum install mod_ssl
+    $ chkconfig --levels 235 httpd on
+
+Configuration of `httpd` will be described in "Configure the Apache httpd instance".
+
+## Install sbt
+Deployment: **reverse proxy**, **standalone**
+
+[sbt](http://www.scala-sbt.org/) is a build tool for both Scala and Java, and is the primary build environment for [Play Framework](http://www.playframework.com)-based applications.  Sbt will resolve all the build dependencies for the [Play Framework](http://www.playframework.com) at compile time, so there is no need to download and install these additional packages.  This procedure needs to be performed with **root** privilege.
+
+To install `sbt` from RPM:
+
+    $ wget http://dl.bintray.com/sbt/rpm/sbt-0.13.5.rpm
+    $ rpm -Uvh sbt-0.13.5.rpm
+
+## Install git
+Deployment: **reverse proxy**, **standalone**
+
+[Git](http://git-scm.com/downloads) is a distributed revision control and source code management (SCM) system used to manage the software lifecycle of the *nsi-requester* code base.  There are alternative ways of accessing the code, but in documentation we will use the `git` command line tool to pull down the needed components. 
+
+To install `git` using `yum`:
+
+    $ yum install git
+
+
+
+

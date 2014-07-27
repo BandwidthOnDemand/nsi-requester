@@ -1,5 +1,5 @@
 ---
-title: Tags
+title: Overview
 layout: default
 ---
 # Overview
@@ -16,22 +16,17 @@ The nsi-requester is written in Scala and utilizes the [Play Framework](http://w
 
 For a Mac you can use either of `brew` or `port` to do the installation:
 
-```
-$ brew install sbt
-```
+    $ brew install sbt
+
 or
 
-```
-$ port install sbt
-```
+    $ port install sbt
 
 To download, build, and run the vanilla default configuration perform the following commands:
 
-```
-$ git clone https://github.com/BandwidthOnDemand/nsi-requester.git
-$ cd nsi-requester
-$ sbt run
-```
+    $ git clone https://github.com/BandwidthOnDemand/nsi-requester.git
+    $ cd nsi-requester
+    $ sbt run
 
 The nsi-requester application will be accessible by browser at the default location [http://localhost:9000](http://localhost:9000).
 
