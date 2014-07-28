@@ -1,0 +1,94 @@
+---
+title: Building Production Load
+layout: default
+---
+
+# Building a Production Load
+These instructions describe a process of downloading the `nsi-requester` source from the BandwidthOnDemand repository on GitHub, cutomizing the look-and-feel, and building the source for deployment.  This process can be done directly on the production server, or on a separate build server for later transfer to the production server.
+ 
+## Download the source
+It is recommended a copy of the source is directly downloaded from the repository using the `git` command so that load tagging during the build process will add the appropriate revision information to your build.  This requires a properly cloned git repository.  Downloading using alternative methods will track the major and minor build versions, but not the specific version within the source code stream.
+
+Perform the following command in the directory you would like to download the source:
+
+    $ git clone https://github.com/BandwidthOnDemand/nsi-requester.git
+    $ cd nsi-requester
+
+You now have the current version of the `nsi-requester` source code.
+
+## Customizing the look-and-feel
+The `nsi-requester` has limited customizable capabilities for tailoring the look-and-feel of the WebUI.  The header, footer, and basic colour schemes can be changed without modifying the source.  These changes must be done before compiling the load as they are not runtime configurable.
+
+Basic header and colour schemes are controlled through the `app/assets/css/variables.less` file.  The contents of this file can be replaced with your specific colour scheme.  Currently, the `app/assets/css/variables-surfnet.less` file provides the SURFnet specific scheme, and the `app/assets/css/variables-esnet.less` file provides the ESnet specific scheme.  Copy one of these schemes to a new file as a starting point, then change the include in `app/assets/css/variables.less` to reference this new file.
+
+Here is the content of the `variables-surfnet.less` file:
+
+```
+# Colouring scheme of main body
+@blueSurf:        #4fb3cf;
+@blueSurfLight:   #85cadd;
+@blueSurfLighter: #ecf8fa;
+@blueSurfDark:    #0381a4;
+@blackLight:      #002f3c;
+@white:           #fff;
+@grayLight:       #f1f1f1;
+@gray:            #ebebeb;
+@grayDark:        #d8dadc;
+@grayDarker:      #bfbfbf;
+
+# Colouring and layout of header
+@titleTextColour:  #000000;
+@titlePaddingLeft: 155px;
+@titlePaddingTop:  30px;
+@titleHeight:      80px;
+@titleBackground:  #4fb3cf;
+@titleHz:          10px;
+@titleVr:          10px;
+@titleImage:       "../images/logo.png";
+
+# Colouring scheme of XML messages
+@messageHeader:         #cae8f0;
+@messageTime:           #dc322f;
+@messageElementTag:     teal;
+@messageElementContent: #dc322f;
+@messageNsTag:          #1e347b;
+@messageNsContents:     #6d6d73;
+
+# Colouring scheme of settings menu item 
+@settingsTextActive: #002f3c;
+@settingsBeakActive: #002f3c;
+
+# Colouring scheme of buttons
+@buttonBackground: #0381a4;
+@buttonColorStart: #4fb3cf;
+@buttonColorEnd:   #0381a4;
+```
+
+Although the `@blueSurf` variable names are not very intuitive, you can view their use in the other `app/assets/css/*.less` files to provide context.  These variable definitions are substituted into these *.less files, and then complied into CSS stylesheets for the WebUI.  The header layout and contents is completely controlled through the `@title` variable definitions.  Point the "@titleImage" to your specific logo.
+
+The `favicon` and footer information is specified in the `conf/application.conf` file which gets populated on page generation.  Locate the `web` block definition and tailor to your needs.
+
+```
+# Deployment specific configuration for the nsi-requester web page.  This
+# information is treated as runtime data and not static CSS layout.  For
+# static CSS layout configuration look at the app/assets/css/variables.less
+# file for customer colour and page layout that is built at compile time.
+# ~~~~~
+web {
+  favicon = "images/favicon.ico"
+  footer = "SURFnet bv | Postbus 19035, 3501 DA Utrecht | T +31 302 305 305 | F +31 302 305 329 |"
+  contactURL = "mailto:admin@surfnet.nl"
+  contactText = "admin@surfnet.nl"
+
+}
+```
+## Preconfiguring runtime
+The `conf/application.conf` and `conf/application-logger.xml` files contain runtime configuration information for the `nsi-requester` application.  These files are compiled into the platform independent jar archive as part of the build process, but can be overriden by command line options when starting the `nsi-requester` application.  I would recommend leaving these default files and override them on the command line with a deployment specific version.
+
+## Building the source
+The [`sbt`](thirdparty#install-sbt) tool installed in the [Installing software dependencies](thirdparty#install-software-dependencies) section will be used to build the production load.  This tool can build platform specific packages (war, rpm, etc.) but we will use it to build an executable platform independent jar archive.  Perform the following commands:
+
+	$ cd nsi-requester
+	$ sbt stage
+
+The `sbt` tool will resolve all software dependencies so Internet access is required to public repositories.  Once completed the directory `target/universal/stage` will contain the `nsi-requester` runtime.  Move this directory to the desired production location and proceed with deployment specific configuration.
