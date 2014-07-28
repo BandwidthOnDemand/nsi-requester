@@ -370,6 +370,15 @@ footer a:hover {
 * html .clearfix {height: 1%;}
 .clearfix {display: block;}
 
+/* John's changes. */
+strong {
+	font-weight: bolder;
+}
+
+em {
+	font-style: italic;
+}
+
 /* #Media Queries
 ================================================== */
 

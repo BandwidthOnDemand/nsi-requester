@@ -11,7 +11,6 @@ This documentation gives a overview of the software dependencies for the followi
 
 These steps were designed based on a *CentOS release 6.5 (Final)* OS release, but can be tailored specifically for you production environment using the OS specific installation instructions for each piece of software.
 
-<hr>
 ## Page Contents
 
 - [Update your OS](#update-your-os)
@@ -19,14 +18,11 @@ These steps were designed based on a *CentOS release 6.5 (Final)* OS release, bu
 - [Install Apache httpd](#install-apache-httpd)
 - [Install sbt](#install-sbt)
 - [Install git](#install-git)
-<hr>
-* auto-gen TOC:
-{:toc}
 
 ## Update your OS
 Deployment: **reverse proxy**, **standalone**
 
-As always it is a good practice to make sure your production system OS and supporting thrid-party software modules are up-to-date with the most recent patches.  As **root** execute your OS update (in this case *yum* for CentOS):
+As always it is a good practice to make sure your production system OS and supporting third-party software modules are up-to-date with the most recent patches.  As **root** execute your OS update (in this case *yum* for CentOS):
 
     $ yum update
 
