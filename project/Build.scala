@@ -1,11 +1,7 @@
-import com.typesafe.sbt.less.Import.LessKeys
 import sbt._
 import sbtbuildinfo.Plugin._
 import play._
-
 import Keys._
-import play.Play.autoImport._
-import PlayKeys._
 
 object ApplicationBuild extends Build {
 
@@ -19,18 +15,20 @@ object ApplicationBuild extends Build {
 
   lazy val gitHeadCommitSha = settingKey[String]("current git commit SHA")
 
+  val headCommitSha = try { Process("git rev-parse --short HEAD").lines.head } catch { case ex: Exception => "undefined" }
+
   val main = Project(
       id = appName,
       base = file("."),
-    settings =
-      buildInfoSettings ++
-      Seq(organization := "nl.surfnet.bod",
-        scalaVersion := "2.10.4",
-        scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
-        gitHeadCommitSha := Process("git rev-parse --short HEAD").lines.head,
-        sourceGenerators in Compile <+= buildInfo,
-        buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, gitHeadCommitSha),
-        buildInfoPackage := "support",
-        libraryDependencies ++= appDependencies
-      )).enablePlugins(PlayScala)
+      settings = buildInfoSettings ++
+        Seq(organization := "nl.surfnet.bod",
+          scalaVersion := "2.10.4",
+          scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
+          gitHeadCommitSha := headCommitSha,
+          sourceGenerators in Compile <+= buildInfo,
+          buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, gitHeadCommitSha),
+          buildInfoPackage := "support",
+          libraryDependencies ++= appDependencies
+        )).enablePlugins(PlayScala)
 }
+
