@@ -14,8 +14,7 @@
 # can be restricted to an internal port.  If an address is not provided then
 # the play framework will bind to all addresses.
 ADDRESS="127.0.0.1"
-HTTP_PORT="disabled"
-HTTPS_PORT="9443"
+HTTP_PORT="9001"
 
 # Install location for the nsi-requester (i.e. wherever the contents of the
 # target/universal/stage directory were place).
@@ -46,16 +45,10 @@ $HOME/bin/nsi-requester \
         -Dlogger.file=$LOG \
         -Dhttp.address=$ADDRESS \
         -Dhttp.port=$HTTP_PORT \
-        -Dhttps.port=$HTTPS_PORT \
-        -Dhttps.keyStore=$KEYSTORE \
-        -Dhttps.keyStoreType="JKS" \
-        -Dhttps.keyStorePassword=$PASSWORD \
-        -Dplay.http.sslengineprovider=support.CustomSSLEngineProvider \
-        -Djdk.tls.ephemeralDHKeySize=2048 \
-        -Djdk.tls.rejectClientInitiatedRenegotiation=true \
         -Djavax.net.ssl.keyStore=$KEYSTORE \
         -Djavax.net.ssl.keyStorePassword=$PASSWORD \
         -Djavax.net.ssl.trustStore=$TRUSTSTORE \
         -Djavax.net.ssl.trustStorePassword=$PASSWORD \
-        -DapplyEvolutions.default=true $EXTRA \
-	    -Djavax.net.debug="all"
+        -DapplyEvolutions.default=true $EXTRA
+
+# Add command line option -Djavax.net.debug="all" if you need to debug SSL.
