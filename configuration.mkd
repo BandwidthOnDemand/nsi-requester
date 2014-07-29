@@ -1,5 +1,62 @@
 ---
-title: Configuration
+title: Configuration - Reverse Proxy Deployment
 layout: default
 ---
 
+# Reverse Proxy Deployment
+The `nsi-requester` has a number of configuration options that will need to be set for the **reverse proxy** deployemnt solution as described in [Production Deployments](deployment#production-deployments).  As shown in the figure below, we will front the `nsi-requester` with the Apache `httpd` that will be ressponsible for handling all incoming SSL/TLS connections, and proxying simple HTTP requests into the `nsi-requester` itself.  On the backend we will configure the Play WS Client to utilize Java SSL on the outbound connections to target NSA.  All SSL/TLS connections will use client authentication (2-way TLS).
+
+![Reverse Proxy Port Usage](diagrams/reverse-proxy-ports.png)
+
+[Java Secure Socket Extension (JSSE) Reference Guide](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
+
+
+## Configure httpd
+
+Follow the standard Apache `httpd` administration [documents](http://httpd.apache.org/docs/) for your specific version of `httpd` to custom tailor for your specific installation.  These steps assume the only role of this `httpd` installation is for hosting `nsi-requester` and perhaps other BandwidthOnDemand modules.  For the remainder of this section `$httpd` will refer to the installation root for `httpd`.  This documentation is based on the **CentOS 6.5** default `httpd` installation. 
+
+### httpd.conf
+
+Open `$httpd/conf/httpd.conf` and add the following VirtualHost entry to the end of the file:
+    
+    <VirtualHost *:80>
+      ServerName nsi-requester.net
+
+      RewriteEngine On
+      RewriteCond %{HTTPS} !=on
+      RewriteRule ^/(.*)$ https://%{SERVER_NAME}/$1 [R,L]
+    </VirtualHost>
+
+This entry will redirect all HTTP traffic to the HTTPS port.  Replace the hostname `nsi-requester.net` with that of your server.  Tailor this to your needs if this HTTP server is being used for other tasks.
+
+### ssl.conf
+
+Within the `ssl.conf` file we configure all parameters relating to SSL/TLS for incoming requests to the `nsi-requester` application.  The important
+
+
+
+Open `$httpd/conf.d/ssl.conf` and within the target `VirtualHost` entry `<VirtualHost _default_:443>` configure the following:
+
+1. **Server Name** - Set the server name to the target host used in the previous step.  For example:
+
+    ```
+    ServerName nsi-requester.net
+    ```
+
+2. **Server Certificate** - Point `SSLCertificateFile` at a PEM encoded server certificate file for this host.  Do not password protect it.  For example:
+
+    ```
+    SSLCertificateFile /etc/httpd/conf.d/cert/service-host.crt
+    ```
+
+3. **Server Private Key** - If the server's private key is not combined with the server's certificate from the previous step, then point `SSLCertificateKeyFile` at the server's key file.  For example:
+
+    ```
+    SSLCertificateKeyFile /etc/httpd/conf.d/cert/service-host.key
+    ```
+
+4. **Server Certificate Chain** - Point `SSLCertificateChainFile` at a file containing the concatenation of PEM encoded CA certificates which form the certificate chain for the server certificate. 
+
+    ```
+    SSLCertificateChainFile /etc/httpd/conf.d/cert/service-cachain.crt
+    ```
