@@ -22,7 +22,7 @@ object ApplicationBuild extends Build {
       base = file("."),
       settings = buildInfoSettings ++
         Seq(organization := "nl.surfnet.bod",
-          scalaVersion := "2.10.4",
+          scalaVersion := "2.11.2",
           scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Xlint"),
           gitHeadCommitSha := headCommitSha,
           sourceGenerators in Compile <+= buildInfo,
