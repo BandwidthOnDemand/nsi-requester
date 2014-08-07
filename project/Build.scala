@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
   val appVersion      = "1.1-SNAPSHOT"
 
   val appDependencies = Seq(
-    "joda-time" % "joda-time" % "2.3",
+    "joda-time" % "joda-time" % "2.4",
     "com.typesafe.play" %% "play-ws" % "2.3.2"
   )
 
