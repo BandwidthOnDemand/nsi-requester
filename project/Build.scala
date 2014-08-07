@@ -10,7 +10,7 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "joda-time" % "joda-time" % "2.3",
-    "com.typesafe.play" %% "play-ws" % "2.3.1"
+    "com.typesafe.play" %% "play-ws" % "2.3.2"
   )
 
   lazy val gitHeadCommitSha = settingKey[String]("current git commit SHA")
