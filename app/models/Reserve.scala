@@ -16,6 +16,7 @@ case class Reserve(
     destination: Port,
     bandwidth: Long,
     connectionId: Option[String] = None,
+    version: Int = 1,
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
@@ -30,7 +31,7 @@ case class Reserve(
       { connectionIdField }
       { globalReservationIdField }
       { descriptionField }
-      <criteria version="1">
+      <criteria version={ version.toString }>
         <schedule>
           { startTimeField }
           { endTimeField }

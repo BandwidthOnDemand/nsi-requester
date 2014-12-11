@@ -216,13 +216,14 @@ object Application extends Controller with Soap11Controller {
         "destination" -> portMapping,
         "bandwidth" -> longNumber(0, 100000),
         "connectionId" -> optional(text),
+        "version" -> number(min = 0),
         "correlationId" -> nonEmptyText,
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean)
-        ((desc, start, end, serviceType, source, dest, bandwidth, connectionId, correlationId, globalReservationId, unProtected) =>
-          Reserve(desc, start, end, serviceType, source, dest, bandwidth, connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
+        ((desc, start, end, serviceType, source, dest, bandwidth, connectionId, version, correlationId, globalReservationId, unProtected) =>
+          Reserve(desc, start, end, serviceType, source, dest, bandwidth, connectionId, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
         (reserve =>
-          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.bandwidth, reserve.connectionId, reserve.correlationId, reserve.globalReservationId, reserve.unprotected))))
+          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.bandwidth, reserve.connectionId, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected))))
 
     def reserveAbortF: Form[ReserveAbort] = Form(
       "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))
