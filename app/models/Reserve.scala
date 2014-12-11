@@ -15,6 +15,7 @@ case class Reserve(
     source: Port,
     destination: Port,
     bandwidth: Long,
+    connectionId: Option[String] = None,
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
@@ -26,6 +27,7 @@ case class Reserve(
 
   override def nsiV2Body =
     <type:reserve>
+      { connectionIdField }
       { globalReservationIdField }
       { descriptionField }
       <criteria version="1">
@@ -46,6 +48,11 @@ case class Reserve(
   private def globalReservationIdField = globalReservationId match {
     case Some(g) => <globalReservationId>{ g }</globalReservationId>
     case None    => <globalReservationId/>
+  }
+
+  private def connectionIdField = connectionId match {
+    case Some(id) => <connectionId>{ id }</connectionId>
+    case None    => Empty
   }
 
   private def descriptionField = description match {
