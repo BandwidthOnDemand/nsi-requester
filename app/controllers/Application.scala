@@ -190,7 +190,6 @@ object Application extends Controller with Soap11Controller {
     }.recover {
       case e =>
         Logger.info("Could not send soap request", e)
-        println(soapRequest);
         BadRequest(Json.obj("message" -> e.getMessage))
     }
   }
