@@ -14,6 +14,7 @@ case class Reserve(
     serviceType: String,
     source: Port,
     destination: Port,
+    ero: List[String],
     bandwidth: Long,
     connectionId: Option[String] = None,
     version: Int = 1,
@@ -64,6 +65,12 @@ case class Reserve(
   private def endTimeField =
     <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(endDate)) }</endTime>
 
+  private def eroPresent: Boolean = {
+    var found = false;
+    ero.withFilter(x => x.nonEmpty).foreach(x => found = true)
+    found
+  }
+
   private def service =
     <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>
       <capacity>{ bandwidth }</capacity>
@@ -71,6 +78,15 @@ case class Reserve(
       <symmetricPath>true</symmetricPath>
       <sourceSTP>{ source.stpId }</sourceSTP>
       <destSTP>{ destination.stpId }</destSTP>
+      {
+        if (eroPresent)
+      <ero>
+        {
+          var order = -1;
+          for (member <- ero; if member.nonEmpty) yield <orderedSTP order={ order += 1; order.toString }><stp>{ member }</stp></orderedSTP>
+        }
+      </ero>
+      }
       {
         if (unprotected)
           <parameter type="protection">UNPROTECTED</parameter>

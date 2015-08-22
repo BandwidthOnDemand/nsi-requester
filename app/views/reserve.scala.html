@@ -26,6 +26,17 @@
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
+                <fieldset id="ero" style="position: relative">
+                    <a href="#" id="plus-ero" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
+                    @repeat(requestForm("reservation.ero"), min = 1) { eroField =>
+                    @inputText(eroField, '_label -> "ERO", 'class -> "input-xlarge")
+                    }
+                </fieldset>
+
+                <div id="template-ero" class="template">
+                    @inputText(requestForm("reservation.ero[x]"), '_label -> "", 'class -> "input-xlarge")
+                </div>
+
                 @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
@@ -36,7 +47,22 @@
             }
         </div>
     </section>
+    <script>
+        $(function() {
+          $("#plus-ero").click(function(event) {
+            $("#template-ero").children().clone().appendTo("#ero");
+            reNumber($("#ero input"));
+        });
 
+
+        function reNumber(elements) {
+          elements.each(function(i, input) {
+            var target = $(input);
+            target.attr('name', target.attr('name').replace(/\[.+\]/, '['+i+']'))
+          });
+         }
+        });
+    </script>
 }
 
 @inputPort(field: String => Field, name: String) = {

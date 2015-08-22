@@ -44,6 +44,7 @@ object Application extends Controller with Soap11Controller {
         serviceType = ServiceType,
         source = Port(currentPortPrefix),
         destination = Port(currentPortPrefix),
+        ero = List(),
         bandwidth = 100,
         replyTo = Some(ReplyToUrl),
         requesterNsa = RequesterNsa,
@@ -189,6 +190,7 @@ object Application extends Controller with Soap11Controller {
     }.recover {
       case e =>
         Logger.info("Could not send soap request", e)
+        println(soapRequest);
         BadRequest(Json.obj("message" -> e.getMessage))
     }
   }
@@ -214,16 +216,17 @@ object Application extends Controller with Soap11Controller {
         "serviceType" -> nonEmptyText,
         "source" -> portMapping,
         "destination" -> portMapping,
+        "ero" -> list(text),
         "bandwidth" -> longNumber(0, 100000),
         "connectionId" -> optional(text),
         "version" -> number(min = 0),
         "correlationId" -> nonEmptyText,
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean)
-        ((desc, start, end, serviceType, source, dest, bandwidth, connectionId, version, correlationId, globalReservationId, unProtected) =>
-          Reserve(desc, start, end, serviceType, source, dest, bandwidth, connectionId, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
+        ((desc, start, end, serviceType, source, dest, ero, bandwidth, connectionId, version, correlationId, globalReservationId, unProtected) =>
+          Reserve(desc, start, end, serviceType, source, dest, ero, bandwidth, connectionId, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected))
         (reserve =>
-          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.bandwidth, reserve.connectionId, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected))))
+          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.ero, reserve.bandwidth, reserve.connectionId, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected))))
 
     def reserveAbortF: Form[ReserveAbort] = Form(
       "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))
