@@ -31,7 +31,6 @@ class FormSupportSpec extends Specification {
     "parse Summary operation" in {
       val operation = queryOperationFormat.bind("operation", Map("operation" -> "Summary"))
 
-      println("2222222 " + operation);
       operation must beRight(QueryOperation.Summary)
     }
   }
