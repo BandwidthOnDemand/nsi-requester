@@ -39,6 +39,13 @@
 
                 @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
 
+                @select(
+                   requestForm("reservation.pathComputationAlgorithm"),
+                   options = ("" -> "Default") :: Reserve.PathComputationAlgorithms.map(x => (x.toUpperCase, x)).toList,
+                   '_label -> "Path computation algorithm",
+                   '_showConstraints -> false
+                )
+
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
 
                 <div class="form-actions">

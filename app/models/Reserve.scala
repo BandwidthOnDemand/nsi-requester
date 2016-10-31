@@ -7,6 +7,9 @@ import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.Period
 import scala.xml.NodeSeq.Empty
 
+object Reserve {
+  val PathComputationAlgorithms = Seq("Chain", "Sequential")
+}
 case class Reserve(
     description: Option[String],
     startDate: Option[Date],
@@ -23,7 +26,9 @@ case class Reserve(
     requesterNsa: String,
     provider: Provider,
     globalReservationId: Option[String] = None,
-    unprotected: Boolean = false) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
+    unprotected: Boolean = false,
+    pathComputationAlgorithm: Option[String] = None
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
 
   import NsiRequest._
 
@@ -92,6 +97,9 @@ case class Reserve(
           <parameter type="protection">UNPROTECTED</parameter>
         else
           <parameter type="protection">PROTECTED</parameter>
+      }
+      {
+        pathComputationAlgorithm.map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>).orNull
       }
     </p2p:p2ps>
 
