@@ -8,7 +8,7 @@ import org.joda.time.Period
 import scala.xml.NodeSeq.Empty
 
 object Reserve {
-  val PathComputationAlgorithms = Seq("Chain", "Sequential")
+  val PathComputationAlgorithms = Seq("Chain", "Sequential", "Tree")
 }
 case class Reserve(
     description: Option[String],
