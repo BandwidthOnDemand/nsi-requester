@@ -21,3 +21,17 @@ libraryDependencies ++= Seq(
 )
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
+
+lazy val licenseText = settingKey[String]("Project license text.")
+
+licenseText := IO.read(baseDirectory.value / "LICENSE")
+
+headers := Map(
+  "scala" -> (
+    HeaderPattern.cStyleBlockComment,
+    licenseText.value.split("\n").map {
+      case ""   => " *"
+      case line => " * " ++ line
+    }.mkString("/*\n", "\n", "\n */\n")
+  )
+)
