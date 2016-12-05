@@ -29,16 +29,12 @@ import java.net.URI
 abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, provider: Provider, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion, addsTrace: Boolean = false) {
   import NsiRequest._
 
+  def soapActionPrefix: String = NsiV2SoapActionPrefix
+  def soapActionSuffix: String
+
   def nsiV2Body: Node
 
-  def soapAction(): String = {
-    def deCapitalize(input: String): String = {
-      val chars = input.toCharArray
-      chars(0) = chars(0).toLower
-      new String(chars)
-    }
-    s"$NsiV2SoapActionPrefix/${deCapitalize(this.getClass().getSimpleName())}"
-  }
+  def soapAction: String = s"$soapActionPrefix/$soapActionSuffix"
 
   def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node =
     wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)

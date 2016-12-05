@@ -31,6 +31,8 @@ case class ReserveAbort(
     requesterNsa: String,
     provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
+  override def soapActionSuffix = "reserveAbort"
+
   override def nsiV2Body =
     <type:reserveAbort>
       <connectionId>{ connectionId }</connectionId>

@@ -43,13 +43,10 @@ case class Query(
     requesterNsa: String,
     provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
-  override def soapAction() = {
-    val action = operation match {
-      case Summary => "querySummary"
-      case SummarySync => "querySummarySync"
-      case Recursive => "queryRecursive"
-    }
-   s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
+  override def soapActionSuffix = operation match {
+    case Summary     => "querySummary"
+    case SummarySync => "querySummarySync"
+    case Recursive   => "queryRecursive"
   }
 
   override def nsiV2Body = operation match {

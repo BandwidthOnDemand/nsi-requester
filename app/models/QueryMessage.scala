@@ -42,14 +42,11 @@ case class QueryMessage(
   requesterNsa: String,
   provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
-  override def soapAction = {
-    val action = operation match {
-      case NotificationSync => "queryNotificationSync"
-      case NotificationAsync => "queryNotification"
-      case ResultSync => "queryResultSync"
-      case ResultAsync => "queryResult"
-    }
-    s"${NsiRequest.NsiV2SoapActionPrefix}/$action"
+  override def soapActionSuffix = operation match {
+    case NotificationSync  => "queryNotificationSync"
+    case NotificationAsync => "queryNotification"
+    case ResultSync        => "queryResultSync"
+    case ResultAsync       => "queryResult"
   }
 
   override def nsiV2Body =

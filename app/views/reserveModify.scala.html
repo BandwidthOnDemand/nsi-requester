@@ -1,0 +1,31 @@
+@(requestForm: Form[ReserveModify])(implicit flash: Flash)
+
+@import helper._
+@import views.helper.MyHelpers._
+
+@nsirequest(s"Make a NSI Reserve Modify Request", "reserve") {
+
+    <section id="formS">
+        <h1>Make a NSI Reserve Modify Request</h1>
+
+        <div class="content">
+            @form(action = routes.Application.reserveModify, 'class -> "form form-horizontal") {
+
+                <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
+
+                @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.version"), '_label -> "Version")
+                @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
+                @inputText(requestForm("reservation.endDate"), '_label -> "End Date")
+
+                @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
+
+                @fragments.nsiCommonFields(name => requestForm("reservation." + name))
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Reserve</button>
+                </div>
+            }
+        </div>
+    </section>
+}

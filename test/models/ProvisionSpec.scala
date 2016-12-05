@@ -19,7 +19,7 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
     "have a soap action" in {
       val res = DefaultProvision()
 
-      res.soapAction() must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/provision")
+      res.soapAction must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/provision")
     }
   }
 

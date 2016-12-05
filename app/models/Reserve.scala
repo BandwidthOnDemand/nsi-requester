@@ -41,7 +41,6 @@ case class Reserve(
     destination: Port,
     ero: List[String],
     bandwidth: Long,
-    connectionId: Option[String] = None,
     version: Int = 1,
     correlationId: String,
     replyTo: Option[URI],
@@ -54,9 +53,10 @@ case class Reserve(
 
   import NsiRequest._
 
+  override def soapActionSuffix = "reserve"
+
   override def nsiV2Body =
     <type:reserve>
-      { connectionIdField }
       { globalReservationIdField }
       { descriptionField }
       <criteria version={ version.toString }>
@@ -77,11 +77,6 @@ case class Reserve(
   private def globalReservationIdField = globalReservationId match {
     case Some(g) => <globalReservationId>{ g }</globalReservationId>
     case None    => <globalReservationId/>
-  }
-
-  private def connectionIdField = connectionId match {
-    case Some(id) => <connectionId>{ id }</connectionId>
-    case None    => Empty
   }
 
   private def descriptionField = description match {

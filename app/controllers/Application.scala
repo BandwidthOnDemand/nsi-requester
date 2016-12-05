@@ -82,6 +82,31 @@ object Application extends Controller with Soap11Controller {
       reservation => sendEnvelope(currentEndPoint, reservation))
   }
 
+  def reserveModifyForm = Action { implicit request =>
+    val startDate = None
+    val endDate = None
+
+    val defaultForm = currentEndPoint.modifyF.fill(
+      ReserveModify(
+        connectionId = "",
+        startDate = None,
+        endDate = None,
+        bandwidth = None,
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider)
+    )
+
+    Ok(views.html.reserveModify(defaultForm))
+  }
+
+  def reserveModify = Action.async { implicit request =>
+    currentEndPoint.modifyF.bindFromRequest.fold(
+      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+      modify => sendEnvelope(currentEndPoint, modify))
+  }
+
   def reserveCommitForm = Action { implicit request =>
     val defaultForm = currentEndPoint.reserveCommitF.fill(
       ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
@@ -196,7 +221,7 @@ object Application extends Controller with Soap11Controller {
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
 
-    val addHeaders = addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction())
+    val addHeaders = addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction)
     val wsRequest = addHeaders(WS.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
 
     wsRequest.post(soapRequest).map { response =>
@@ -239,16 +264,26 @@ object Application extends Controller with Soap11Controller {
         "destination" -> portMapping,
         "ero" -> list(text),
         "bandwidth" -> longNumber(0, 100000),
-        "connectionId" -> optional(text),
         "version" -> number(min = 0),
         "correlationId" -> nonEmptyText,
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean,
         "pathComputationAlgorithm" -> optional(nonEmptyText))
-        ((desc, start, end, serviceType, source, dest, ero, bandwidth, connectionId, version, correlationId, globalReservationId, unProtected, pathComputationAlgorithm) =>
-          Reserve(desc, start, end, serviceType, source, dest, ero, bandwidth, connectionId, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected, pathComputationAlgorithm))
+        ((desc, start, end, serviceType, source, dest, ero, bandwidth, version, correlationId, globalReservationId, unProtected, pathComputationAlgorithm) =>
+          Reserve(desc, start, end, serviceType, source, dest, ero, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected, pathComputationAlgorithm))
         (reserve =>
-          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.ero, reserve.bandwidth, reserve.connectionId, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected, reserve.pathComputationAlgorithm))))
+          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.ero, reserve.bandwidth, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected, reserve.pathComputationAlgorithm))))
+
+    def modifyF: Form[ReserveModify] = Form(
+      "reservation" -> mapping(
+        "connectionId" -> text,
+        "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
+        "endDate" -> optional(date("yyyy-MM-dd HH:mm")),
+        "bandwidth" -> optional(longNumber(0, 100000)),
+        "version" -> number(min = 0),
+        "correlationId" -> nonEmptyText)((connectionId, start, end, bandwidth, version, correlationId) =>
+          ReserveModify(connectionId, start, end, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider))(modify =>
+          Some((modify.connectionId, modify.startDate, modify.endDate, modify.bandwidth, modify.version, modify.correlationId))))
 
     def reserveAbortF: Form[ReserveAbort] = Form(
       "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))

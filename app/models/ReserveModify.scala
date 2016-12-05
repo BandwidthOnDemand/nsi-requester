@@ -23,19 +23,52 @@
 package models
 
 import java.net.URI
+import java.util.Date
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.Period
+import scala.xml.NodeSeq.Empty
 
-case class ReserveCommit(
+case class ReserveModify(
     connectionId: String,
+    startDate: Option[Date],
+    endDate: Option[Date],
+    bandwidth: Option[Long],
+    version: Int = 1,
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true
+) {
 
-  override def soapActionSuffix = "reserveCommit"
+  import NsiRequest._
+
+  override def soapActionSuffix = "reserve"
 
   override def nsiV2Body =
-    <type:reserveCommit>
+    <type:reserve>
       <connectionId>{ connectionId }</connectionId>
-    </type:reserveCommit>
+      <criteria version={ version.toString }>
+        <schedule>
+          { startTimeField }
+          { endTimeField }
+        </schedule>
+        { capacity }
+      </criteria>
+    </type:reserve>
 
+  private def startTimeField = startDate match {
+    case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
+    case None       => Empty
+  }
+
+  private def endTimeField = endDate match {
+    case Some(date) => <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</endTime>
+    case None       => Empty
+  }
+
+  private def capacity = bandwidth match {
+    case Some(capacity) => <p2p:capacity xmlns:p2p={ NsiV2Point2PointNamespace }>{ capacity }</p2p:capacity>
+    case None           => Empty
+  }
 }

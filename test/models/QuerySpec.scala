@@ -41,7 +41,7 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
     "have a soap action" in {
       val query = DefaultQuery(operation = Recursive)
 
-      query.soapAction() must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/queryRecursive")
+      query.soapAction must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/queryRecursive")
     }
   }
 
