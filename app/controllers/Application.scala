@@ -90,7 +90,9 @@ object Application extends Controller with Soap11Controller {
       ReserveModify(
         connectionId = "",
         startDate = None,
+        startNow = false,
         endDate = None,
+        indefiniteEnd = false,
         bandwidth = None,
         correlationId = generateCorrelationId,
         replyTo = Some(ReplyToUrl),
@@ -278,12 +280,14 @@ object Application extends Controller with Soap11Controller {
       "reservation" -> mapping(
         "connectionId" -> text,
         "startDate" -> optional(date("yyyy-MM-dd HH:mm")),
+        "startNow" -> boolean,
         "endDate" -> optional(date("yyyy-MM-dd HH:mm")),
+        "indefiniteEnd" -> boolean,
         "bandwidth" -> optional(longNumber(0, 100000)),
         "version" -> number(min = 0),
-        "correlationId" -> nonEmptyText)((connectionId, start, end, bandwidth, version, correlationId) =>
-          ReserveModify(connectionId, start, end, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider))(modify =>
-          Some((modify.connectionId, modify.startDate, modify.endDate, modify.bandwidth, modify.version, modify.correlationId))))
+        "correlationId" -> nonEmptyText)((connectionId, start, startNow, end, indefiniteEnd, bandwidth, version, correlationId) =>
+          ReserveModify(connectionId, start, startNow, end, indefiniteEnd, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider))(modify =>
+          Some((modify.connectionId, modify.startDate, modify.startNow, modify.endDate, modify.indefiniteEnd, modify.bandwidth, modify.version, modify.correlationId))))
 
     def reserveAbortF: Form[ReserveAbort] = Form(
       "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))

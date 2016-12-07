@@ -32,7 +32,9 @@ import scala.xml.NodeSeq.Empty
 case class ReserveModify(
     connectionId: String,
     startDate: Option[Date],
+    startNow: Boolean,
     endDate: Option[Date],
+    indefiniteEnd: Boolean,
     bandwidth: Option[Long],
     version: Int = 1,
     correlationId: String,
@@ -58,13 +60,15 @@ case class ReserveModify(
     </type:reserve>
 
   private def startTimeField = startDate match {
-    case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
-    case None       => Empty
+    case _ if startNow => <startTime xsi:nil="true"/>
+    case Some(date)    => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
+    case None          => Empty
   }
 
   private def endTimeField = endDate match {
-    case Some(date) => <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</endTime>
-    case None       => Empty
+    case _ if indefiniteEnd => <endTime xsi:nil="true"/>
+    case Some(date)         => <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</endTime>
+    case None               => Empty
   }
 
   private def capacity = bandwidth match {

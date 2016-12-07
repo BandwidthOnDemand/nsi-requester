@@ -15,8 +15,26 @@
 
                 @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
                 @inputText(requestForm("reservation.version"), '_label -> "Version")
-                @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
-                @inputText(requestForm("reservation.endDate"), '_label -> "End Date")
+
+                @helper.input(requestForm("reservation.startDate"), '_label -> "Start Date") { (id, name, value, args) =>
+                    <input type="text" name="@name" id="@id" @toHtmlArgs(args)>
+                    <span style="margin-left: 10px;">
+                        <label class="checkbox inline">
+                            <input id="reservation_startNow" name="reservation.startNow" type="checkbox" value="@{requestForm("reservation.startNow").value}" />
+                            Now
+                        </label>
+                    </span>
+                }
+
+                @helper.input(requestForm("reservation.endDate"), '_label -> "End Date") { (id, name, value, args) =>
+                    <input type="text" name="@name" id="@id" @toHtmlArgs(args)>
+                    <span style="margin-left: 10px;">
+                        <label class="checkbox inline">
+                            <input id="reservation_indefiniteEnd" name="reservation.indefiniteEnd" type="checkbox" value="true" />
+                            Indefinite
+                        </label>
+                    </span>
+                }
 
                 @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
 
@@ -28,4 +46,22 @@
             }
         </div>
     </section>
+    <script>
+        $(function() {
+            $("#reservation_startNow").on("change", function (ev) {
+                if (ev.target.checked) {
+                    $("#reservation_startDate").attr("disabled", "disabled");
+                } else {
+                    $("#reservation_startDate").removeAttr("disabled");
+                }
+            });
+            $("#reservation_indefiniteEnd").on("change", function (ev) {
+                if (ev.target.checked) {
+                    $("#reservation_endDate").attr("disabled", "disabled");
+                } else {
+                    $("#reservation_endDate").removeAttr("disabled");
+                }
+            });
+        });
+    </script>
 }

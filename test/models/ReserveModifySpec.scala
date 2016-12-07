@@ -37,7 +37,9 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
     ReserveModify(
       connectionId = connectionId,
       startDate = start,
+      startNow = false,
       endDate = end,
+      indefiniteEnd = false,
       bandwidth = bandwidth,
       version = version,
       correlationId = "FD5C4151-F980-410A-8565-5E8EDCE880F1",
