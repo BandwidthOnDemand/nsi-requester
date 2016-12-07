@@ -196,8 +196,9 @@ $(function() {
 
    var initKeymaster = function() {
        key('shift+r', function() { clickMenu("reserve") });
-       key('c', function() { clickMenu("reserveCommit") });
-       key('a', function() { clickMenu("reserveAbort") });
+       key('shift+m', function() { clickMenu("modify") });
+       key('c', function() { clickMenu("commit") });
+       key('a', function() { clickMenu("abort") });
        key('p', function() { clickMenu("provision") });
        key('r', function() { clickMenu("release") });
        key('t', function() { clickMenu("terminate") });
