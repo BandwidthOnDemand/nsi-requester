@@ -12,7 +12,7 @@ The nsi-requester can be deployed in a number of configurations, each achieving 
 
 ## References 
 
-- [Building Production Load](building)
+- [Building Production Load](build)
 - [Third-party software dependencies](thirdparty)
 - [Production Deployment](deployment)
 - [Configuration - Reverse Proxy Deployment](configuration)
