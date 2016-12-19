@@ -10,6 +10,14 @@ The NSI Requester (nsi-requester) is a web-based client application implementing
 
 The nsi-requester can be deployed in a number of configurations, each achieving an NSI compliant deployment.  Choosing the correct options may take some trial and error, but using the information held within this documentation should reduce your time to successful deployment considerably.  Please see the documentation page on production deployments for more information on a deployment option that can meet your needs. 
 
+## References 
+
+- [Building Production Load](building)
+- [Third-party software dependencies](thirdparty)
+- [Production Deployment](deployment)
+- [Configuration - Reverse Proxy Deployment](configuration)
+- [Certificates](certificates)
+
 ## Quick Start
 
 The nsi-requester is written in Scala and utilizes the [Play Framework](http://www.playframework.com) as a runtime environment.  This will require Java to be installed on your platform of choice (Java 1.8 is preferred), and as a minimum either Play 2.3.1 or SBT 0.13.5.  We recommend installing SBT since it will pull in the required Play Framework dependencies.  Instructions for SBT download and installation can be found [here](http://www.scala-sbt.org/download.html).
