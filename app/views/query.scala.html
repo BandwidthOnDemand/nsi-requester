@@ -32,6 +32,8 @@
                     }
                 </fieldset>
 
+                @inputText(queryForm("query.ifModifiedSince"), '_label -> "If Modfied Since")
+
                 @fragments.nsiCommonFields(name => queryForm("query." + name))
 
                 <div class="form-actions">

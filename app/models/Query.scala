@@ -23,6 +23,10 @@
 package models
 
 import java.net.URI
+import java.util.Date
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
+import scala.xml.NodeSeq.Empty
 
 object QueryOperation extends Enumeration {
   type QueryOperation = Value
@@ -38,6 +42,7 @@ case class Query(
     operation: QueryOperation = Summary,
     connectionIds: List[String],
     globalReservationIds: List[String],
+    ifModifiedSince: Option[Date],
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
@@ -54,6 +59,7 @@ case class Query(
       <type:querySummary>
         { connectionIdTags }
         { globalReservationIdTags }
+        { ifModifiedSinceTag }
       </type:querySummary>
     case SummarySync =>
       <type:querySummarySync>
@@ -74,5 +80,10 @@ case class Query(
 
   private def globalReservationIdTags =
     globalReservationIds.map(id => <globalReservationId>{ id }</globalReservationId>)
+
+  private def ifModifiedSinceTag = ifModifiedSince match {
+    case Some(date) => <ifModifiedSince>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</ifModifiedSince>
+    case None => Empty
+  }
 
 }

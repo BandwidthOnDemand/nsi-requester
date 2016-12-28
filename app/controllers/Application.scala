@@ -39,6 +39,7 @@ import RequesterSession._
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future
+import org.joda.time.DateTime
 
 object Application extends Controller with Soap11Controller {
 
@@ -175,8 +176,9 @@ object Application extends Controller with Soap11Controller {
   }
 
   def queryForm = Action { implicit request =>
+    val defaultModifiedSince = DateTime.now.minusMonths(1).toDate
     val defaultForm = currentEndPoint.queryF.fill(
-      Query(QueryOperation.Summary, Nil, Nil, generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      Query(QueryOperation.Summary, Nil, Nil, Some(defaultModifiedSince), generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
 
     Ok(views.html.query(defaultForm))
   }
@@ -324,8 +326,9 @@ object Application extends Controller with Soap11Controller {
         "operation" -> of[QueryOperation.Value],
         "connectionIds" -> listWithoutEmptyStrings,
         "globalReservationIds" -> listWithoutEmptyStrings,
-        "correlationId" -> nonEmptyText)((operation, connectionIds, globalReservationIds, correlationId) => Query(operation, connectionIds, globalReservationIds, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ query =>
-          Some((query.operation, query.connectionIds, query.globalReservationIds, query.correlationId))
+        "ifModifiedSince" -> optional(date("yyyy-MM-dd HH:mm")),
+        "correlationId" -> nonEmptyText)((operation, connectionIds, globalReservationIds, ifModifiedSince, correlationId) => Query(operation, connectionIds, globalReservationIds, ifModifiedSince, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ query =>
+          Some((query.operation, query.connectionIds, query.globalReservationIds, query.ifModifiedSince, query.correlationId))
         }
       )
 
