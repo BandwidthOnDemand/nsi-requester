@@ -22,7 +22,6 @@
         display: inline;
         position: absolute;
         left: 35px;
-        margin-top: 6px;
     }
 }
 
@@ -51,6 +50,7 @@ a i[class^="icon-"] { text-decoration: none; }
     background-color: @messageHeader;
     font-weight: bold;
     font-size: 1.1em;
+    color: @messageHeaderText;
 
     .section-number {
         float: left;
@@ -120,9 +120,13 @@ iframe { display: none; }
 .user-box {
     .nav {
         li {
+          color: @settingsTextInactive;
           font-size: 17px;
           text-align: center;
-          padding-top: 15px;
+          padding-top: 16px;
+        }
+        li a {
+          color: @settingsTextInactive;
         }
         li a:hover,
         li.active a {

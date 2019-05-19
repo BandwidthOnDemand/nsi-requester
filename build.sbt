@@ -4,7 +4,7 @@ version := "1.1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.12"
 scalacOptions := Seq("-deprecation", "-feature", "-unchecked", "-Xlint")
 
 val gitHeadCommitSha = settingKey[String]("git HEAD SHA")
