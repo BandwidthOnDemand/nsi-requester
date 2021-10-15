@@ -32,7 +32,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/nsi-requester/target/universal/stage/bin/nsi-requester"]
+          command: ["/nsi-requester/bin/nsi-requester"]
           args:
             - {{ printf "-Dconfig.file=%s/config-overrides.conf" .Values.config.mountPath | quote }}
             - {{ printf "-Dhttp.port=%.0f" .Values.service.containerPort | quote }}
