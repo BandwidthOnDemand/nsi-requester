@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "nsi-requester.fullname" . }}
+  labels:
+    {{- include "nsi-requester.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Chart.Name }}
+  selector:
+    matchLabels:
+      {{- include "nsi-requester.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nsi-requester.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nsi-requester.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/nsi-requester/target/universal/stage/bin/nsi-requester"]
+          args:
+            - {{ printf "-Dconfig.file=%s/config-overrides.conf" .Values.config.mountPath | quote }}
+            - {{ printf "-Dhttp.port=%.0f" .Values.service.containerPort | quote }}
+            - "-Dhttp.address=0.0.0.0"
+            - "-DapplyEvolutions.default=true"
+            - "-Djavax.net.ssl.trustStoreType=jks"
+            - "-Djavax.net.ssl.keyStoreType=jks"
+            - "-Djavax.net.ssl.trustStorePassword=secret"
+            - "-Djavax.net.ssl.keyStorePassword=secret"
+            - {{ printf "-Djavax.net.ssl.trustStore=%s/nsi-requester-truststore.jks" .Values.config.mountPath | quote }}
+            - {{ printf "-Djavax.net.ssl.keyStore=%s/nsi-requester-keystore.jks" .Values.config.mountPath | quote }}
+            - "-J-Xms512m"
+            - "-J-Xmx512m"
+            - "-J-server"
+            - "-J-verbose:gc"
+            - "-J-XX:+PrintGCDetails"
+            - "-J-XX:+PrintGCDateStamps"
+            - "-J-XX:+UseParallelGC"
+            - "-J-XX:+UseParallelOldGC"
+          env:
+            - name: NSI_REQUESTER_APPLICATION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-secret
+                  key: NSI_REQUESTER_APPLICATION_SECRET
+          ports:
+            - name: internal
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: {{ .Values.config.name }}
+              mountPath: {{ .Values.config.mountPath }}
+              readOnly: true
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              scheme: {{ .Values.livenessProbe.scheme }}
+              path: {{ .Values.livenessProbe.path }}
+              port: {{ .Values.service.containerPort }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              scheme: {{ .Values.startupProbe.scheme }}
+              path: {{ .Values.startupProbe.path }}
+              port: {{ .Values.service.containerPort }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: {{ .Values.config.name }}
+          configMap:
+            name: {{ include "nsi-requester.fullname" . }}-{{ .Values.config.name }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

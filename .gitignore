@@ -18,3 +18,5 @@ bin
 *.iml
 /.cache-main
 /.cache-tests
+.java-version
+charts/nsi-requester/config
