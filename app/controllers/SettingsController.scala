@@ -22,14 +22,18 @@
  */
 package controllers
 
-import play.api.mvc._
+import javax.inject.{ Inject, Singleton }
+import models._
+import play.api.Configuration
+import play.api.Environment
 import play.api.data.Form
 import play.api.data.Forms._
-import models._
-import RequesterSession._
+import play.api.mvc._
 import support.BuildInfo
 
-object SettingsController extends Controller {
+@Singleton
+class SettingsController @Inject()(val configuration: Configuration, val environment: Environment)(implicit requesterSession: RequesterSession) extends InjectedController with ViewContextSupport {
+  import RequesterSession._, requesterSession._
 
   def settingsForm = Action { implicit request =>
     val defaultForm = settingsF.fill(currentEndPoint)
@@ -38,7 +42,7 @@ object SettingsController extends Controller {
   }
 
   def settings = Action { implicit request =>
-    settingsF.bindFromRequest.fold[Result](
+    settingsF.bindFromRequest().fold[Result](
       formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
       {
         case endPoint =>{

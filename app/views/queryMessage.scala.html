@@ -1,5 +1,6 @@
-@(queryMessageForm: Form[QueryMessage])(implicit flash: Flash)
+@(queryMessageForm: Form[QueryMessage])(implicit context: views.Context)
 
+@import context._
 @import helper._
 @import views.helper.MyHelpers._
 

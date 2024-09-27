@@ -1,5 +1,6 @@
-@(requestForm: Form[Reserve])(implicit flash: Flash)
+@(requestForm: Form[Reserve])(implicit context: views.Context)
 
+@import context._
 @import helper._
 @import views.helper.MyHelpers._
 

@@ -22,25 +22,23 @@
  */
 package controllers
 
+import akka.stream._
+import akka.stream.scaladsl._
+import javax.inject.Inject
+import models.Ack
+import org.joda.time.DateTime
 import play.api._
-import play.api.mvc._
 import play.api.libs._
 import play.api.libs.json.Json.stringify
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Concurrent.Channel
-import play.api.libs.concurrent.Execution.Implicits._
-import views.html.defaultpages.badRequest
-import org.joda.time.DateTime
+import play.api.mvc._
 import scala.concurrent.stm.TMap
-import support.JsonResponse
 import scala.xml.NodeSeq
-import models.Ack
-import models.Provider
-import models.NsiRequest
+import support.JsonResponse
 
-object ResponseController extends Controller with Soap11Controller {
+class ResponseController @Inject()(requesterSession: RequesterSession)(implicit materializer: Materializer) extends InjectedController with Soap11Controller {
+  private val logger = Logger(classOf[ResponseController])
 
-  private val channels: TMap.View[String, Channel[String]] = TMap().single
+  private val channels: TMap.View[String, BoundedSourceQueue[String]] = TMap().single
 
   private val CorrelationId = "urn:uuid:(.*)".r
 
@@ -51,16 +49,16 @@ object ResponseController extends Controller with Soap11Controller {
 
     correlationId.foreach { id =>
       val clients = channels.get(id).map(Seq(_)).getOrElse {
-        Logger.info(s"Could not find correlation id $id, sending reply to all clients")
+        logger.info(s"Could not find correlation id $id, sending reply to all clients")
         channels.values
       }
 
       clients foreach { client =>
-        client.push(stringify(JsonResponse.response(request.body, DateTime.now())))
+        client.offer(stringify(JsonResponse.response(request.body, DateTime.now())))
       }
     }
 
-    providerNsa.flatMap(RequesterSession.findProvider).fold(badRequest("Could not find provider nsa")) { provider =>
+    providerNsa.flatMap(requesterSession.findProvider).fold(badRequest("Could not find provider nsa")) { provider =>
       correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
         Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope()).as(ContentTypeSoap11)
       }
@@ -85,11 +83,13 @@ object ResponseController extends Controller with Soap11Controller {
     (xml \\ "providerNSA").headOption.map(_.text)
 
   def comet(id: String) = Action {
-    val (enumerator, channel) = Concurrent.broadcast[String]
+    val source = Source.queue[String](100)
+    val queue: BoundedSourceQueue[String] = source.toMat(Sink.ignore)(Keep.left).run()
 
-    channels += (id -> channel)
+    BroadcastHub
+    channels += (id -> queue)
 
-    Ok.chunked(enumerator &> Comet(callback = "parent.message"))
+    Ok.chunked(source.via(Comet.string("parent.message")))
   }
 
 }

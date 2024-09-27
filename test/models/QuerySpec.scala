@@ -49,10 +49,11 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
 
     def apply(connectionIds: List[String] = Nil, globalReservationIds: List[String] = Nil, operation: QueryOperation = Summary) =
       Query(
+        operation = operation,
         connectionIds = connectionIds,
         globalReservationIds = globalReservationIds,
+        ifModifiedSince = None,
         correlationId = "corr",
-        operation = operation,
         replyTo = Some(uri("http://localhost")),
         requesterNsa = "requesterNsa",
         provider = Provider("nsa:surfnet.nl", uri("http://localhost"), "urn:ogf:network:"))

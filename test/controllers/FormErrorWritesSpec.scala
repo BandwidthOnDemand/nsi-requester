@@ -1,16 +1,17 @@
 package controllers
 
+import play.api.test._
 import play.api.data.FormError
-import play.api.libs.json.Json
-import play.api.libs.json.JsString
-import play.api.libs.json.JsArray
+import play.api.libs.json._
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class FormErrorWritesSpec extends support.Specification {
 
-  "FormErrorWrites" should {
+  "FormErrorWrites" should new WithApplication with Injecting {
 
-    import Application.FormErrorWrites
+    val subject = inject[controllers.Application]
+
+    import subject.FormErrorWrites
 
     "write json for FormError" in {
       val error = FormError("reserve.connectionId", "required")

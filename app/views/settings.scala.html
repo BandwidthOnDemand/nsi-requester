@@ -1,5 +1,6 @@
-@(settingsF: Form[EndPoint], version: String)(implicit flash: Flash)
+@(settingsF: Form[EndPoint], version: String)(implicit context: views.Context, requesterSession: RequesterSession)
 
+@import context._
 @import helper._
 @import views.helper.MyHelpers._
 
@@ -16,7 +17,7 @@
 
                 @select(
                    settingsF("provider.id"),
-                   options = options(RequesterSession.allProviders.map(_.nsaId).toList),
+                   options = options(requesterSession.allProviders.map(_.nsaId).toList),
                    '_label -> "Provider",
                    '_showConstraints -> false,
                    'class -> "input-xlarge",

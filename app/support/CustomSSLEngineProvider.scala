@@ -23,7 +23,6 @@
 package support
 
 import javax.net.ssl._
-import play.core.ApplicationProvider
 import play.server.api._
 
 /*
@@ -33,10 +32,12 @@ import play.server.api._
  *
  *     -Dplay.http.sslengineprovider=support.CustomSSLEngineProvider
  */
-class CustomSSLEngineProvider(appProvider: ApplicationProvider) extends SSLEngineProvider {
+class CustomSSLEngineProvider extends SSLEngineProvider {
   override def createSSLEngine(): SSLEngine = {
     val sslEngine = SSLContext.getDefault.createSSLEngine
     sslEngine.setNeedClientAuth(true)
     sslEngine
   }
+
+  override def sslContext: SSLContext = SSLContext.getDefault
 }

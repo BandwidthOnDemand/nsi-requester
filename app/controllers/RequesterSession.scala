@@ -25,18 +25,25 @@ package controllers
 import models._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
-import play.api.Play.current
-import play.api.Play
 import java.net.URI
-import scala.collection.JavaConversions._
 import com.typesafe.config.ConfigObject
+import javax.inject.{ Inject, Singleton }
+import play.api.Configuration
+import com.typesafe.config.ConfigList
+import com.typesafe.config.ConfigValue
+import scala.jdk.CollectionConverters._
+import play.api.Environment
 
 object RequesterSession {
-
   val ProviderNsaSessionField = "nsaId"
   val AccessTokensSessionField = "accessTokens"
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
-  val RequesterNsa = current.configuration.getString("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
+}
+@Singleton
+class RequesterSession @Inject()(configuration: Configuration) {
+  import RequesterSession._
+
+  val RequesterNsa = configuration.getOptional[String]("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
   def currentPortPrefix(implicit request: Request[AnyContent]): String = currentProvider.portPrefix
 
@@ -52,17 +59,22 @@ object RequesterSession {
 
   def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 
-  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https") || current.configuration.getBoolean("requester.ssl") == Some(true)
+  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https") || configuration.getOptional[Boolean]("requester.ssl") == Some(true)
 
   // is not a lazy val, because some tests will break (object will only be initialized once during tests
   def allProviders: Seq[Provider] = {
-    def toProvider(providerObject: ConfigObject): Provider =
-      Provider(
-        providerObject.get("id").unwrapped().asInstanceOf[String],
-        URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
-        providerObject.get("portPrefix").unwrapped().asInstanceOf[String])
+    def toProvider(value: ConfigValue): Provider = value match {
+      case providerObject: ConfigObject =>
+        Provider(
+          providerObject.get("id").unwrapped().asInstanceOf[String],
+          URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
+          providerObject.get("portPrefix").unwrapped().asInstanceOf[String],
+        )
+      case _ =>
+        sys.error(s"bad provider configuration $value")
+    }
 
-    current.configuration.getObjectList("requester.nsi.providers").map(_.map(toProvider)).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
+    configuration.getOptional[ConfigList]("requester.nsi.providers").map(x => x.iterator.asScala.map(toProvider).toSeq).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
   }
 
   def findProvider(nsaId: String) = allProviders.find(_.nsaId == nsaId)
