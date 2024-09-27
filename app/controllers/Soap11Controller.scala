@@ -23,13 +23,11 @@
 package controllers
 
 import play.api.http.ContentTypeOf
-import play.api.http.MimeTypes
 import play.api.http.ContentTypes._
+import scala.xml.Node
 
 trait Soap11Controller {
-
   val ContentTypeSoap11 = "text/xml"
 
-  implicit val soapContentType = ContentTypeOf[scala.xml.Node](Some(withCharset(ContentTypeSoap11)))
-
+  implicit val soapContentType: ContentTypeOf[Node] = ContentTypeOf[Node](Some(withCharset(ContentTypeSoap11)))
 }
