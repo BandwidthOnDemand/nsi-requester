@@ -3,13 +3,14 @@ package controllers
 import play.api.test._
 import play.api.data.FormError
 import play.api.libs.json._
+import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class FormErrorWritesSpec extends support.Specification {
 
-  "FormErrorWrites" should new WithApplication with Injecting {
+  "FormErrorWrites" should new WithViewContext {
 
-    val subject = inject[controllers.Application]
+    val subject = inject[controllers.ApplicationController]
 
     import subject.FormErrorWrites
 

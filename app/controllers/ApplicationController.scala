@@ -40,8 +40,8 @@ import org.joda.time.DateTime
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
-class Application @Inject()(val configuration: Configuration, val environment: Environment, requesterSession: RequesterSession, ws: WSClient)(implicit ec: ExecutionContext) extends InjectedController
-  with Soap11Controller with ViewContextSupport
+class ApplicationController @Inject()(val configuration: Configuration, val environment: Environment, requesterSession: RequesterSession, ws: WSClient)(implicit ec: ExecutionContext)
+  extends InjectedController with Soap11Controller with ViewContextSupport
 {
   import requesterSession._
 
@@ -55,7 +55,7 @@ class Application @Inject()(val configuration: Configuration, val environment: E
   }
 
   def index = Action {
-    Redirect(routes.Application.reserveForm)
+    Redirect(routes.ApplicationController.reserveForm)
   }
 
   def reserveForm = Action { implicit request =>

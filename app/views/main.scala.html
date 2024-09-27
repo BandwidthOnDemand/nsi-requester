@@ -7,15 +7,15 @@
 
 @menuItems = @{
   List(
-    ("reserve", routes.Application.reserveForm),
-    ("commit", routes.Application.reserveCommitForm),
-    ("abort", routes.Application.reserveAbortForm),
-    ("modify", routes.Application.reserveModifyForm),
-    ("provision", routes.Application.provisionForm),
-    ("release", routes.Application.releaseForm),
-    ("terminate", routes.Application.terminateForm),
-    ("query", routes.Application.queryForm),
-    ("queryMessage", routes.Application.queryMessage)
+    ("reserve", routes.ApplicationController.reserveForm),
+    ("commit", routes.ApplicationController.reserveCommitForm),
+    ("abort", routes.ApplicationController.reserveAbortForm),
+    ("modify", routes.ApplicationController.reserveModifyForm),
+    ("provision", routes.ApplicationController.provisionForm),
+    ("release", routes.ApplicationController.releaseForm),
+    ("terminate", routes.ApplicationController.terminateForm),
+    ("query", routes.ApplicationController.queryForm),
+    ("queryMessage", routes.ApplicationController.queryMessage)
   )
 }
 
@@ -32,7 +32,7 @@
     <body>
         <div class="wrapper">
             <header>
-                <a href="@routes.Application.index">Home</a>
+                <a href="@routes.ApplicationController.index">Home</a>
                 <h1>NSI Requester client</h1>
             </header>
             <section class="user-box">

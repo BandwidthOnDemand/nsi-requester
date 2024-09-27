@@ -46,7 +46,7 @@ class SettingsController @Inject()(val configuration: Configuration, val environ
       formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
       {
         case endPoint =>{
-          Redirect(routes.Application.reserveForm)
+          Redirect(routes.ApplicationController.reserveForm)
             .flashing("success" -> "Settings changed for this session")
             .withSession(
               AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
