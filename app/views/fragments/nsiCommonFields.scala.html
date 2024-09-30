@@ -9,5 +9,5 @@
 </div>
 
 <fieldset @if(showCollapse){class="extra-fields"}>
-    @if(showCollapse){@inputText(formField("correlationId"), '_label -> "Correlation Id", 'class -> "input-xlarge")}
+    @if(showCollapse){@inputText(formField("correlationId"), Symbol("_label") -> "Correlation Id", Symbol("class") -> "input-xlarge")}
 </fieldset>

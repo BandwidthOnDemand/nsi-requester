@@ -15,6 +15,6 @@ abstract class WithViewContext(app: Application = GuiceApplicationBuilder().buil
   }
 
   implicit val flash: Flash = Flash()
-  implicit def viewContex: Context = new Context()(app.configuration, app.environment, flash, inject[Messages])
+  implicit def viewContext: Context = new Context()(app.configuration, app.environment, flash, inject[Messages])
   implicit def requesterSession: RequesterSession = inject[RequesterSession]
 }

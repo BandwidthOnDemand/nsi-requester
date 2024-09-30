@@ -26,7 +26,6 @@ import java.net.URI
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.Period
 import scala.xml.NodeSeq.Empty
 
 object Reserve {
@@ -87,11 +86,7 @@ case class Reserve(
   private def endTimeField =
     <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(endDate)) }</endTime>
 
-  private def eroPresent: Boolean = {
-    var found = false;
-    ero.withFilter(x => x.nonEmpty).foreach(x => found = true)
-    found
-  }
+  private def eroPresent: Boolean = ero.exists(_.nonEmpty)
 
   private def service =
     <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>
@@ -119,22 +114,4 @@ case class Reserve(
         pathComputationAlgorithm.map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>).orNull
       }
     </p2p:p2ps>
-
-  private def possibleUnprotected =
-    if (unprotected)
-      <serviceAttributes>
-        <guaranteed>
-          <saml:Attribute
-            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="sNCP">
-            <saml:AttributeValue
-              xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-              Unprotected
-            </saml:AttributeValue>
-          </saml:Attribute>
-        </guaranteed>
-      </serviceAttributes>
-    else
-      Empty
 }

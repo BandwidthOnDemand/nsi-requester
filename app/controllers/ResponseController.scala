@@ -24,7 +24,6 @@ package controllers
 
 import akka.stream._
 import akka.stream.scaladsl._
-import javax.inject.Inject
 import models.Ack
 import org.joda.time.DateTime
 import play.api._
@@ -35,7 +34,7 @@ import scala.xml.NodeSeq
 import support.JsonResponse
 
 @javax.inject.Singleton
-class ResponseController @Inject()(requesterSession: RequesterSession)(implicit materializer: Materializer) extends InjectedController with Soap11Controller {
+class ResponseController @javax.inject.Inject()(requesterSession: RequesterSession) extends InjectedController with Soap11Controller {
   private val logger = Logger(classOf[ResponseController])
 
   private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single

@@ -1,9 +1,9 @@
 package controllers
 
-import play.api.test._
-import models._
 import com.typesafe.config.ConfigFactory
-import scala.collection.JavaConverters._
+import models._
+import play.api.test._
+import scala.jdk.CollectionConverters._
 import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])

@@ -9,10 +9,10 @@
     <section id="formS">
         <h1>Make a NSI Provision Request</h1>
         <div class="content">
-            @form(action = routes.ApplicationController.provision, 'class -> "form form-horizontal") {
+            @form(action = routes.ApplicationController.provision, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>Provision attributes</h3></div>
-                @inputText(provisionForm("provision.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(provisionForm("provision.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => provisionForm("provision." + name))
 

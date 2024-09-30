@@ -26,7 +26,6 @@ import java.net.URI
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.Period
 import scala.xml.NodeSeq.Empty
 
 case class ReserveModify(

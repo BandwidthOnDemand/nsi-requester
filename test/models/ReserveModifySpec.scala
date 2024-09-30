@@ -1,9 +1,6 @@
 package models
 
 import java.util.Date
-import org.joda.time.DateTime
-import org.joda.time.Period
-import scala.xml.Node
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class ReserveModifySpec extends support.Specification with org.specs2.matcher.XmlMatchers {

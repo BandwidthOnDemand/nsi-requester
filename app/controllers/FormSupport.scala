@@ -23,13 +23,13 @@
 package controllers
 
 import java.net.URI
-import models._
 import models.QueryMessageMode.QueryMessageMode
 import models.QueryOperation.QueryOperation
+import models._
 import org.joda.time.Period
 import org.joda.time.format.PeriodFormatterBuilder
 import play.api.data.FormError
-import play.api.data.Forms.{mapping, number, optional, text}
+import play.api.data.Forms.text
 import play.api.data.Mapping
 import play.api.data.format.Formats.stringFormat
 import play.api.data.format.Formatter
@@ -55,10 +55,10 @@ object FormSupport {
     override val format = Some(("Period ('days:hours:minutes')", Nil))
 
     def bind(key: String, data: Map[String, String]) = {
-      stringFormat.bind(key, data).right.flatMap { s =>
+      stringFormat.bind(key, data).flatMap { s =>
         scala.util.control.Exception.allCatch[Period]
           .either(periodFormatter.parsePeriod(s))
-          .left.map(e => Seq(FormError(key, "error.period", Nil)))
+          .left.map(_ => Seq(FormError(key, "error.period", Nil)))
       }
     }
 
@@ -69,10 +69,10 @@ object FormSupport {
     override val format = Some((s"Allowed values: ${QueryMessageMode.values.mkString(", ")}", Nil))
 
     def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryMessageMode] =
-      stringFormat.bind(key, data).right.flatMap { s =>
+      stringFormat.bind(key, data).flatMap { s =>
         scala.util.control.Exception.allCatch[QueryMessageMode]
           .either(QueryMessageMode.withName(s))
-          .left.map(e => Seq(FormError(key, "error.queryMessageMode", Nil)))
+          .left.map(_ => Seq(FormError(key, "error.queryMessageMode", Nil)))
       }
 
     def unbind(key: String, value: QueryMessageMode) = Map(key -> value.toString)
@@ -82,20 +82,12 @@ object FormSupport {
     override val format = Some((s"Allowed values: ${QueryOperation.values.mkString(", ")}", Nil))
 
     def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryOperation] =
-      stringFormat.bind(key, data).right.flatMap { s =>
+      stringFormat.bind(key, data).flatMap { s =>
         scala.util.control.Exception.allCatch[QueryOperation]
           .either(QueryOperation.withName(s))
-          .left.map(e => Seq(FormError(key, "error.queryOperation", Nil)))
+          .left.map(_ => Seq(FormError(key, "error.queryOperation", Nil)))
       }
 
     def unbind(key: String, value: QueryOperation) = Map(key -> value.toString)
   }
-
-//  val providerMapping: Mapping[Provider] = mapping(
-//    "providerUrl" -> uri,
-//    "username" -> optional(text),
-//    "password" -> optional(text),
-//    "accessToken" -> optional(text)
-//  ){ Provider.apply } { Provider.unapply }
-
 }

@@ -34,7 +34,7 @@ object PrettyXml {
 
     def prettify: String = xml match {
         case x: Node => pp.format(x);
-        case x: NodeSeq => xml.foldLeft("") { (str, node) =>
+        case x: NodeSeq => x.foldLeft("") { (str, node) =>
           val sep = if (str.isEmpty) "" else "\n"
           str + sep + node.prettify
         }

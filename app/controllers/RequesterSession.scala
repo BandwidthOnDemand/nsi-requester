@@ -22,25 +22,21 @@
  */
 package controllers
 
-import models._
-import play.api.mvc.Request
-import play.api.mvc.AnyContent
+import com.typesafe.config.{ ConfigList, ConfigObject, ConfigValue }
 import java.net.URI
-import com.typesafe.config.ConfigObject
-import javax.inject.{ Inject, Singleton }
+import models._
 import play.api.Configuration
-import com.typesafe.config.ConfigList
-import com.typesafe.config.ConfigValue
+import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import scala.jdk.CollectionConverters._
-import play.api.Environment
 
 object RequesterSession {
   val ProviderNsaSessionField = "nsaId"
   val AccessTokensSessionField = "accessTokens"
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
 }
-@Singleton
-class RequesterSession @Inject()(configuration: Configuration) {
+@javax.inject.Singleton
+class RequesterSession @javax.inject.Inject()(configuration: Configuration) {
   import RequesterSession._
 
   val RequesterNsa = configuration.getOptional[String]("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))

@@ -1,7 +1,6 @@
 package models
 
 import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers {

@@ -29,7 +29,6 @@ import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import support.PrettyXml._
 import play.api.libs.json.JsObject
-import java.util.UUID
 
 object JsonResponse {
 

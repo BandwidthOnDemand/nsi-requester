@@ -22,7 +22,6 @@
  */
 package controllers
 
-import javax.inject.{ Inject, Singleton }
 import models._
 import play.api.Configuration
 import play.api.Environment
@@ -31,8 +30,10 @@ import play.api.data.Forms._
 import play.api.mvc._
 import support.BuildInfo
 
-@Singleton
-class SettingsController @Inject()(val configuration: Configuration, val environment: Environment)(implicit requesterSession: RequesterSession) extends InjectedController with ViewContextSupport {
+@javax.inject.Singleton
+class SettingsController @javax.inject.Inject()(val configuration: Configuration, val environment: Environment)(implicit requesterSession: RequesterSession)
+  extends InjectedController with ViewContextSupport
+{
   import RequesterSession._, requesterSession._
 
   def settingsForm = Action { implicit request =>

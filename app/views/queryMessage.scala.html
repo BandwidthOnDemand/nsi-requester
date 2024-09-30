@@ -9,19 +9,19 @@
     <section id="formS">
         <h1>Make a NSI Query Notification/Result Request</h1>
         <div class="content">
-             @form(action = routes.ApplicationController.queryMessage, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.queryMessage, Symbol("class") -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
                 @select(
                     queryMessageForm("queryMessage.operation"),
                     options = options(QueryMessageMode.values.map(_.toString).toList),
-                    '_label -> "Operation",
-                    '_showConstraints -> false
+                    Symbol("_label") -> "Operation",
+                    Symbol("_showConstraints") -> false
                 )
 
-                @inputText(queryMessageForm("queryMessage.connectionId"), 'class -> "input-xlarge", '_label -> "ConnectionId")
-                @inputText(queryMessageForm("queryMessage.startId"), '_label -> "Start id", '_showConstraints -> false)
-                @inputText(queryMessageForm("queryMessage.endId"), '_label -> "End id", '_showConstraints -> false)
+                @inputText(queryMessageForm("queryMessage.connectionId"), Symbol("class") -> "input-xlarge", Symbol("_label") -> "ConnectionId")
+                @inputText(queryMessageForm("queryMessage.startId"), Symbol("_label") -> "Start id", Symbol("_showConstraints") -> false)
+                @inputText(queryMessageForm("queryMessage.endId"), Symbol("_label") -> "End id", Symbol("_showConstraints") -> false)
 
                 @fragments.nsiCommonFields(name => queryMessageForm("queryMessage." + name))
 

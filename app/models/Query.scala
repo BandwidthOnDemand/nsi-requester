@@ -30,9 +30,8 @@ import scala.xml.NodeSeq.Empty
 
 object QueryOperation extends Enumeration {
   type QueryOperation = Value
-  val Summary, SummarySync, Details, Recursive = Value
+  val Summary, SummarySync, Recursive = Value
 
-  def operationsV1 = List(Summary, Details)
   def operationsV2 = List(Summary, SummarySync, Recursive)
 }
 

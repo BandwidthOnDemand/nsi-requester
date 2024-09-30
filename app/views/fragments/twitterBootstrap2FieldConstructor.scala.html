@@ -1,9 +1,6 @@
 @(elements: views.html.helper.FieldElements)
 
-@import play.api.i18n._
-@import views.html.helper._
-
-<div class="control-group @elements.args.get('_class) @if(elements.hasErrors) {error}" id="@elements.args.get('_id).getOrElse(elements.id + "_field")">
+<div class="control-group @elements.args.get(Symbol("_class")) @if(elements.hasErrors) {error}" id="@elements.args.get(Symbol("_id")).getOrElse(elements.id + "_field")">
     <label class="control-label" for="@elements.id">@elements.label</label>
     <div class="controls">
         @elements.input
