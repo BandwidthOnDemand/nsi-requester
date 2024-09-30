@@ -36,3 +36,5 @@ licenseText := IO.read(baseDirectory.value / "LICENSE")
 organizationName := "SURFnet B.V."
 startYear := Some(2012)
 licenses += ("BSD-3-Clause", new URL("file:LICENSE"))
+
+PlayKeys.devSettings += "play.server.websocket.periodic-keep-alive-max-idle" -> "10 seconds"

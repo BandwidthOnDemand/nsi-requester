@@ -28,17 +28,17 @@ import javax.inject.Inject
 import models.Ack
 import org.joda.time.DateTime
 import play.api._
-import play.api.libs._
-import play.api.libs.json.Json.stringify
+import play.api.libs.json._
 import play.api.mvc._
 import scala.concurrent.stm.TMap
 import scala.xml.NodeSeq
 import support.JsonResponse
 
+@javax.inject.Singleton
 class ResponseController @Inject()(requesterSession: RequesterSession)(implicit materializer: Materializer) extends InjectedController with Soap11Controller {
   private val logger = Logger(classOf[ResponseController])
 
-  private val channels: TMap.View[String, BoundedSourceQueue[String]] = TMap().single
+  private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single
 
   private val CorrelationId = "urn:uuid:(.*)".r
 
@@ -54,7 +54,7 @@ class ResponseController @Inject()(requesterSession: RequesterSession)(implicit 
       }
 
       clients foreach { client =>
-        client.offer(stringify(JsonResponse.response(request.body, DateTime.now())))
+        client.offer(JsonResponse.response(request.body, DateTime.now()))
       }
     }
 
@@ -82,14 +82,11 @@ class ResponseController @Inject()(requesterSession: RequesterSession)(implicit 
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
     (xml \\ "providerNSA").headOption.map(_.text)
 
-  def comet(id: String) = Action {
-    val source = Source.queue[String](100)
-    val queue: BoundedSourceQueue[String] = source.toMat(Sink.ignore)(Keep.left).run()
+  def websocket(id: String) = WebSocket.accept[JsValue, JsValue] { _ =>
+    val source = Source.queue[JsValue](100).mapMaterializedValue { queue =>
+      channels += (id -> queue)
+    }
 
-    BroadcastHub
-    channels += (id -> queue)
-
-    Ok.chunked(source.via(Comet.string("parent.message")))
+    Flow.fromSinkAndSource(Sink.ignore, source)
   }
-
 }

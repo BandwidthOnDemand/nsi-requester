@@ -1,4 +1,5 @@
 $(function() {
+   let websocket;
 
    var initExtraFields = function() {
 
@@ -103,7 +104,15 @@ $(function() {
       }
 
       function hideQueryForm(correlationId) {
-         $('<iframe></iframe>').attr('src', 'comet/'+correlationId).insertAfter(responseS);
+         if (websocket) websocket.close();
+
+         websocket = new WebSocket(`/websocket/${correlationId}`)
+         websocket.addEventListener('message', (message) => {
+             let data = JSON.parse(message.data);
+             console.log(data);
+             addXmlBlock('Response', data.response.xml, data.response.time);
+         });
+
          queryS.css("display", "none");
          responseS.css("display", "block");
       }
