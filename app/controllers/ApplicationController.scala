@@ -40,6 +40,7 @@ import org.joda.time.DateTime
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
+@javax.inject.Singleton
 class ApplicationController @Inject()(val configuration: Configuration, val environment: Environment, requesterSession: RequesterSession, ws: WSClient)(implicit ec: ExecutionContext)
   extends InjectedController with Soap11Controller with ViewContextSupport
 {
