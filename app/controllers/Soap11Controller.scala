@@ -23,7 +23,7 @@
 package controllers
 
 import play.api.http.ContentTypeOf
-import play.api.http.ContentTypes._
+import play.api.http.ContentTypes.*
 import scala.xml.Node
 
 trait Soap11Controller {

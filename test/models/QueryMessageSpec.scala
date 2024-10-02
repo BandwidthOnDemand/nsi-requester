@@ -5,9 +5,9 @@ import org.junit.runner.RunWith
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
 
-  import QueryMessageMode._
+  import QueryMessageMode.*
 
-  val queryNotifiation = QueryMessage(
+  val queryNotifiation: QueryMessage = QueryMessage(
     NotificationAsync,
     "connectionId",
     Some(2),

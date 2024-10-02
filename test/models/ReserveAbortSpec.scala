@@ -17,7 +17,7 @@ class ReserveAbortSpec extends support.Specification {
   }
 
   object DefaultReserveAbort {
-    def apply() = ReserveAbort(
+    def apply(): ReserveAbort = ReserveAbort(
       "connectionId",
       "correlationId",
       Some(uri("http://localhost/reply")),

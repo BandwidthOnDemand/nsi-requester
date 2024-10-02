@@ -10,7 +10,7 @@
 
         <div class="content">
 
-            @form(action = routes.SettingsController.settings, 'class -> "form form-horizontal") {
+            @form(action = routes.SettingsController.settings, Symbol("class") -> "form form-horizontal") {
                 <div class="message">
                     <h3>Provider attributes</h3>
                 </div>
@@ -18,16 +18,16 @@
                 @select(
                    settingsF("provider.id"),
                    options = options(requesterSession.allProviders.map(_.nsaId).toList),
-                   '_label -> "Provider",
-                   '_showConstraints -> false,
-                   'class -> "input-xlarge",
+                   Symbol("_label") -> "Provider",
+                   Symbol("_showConstraints") -> false,
+                   Symbol("class") -> "input-xlarge",
                    Symbol("data-validate-url") -> routes.ApplicationController.validateProvider
                 )
 
                 <fieldset id="tokens" style="position: relative">
                   <a href="#" id="plus-token" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
                   @repeat(settingsF("accessTokens"), min = 1) { tokenField =>
-                    @inputText(tokenField, '_label -> "Access Token", 'class -> "input-xlarge")
+                    @inputText(tokenField, Symbol("_label") -> "Access Token", Symbol("class") -> "input-xlarge")
                   }
                 </fieldset>
 
@@ -48,7 +48,7 @@
             }
         </div>
         <div id="template-token" class="template">
-          @inputText(settingsF("accessTokens[x]"), '_label -> "Access Token", 'class -> "input-xlarge")
+          @inputText(settingsF("accessTokens[x]"), Symbol("_label") -> "Access Token", Symbol("class") -> "input-xlarge")
         </div>
     </section>
     <script>

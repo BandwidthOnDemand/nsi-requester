@@ -23,6 +23,7 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class Provision(
     connectionId: String,
@@ -34,7 +35,7 @@ case class Provision(
 
   override def soapActionSuffix = "provision"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:provision>
       <connectionId>{connectionId}</connectionId>
     </type:provision>

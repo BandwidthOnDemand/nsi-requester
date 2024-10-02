@@ -34,7 +34,7 @@ abstract class NsiRequest(
     protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion,
     addsTrace: Boolean = false
 ) {
-  import NsiRequest._
+  import NsiRequest.*
 
   def soapActionPrefix: String = NsiV2SoapActionPrefix
   def soapActionSuffix: String
@@ -59,30 +59,33 @@ abstract class NsiRequest(
       <providerNSA>{provider.nsaId}</providerNSA>
       {replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{replyTo}</replyTo>)}
       {
-      if (remoteUser.isDefined || !accessTokens.isEmpty) {
-        <sessionSecurityAttr>
+        if remoteUser.isEmpty && accessTokens.isEmpty then NodeSeq.Empty
+        else {
+          <sessionSecurityAttr>
             {
-          if (remoteUser.isDefined)
-            <saml:Attribute Name="user">
-                  <saml:AttributeValue xsi:type="xs:string">{remoteUser.get}</saml:AttributeValue>
+              remoteUser.fold(NodeSeq.Empty) { user =>
+                <saml:Attribute Name="user">
+                  <saml:AttributeValue xsi:type="xs:string">{user}</saml:AttributeValue>
                 </saml:Attribute>
-        }
+              }
+            }
             {
-          accessTokens.map { token =>
-            <saml:Attribute Name="token">
+              accessTokens.map { token =>
+                <saml:Attribute Name="token">
                   <saml:AttributeValue xsi:type="xs:string">{token}</saml:AttributeValue>
                 </saml:Attribute>
-          }
-        }
+              }
+            }
           </sessionSecurityAttr>
+        }
       }
-    }
       {
-      if (addsTrace)
-        <gns:ConnectionTrace>
-            <Connection index="0">{requesterNsa + ":noId"}</Connection>
-          </gns:ConnectionTrace>
-    }
+        if addsTrace
+        then <gns:ConnectionTrace>
+               <Connection index="0">{requesterNsa + ":noId"}</Connection>
+             </gns:ConnectionTrace>
+        else NodeSeq.Empty
+      }
     </head:nsiHeader>
 
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
@@ -109,9 +112,9 @@ object NsiRequest {
   val NsiV2RequesterProtocolVersion = "application/vnd.ogf.nsi.cs.v2.requester+soap"
 
   val NsiV2NamespacePrefix = "http://schemas.ogf.org/nsi/2013/12"
-  val NsiV2ProviderNamespace = s"$NsiV2NamespacePrefix/connection/provider"
-  val NsiV2ConnectionTypesNamespace = s"$NsiV2NamespacePrefix/connection/types"
-  val NsiV2FrameworkHeadersNamespace = s"$NsiV2NamespacePrefix/framework/headers"
-  val NsiV2Point2PointNamespace = s"$NsiV2NamespacePrefix/services/point2point"
-  val NsiV2SoapActionPrefix = s"$NsiV2NamespacePrefix/connection/service"
+  val NsiV2ProviderNamespace: String = s"$NsiV2NamespacePrefix/connection/provider"
+  val NsiV2ConnectionTypesNamespace: String = s"$NsiV2NamespacePrefix/connection/types"
+  val NsiV2FrameworkHeadersNamespace: String = s"$NsiV2NamespacePrefix/framework/headers"
+  val NsiV2Point2PointNamespace: String = s"$NsiV2NamespacePrefix/services/point2point"
+  val NsiV2SoapActionPrefix: String = s"$NsiV2NamespacePrefix/connection/service"
 }

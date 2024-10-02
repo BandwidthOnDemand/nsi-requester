@@ -27,9 +27,10 @@ import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
+import scala.xml.Elem
 
 object Reserve {
-  val PathComputationAlgorithms = Seq("Chain", "Sequential", "Tree")
+  val PathComputationAlgorithms: Seq[String] = Seq("Chain", "Sequential", "Tree")
 }
 case class Reserve(
     description: Option[String],
@@ -50,11 +51,11 @@ case class Reserve(
     pathComputationAlgorithm: Option[String] = None
 ) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
 
-  import NsiRequest._
+  import NsiRequest.*
 
   override def soapActionSuffix = "reserve"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserve>
       {globalReservationIdField}
       {descriptionField}
@@ -97,26 +98,25 @@ case class Reserve(
       <sourceSTP>{source.stpId}</sourceSTP>
       <destSTP>{destination.stpId}</destSTP>
       {
-      if (eroPresent)
-        <ero>
-        {
-          var order = -1;
-          for (member <- ero; if member.nonEmpty) yield <orderedSTP order={
-            order += 1; order.toString
-          }><stp>{member}</stp></orderedSTP>
-        }
-      </ero>
-    }
+        if eroPresent
+        then
+          <ero>{
+            for {
+              (member, order) <- ero.filter(_.nonEmpty).zipWithIndex
+              if member.nonEmpty
+            } yield <orderedSTP order={order.toString}><stp>{member}</stp></orderedSTP>
+          }</ero>
+        else Empty
+      }
       {
-      if (unprotected)
-        <parameter type="protection">UNPROTECTED</parameter>
-      else
-        <parameter type="protection">PROTECTED</parameter>
-    }
+        <parameter type="protection">{
+          if unprotected then "UNPROTECTED" else "PROTECTED"
+        }</parameter>
+      }
       {
-      pathComputationAlgorithm
-        .map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>)
-        .orNull
-    }
+        pathComputationAlgorithm
+          .map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>)
+          .getOrElse(Empty)
+      }
     </p2p:p2ps>
 }

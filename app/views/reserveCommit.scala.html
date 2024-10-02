@@ -9,10 +9,10 @@
     <section id="formS">
         <h1>Make a NSI ReserveCommit Request</h1>
         <div class="content">
-             @form(action = routes.ApplicationController.reserveCommit, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.reserveCommit, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>ReserveCommit attributes</h3></div>
-                @inputText(reserveCommitForm("reserveCommit.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(reserveCommitForm("reserveCommit.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => reserveCommitForm("reserveCommit." + name))
 

@@ -22,8 +22,8 @@
  */
 package support
 
-import javax.net.ssl._
-import play.server.api._
+import javax.net.ssl.*
+import play.server.api.*
 
 /*
  * This custom SSL engine creates an instance of the default SSL Engine and

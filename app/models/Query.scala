@@ -27,15 +27,16 @@ import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
+import scala.xml.Node
 
 object QueryOperation extends Enumeration {
   type QueryOperation = Value
   val Summary, SummarySync, Recursive = Value
 
-  def operationsV2 = List(Summary, SummarySync, Recursive)
+  def operationsV2: List[Value] = List(Summary, SummarySync, Recursive)
 }
 
-import QueryOperation._
+import QueryOperation.*
 
 case class Query(
     operation: QueryOperation = Summary,
@@ -48,13 +49,13 @@ case class Query(
     provider: Provider
 ) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
-  override def soapActionSuffix = operation match {
+  override def soapActionSuffix: String = operation match {
     case Summary     => "querySummary"
     case SummarySync => "querySummarySync"
     case Recursive   => "queryRecursive"
   }
 
-  override def nsiV2Body = operation match {
+  override def nsiV2Body: Node = operation match {
     case Summary =>
       <type:querySummary>
         {connectionIdTags}

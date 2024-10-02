@@ -36,7 +36,7 @@ object PrettyXml {
       case x: Node => pp.format(x);
       case x: NodeSeq =>
         x.foldLeft("") { (str, node) =>
-          val sep = if (str.isEmpty) "" else "\n"
+          val sep = if str.isEmpty then "" else "\n"
           str + sep + node.prettify
         }
     }

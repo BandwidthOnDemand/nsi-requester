@@ -23,6 +23,7 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class Terminate(
     connectionId: String,
@@ -34,7 +35,7 @@ case class Terminate(
 
   override def soapActionSuffix = "terminate"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:terminate>
       <connectionId>{connectionId}</connectionId>
     </type:terminate>

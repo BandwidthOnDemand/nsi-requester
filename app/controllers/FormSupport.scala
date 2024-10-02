@@ -25,7 +25,7 @@ package controllers
 import java.net.URI
 import models.QueryMessageMode.QueryMessageMode
 import models.QueryOperation.QueryOperation
-import models._
+import models.*
 import org.joda.time.Period
 import org.joda.time.format.PeriodFormatterBuilder
 import play.api.data.FormError

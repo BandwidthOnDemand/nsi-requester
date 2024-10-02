@@ -1,6 +1,6 @@
 package models
 
-import QueryOperation._
+import QueryOperation.*
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatchers {
@@ -47,7 +47,7 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
         connectionIds: List[String] = Nil,
         globalReservationIds: List[String] = Nil,
         operation: QueryOperation = Summary
-    ) =
+    ): Query =
       Query(
         operation = operation,
         connectionIds = connectionIds,

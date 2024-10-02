@@ -4,15 +4,13 @@ version := "2.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.13.14"
+scalaVersion := "3.3.4"
 
 scalacOptions ++= Seq(
   "-deprecation",
   "-feature",
   "-unchecked",
-  "-Xlint",
-  "-Ywarn-unused",
-  "-Ywarn-value-discard",
+  "-Wunused:imports,privates,locals,params",
   "-release:21"
 )
 
@@ -31,7 +29,7 @@ libraryDependencies ++= Seq(
   guice,
   ws,
   "com.typesafe.akka" %% "akka-stream" % akkaVersion,
-  "org.scala-stm" %% "scala-stm" % "0.11.0",
+  "org.scala-stm" %% "scala-stm" % "0.11.1",
   "joda-time" % "joda-time" % "2.12.0",
   specs2 % "test",
   "org.specs2" %% "specs2-matcher-extra" % "4.20.7" % "test"

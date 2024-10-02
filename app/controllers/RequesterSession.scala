@@ -24,11 +24,11 @@ package controllers
 
 import com.typesafe.config.{ConfigList, ConfigObject, ConfigValue}
 import java.net.URI
-import models._
+import models.*
 import play.api.Configuration
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object RequesterSession {
   val ProviderNsaSessionField = "nsaId"
@@ -37,9 +37,9 @@ object RequesterSession {
 }
 @javax.inject.Singleton
 class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
-  import RequesterSession._
+  import RequesterSession.*
 
-  val RequesterNsa = configuration
+  val RequesterNsa: String = configuration
     .getOptional[String]("requester.nsi.requesterNsa")
     .getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
@@ -55,7 +55,7 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
     }
   }
 
-  def ReplyToUrl(implicit request: Request[AnyContent]) =
+  def ReplyToUrl(implicit request: Request[AnyContent]): URI =
     URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 
   private def isUsingSsl(implicit request: Request[AnyContent]) = (
@@ -82,5 +82,5 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
       .getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
   }
 
-  def findProvider(nsaId: String) = allProviders.find(_.nsaId == nsaId)
+  def findProvider(nsaId: String): Option[Provider] = allProviders.find(_.nsaId == nsaId)
 }

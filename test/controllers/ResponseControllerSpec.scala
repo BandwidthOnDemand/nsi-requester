@@ -2,19 +2,19 @@ package controllers
 
 import org.specs2.mutable.Specification
 import org.junit.runner.RunWith
-import play.api.test._
-import play.api.test.Helpers._
+import play.api.test.*
+import play.api.test.Helpers.*
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class ResponseControllerSpec extends Specification {
 
-  "The response controllers" should new WithApplication with Injecting {
+  "The response controllers" should {
 
-    val subject = inject[ResponseController]
-
-    "respond with an NSI Ok" in new WithApplication() {
-      val body =
-        <Envelope>
+    "respond with an NSI Ok" in new WithApplication with Injecting {
+      override def running() = {
+        val subject = inject[ResponseController]
+        val body =
+          <Envelope>
           <header>
             <correlationId>urn:uuid:1234</correlationId>
             <providerNSA>urn:ogf:network:surfnet.nl:1990:nsa:bod-dev</providerNSA>
@@ -24,47 +24,60 @@ class ResponseControllerSpec extends Specification {
           </Body>
         </Envelope>
 
-      val result = subject.reply()(FakeXmlRequest(body))
+        val result = subject.reply()(FakeXmlRequest(body))
 
-      contentAsString(result) must contain("http://schemas.ogf.org/nsi/2013/12")
-      contentAsString(result) must contain(
-        "<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>"
-      )
-      status(result) must equalTo(200)
+        contentAsString(result) must contain("http://schemas.ogf.org/nsi/2013/12")
+        contentAsString(result) must contain(
+          "<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>"
+        )
+        status(result) must equalTo(200)
+      }
     }
 
-    "respond with a BadRequest when the provider NSA is unknown" in {
-      val body =
-        <header>
+    "respond with a BadRequest when the provider NSA is unknown" in new WithApplication
+      with Injecting {
+      override def running() = {
+        val subject = inject[ResponseController]
+        val body =
+          <header>
           <correlationId>urn:uuid:1234</correlationId>
           <providerNSA>urn:ogf:network:surfnet.nl:1990:nsa:unknown</providerNSA>
         </header>
 
-      val result = subject.reply()(FakeXmlRequest(body))
+        val result = subject.reply()(FakeXmlRequest(body))
 
-      status(result) must equalTo(400)
+        status(result) must equalTo(400)
+      }
     }
 
-    "respond with a BadRequest when the correlationId is missing" in {
-      val body =
-        <header>
+    "respond with a BadRequest when the correlationId is missing" in new WithApplication
+      with Injecting {
+      override def running() = {
+        val subject = inject[ResponseController]
+        val body =
+          <header>
           <noCorrelationId/>
         </header>
 
-      val result = subject.reply()(FakeXmlRequest(body))
+        val result = subject.reply()(FakeXmlRequest(body))
 
-      status(result) must equalTo(400)
+        status(result) must equalTo(400)
+      }
     }
 
-    "respond with a BadRequest when correlationId has not the correct form" in {
-      val body =
-        <header>
+    "respond with a BadRequest when correlationId has not the correct form" in new WithApplication
+      with Injecting {
+      override def running() = {
+        val subject = inject[ResponseController]
+        val body =
+          <header>
           <correlationId>{"123-abc"}</correlationId>
         </header>
 
-      val result = subject.reply()(FakeXmlRequest(body))
+        val result = subject.reply()(FakeXmlRequest(body))
 
-      status(result) must equalTo(400)
+        status(result) must equalTo(400)
+      }
     }
   }
 

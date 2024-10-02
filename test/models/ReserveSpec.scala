@@ -50,6 +50,15 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
         ("sessionSecurityAttr") \\ ("AttributeValue") \> user
     }
 
+    "include ero" in {
+      val res = DefaultReservation(ero = List("ero-1", "", "ero-2"))
+      res.toNsiEnvelope() \\ ("ero") must beEqualToIgnoringSpace(
+        <ero xmlns:p2p="http://schemas.ogf.org/nsi/2013/12/services/point2point">
+          <orderedSTP order="0"><stp>ero-1</stp></orderedSTP>
+          <orderedSTP order="1"><stp>ero-2</stp></orderedSTP>
+        </ero>
+      )
+    }
   }
 
   object DefaultReservation {
@@ -57,8 +66,9 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
         description: Option[String] = None,
         start: Option[Date] = Some(new Date()),
         end: Date = new Date(),
-        globalReservationId: Option[String] = Some("urn:surfnet:123456")
-    ) = {
+        globalReservationId: Option[String] = Some("urn:surfnet:123456"),
+        ero: List[String] = Nil
+    ): Reserve = {
       val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
       Reserve(
         description,
@@ -67,7 +77,7 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
         "connection",
         Port("source"),
         Port("dest"),
-        Nil,
+        ero,
         10,
         1,
         "FD5C4151-F980-410A-8565-5E8EDCE880F1",

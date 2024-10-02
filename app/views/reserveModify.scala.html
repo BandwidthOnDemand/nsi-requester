@@ -10,14 +10,14 @@
         <h1>Make a NSI Reserve Modify Request</h1>
 
         <div class="content">
-            @form(action = routes.ApplicationController.reserveModify, 'class -> "form form-horizontal") {
+            @form(action = routes.ApplicationController.reserveModify, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
 
-                @inputText(requestForm("reservation.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.version"), '_label -> "Version")
+                @inputText(requestForm("reservation.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
+                @inputText(requestForm("reservation.version"), Symbol("_label") -> "Version")
 
-                @helper.input(requestForm("reservation.startDate"), '_label -> "Start Date") { (id, name, value, args) =>
+                @helper.input(requestForm("reservation.startDate"), Symbol("_label") -> "Start Date") { (id, name, value, args) =>
                     <input type="text" name="@name" id="@id" @toHtmlArgs(args)>
                     <span style="margin-left: 10px;">
                         <label class="checkbox inline">
@@ -27,7 +27,7 @@
                     </span>
                 }
 
-                @helper.input(requestForm("reservation.endDate"), '_label -> "End Date") { (id, name, value, args) =>
+                @helper.input(requestForm("reservation.endDate"), Symbol("_label") -> "End Date") { (id, name, value, args) =>
                     <input type="text" name="@name" id="@id" @toHtmlArgs(args)>
                     <span style="margin-left: 10px;">
                         <label class="checkbox inline">
@@ -37,7 +37,7 @@
                     </span>
                 }
 
-                @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
+                @inputText(requestForm("reservation.bandwidth"), Symbol("_label") -> "Bandwidth")
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
 

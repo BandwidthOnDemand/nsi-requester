@@ -27,7 +27,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
-import support.PrettyXml._
+import support.PrettyXml.*
 import play.api.libs.json.JsObject
 
 object JsonResponse {

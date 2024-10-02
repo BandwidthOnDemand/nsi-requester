@@ -23,6 +23,7 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class ReserveAbort(
     connectionId: String,
@@ -34,7 +35,7 @@ case class ReserveAbort(
 
   override def soapActionSuffix = "reserveAbort"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserveAbort>
       <connectionId>{connectionId}</connectionId>
     </type:reserveAbort>

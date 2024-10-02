@@ -24,7 +24,7 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
   }
 
   object DefaultProvision {
-    def apply() = Provision(
+    def apply(): Provision = Provision(
       "123-abc",
       "asdf-098",
       Some(uri("http://localhost/reply")),

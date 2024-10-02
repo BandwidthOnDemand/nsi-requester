@@ -1,6 +1,6 @@
 package views
 
-import play.api._
+import play.api.*
 import play.api.mvc.Flash
 import play.api.i18n.Messages
 

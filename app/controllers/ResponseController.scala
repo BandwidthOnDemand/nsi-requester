@@ -22,21 +22,24 @@
  */
 package controllers
 
-import akka.stream._
-import akka.stream.scaladsl._
+import akka.stream.*
+import akka.stream.scaladsl.*
 import models.Ack
 import org.joda.time.DateTime
-import play.api._
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.*
+import play.api.libs.json.*
+import play.api.mvc.*
 import scala.concurrent.stm.TMap
 import scala.xml.NodeSeq
 import support.JsonResponse
 
 @javax.inject.Singleton
-class ResponseController @javax.inject.Inject() (requesterSession: RequesterSession)(implicit
+class ResponseController @javax.inject.Inject() (
+    val controllerComponents: ControllerComponents,
+    requesterSession: RequesterSession
+)(implicit
     mat: Materializer
-) extends InjectedController
+) extends BaseController
     with Soap11Controller {
   private val logger = Logger(classOf[ResponseController])
 
@@ -44,7 +47,7 @@ class ResponseController @javax.inject.Inject() (requesterSession: RequesterSess
 
   private val CorrelationId = "urn:uuid:(.*)".r
 
-  def reply = Action(parse.xml) { request =>
+  def reply: Action[NodeSeq] = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
     val providerNsa = parseProviderNsa(request.body)
     val requesterNsa = parseRequesterNsa(request.body)
@@ -87,7 +90,7 @@ class ResponseController @javax.inject.Inject() (requesterSession: RequesterSess
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
     (xml \\ "providerNSA").headOption.map(_.text)
 
-  def websocket(id: String) = WebSocket.accept[JsValue, JsValue] { request =>
+  def websocket(id: String): WebSocket = WebSocket.accept[JsValue, JsValue] { request =>
     val (queue, source) = Source.queue[JsValue](100).preMaterialize()
     channels += (id -> queue)
     Flow.fromSinkAndSource(Sink.ignore, source)

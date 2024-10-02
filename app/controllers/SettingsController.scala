@@ -22,30 +22,31 @@
  */
 package controllers
 
-import models._
+import models.*
 import play.api.Configuration
 import play.api.Environment
 import play.api.data.Form
-import play.api.data.Forms._
-import play.api.mvc._
+import play.api.data.Forms.*
+import play.api.mvc.*
 import support.BuildInfo
 
 @javax.inject.Singleton
 class SettingsController @javax.inject.Inject() (
+    val controllerComponents: ControllerComponents,
     val configuration: Configuration,
     val environment: Environment
 )(implicit requesterSession: RequesterSession)
-    extends InjectedController
+    extends BaseController
     with ViewContextSupport {
-  import RequesterSession._, requesterSession._
+  import RequesterSession.*, requesterSession.*
 
-  def settingsForm = Action { implicit request =>
+  def settingsForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = settingsF.fill(currentEndPoint)
 
     Ok(views.html.settings(defaultForm, VersionString))
   }
 
-  def settings = Action { implicit request =>
+  def settings: Action[AnyContent] = Action { implicit request =>
     settingsF
       .bindFromRequest()
       .fold[Result](
@@ -71,6 +72,6 @@ class SettingsController @javax.inject.Inject() (
         Some(provider.nsaId)
       ),
       "accessTokens" -> list(text)
-    )(EndPoint.apply)(EndPoint.unapply)
+    )(EndPoint.apply)(ep => Some(Tuple.fromProductTyped(ep)))
   )
 }

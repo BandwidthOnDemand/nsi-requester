@@ -5,7 +5,7 @@ import org.junit.runner.RunWith
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class PrettyXmlSpec extends Specification {
 
-  import PrettyXml._
+  import PrettyXml.*
 
   "Pretty XML" should {
 

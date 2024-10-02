@@ -24,15 +24,16 @@ package controllers
 
 import java.util.UUID
 import play.api.data.{Form, FormError, Mapping}
-import play.api.data.Forms._
-import play.api.data.format.Formats._
+import play.api.data.Forms.*
+import play.api.data.format.Formats.*
 import play.api.libs.ws.{WSClient, WSRequest}
-import play.api.libs.json._
-import play.api._
-import play.api.mvc._
+import play.api.libs.ws.XMLBodyWritables.*
+import play.api.libs.json.*
+import play.api.*
+import play.api.mvc.*
 import support.JsonResponse
-import models._
-import FormSupport._
+import models.*
+import FormSupport.*
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future
@@ -42,29 +43,30 @@ import javax.inject.Inject
 
 @javax.inject.Singleton
 class ApplicationController @Inject() (
+    val controllerComponents: ControllerComponents,
     val configuration: Configuration,
     val environment: Environment,
     requesterSession: RequesterSession,
     ws: WSClient
 )(implicit ec: ExecutionContext)
-    extends InjectedController
+    extends BaseController
     with Soap11Controller
     with ViewContextSupport {
-  import requesterSession._
+  import requesterSession.*
 
   private val logger = Logger(classOf[Application])
 
   implicit object FormErrorWrites extends Writes[FormError] {
-    def writes(error: FormError) = Json.toJson(
+    def writes(error: FormError): JsValue = Json.toJson(
       Map("id" -> Json.toJson(error.key.replace('.', '_')), "message" -> Json.toJson(error.message))
     )
   }
 
-  def index = Action {
+  def index: Action[AnyContent] = Action {
     Redirect(routes.ApplicationController.reserveForm)
   }
 
-  def reserveForm = Action { implicit request =>
+  def reserveForm: Action[AnyContent] = Action { implicit request =>
     val startDate = DateTime.now.plusMinutes(5)
     val endDate = startDate.plusMinutes(15)
 
@@ -97,7 +99,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def reserveModifyForm = Action { implicit request =>
+  def reserveModifyForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.modifyF.fill(
       ReserveModify(
         connectionId = "",
@@ -125,7 +127,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def reserveCommitForm = Action { implicit request =>
+  def reserveCommitForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.reserveCommitF.fill(
       ReserveCommit(
         connectionId = "",
@@ -148,7 +150,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def reserveAbortForm = Action { implicit request =>
+  def reserveAbortForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.reserveAbortF.fill(
       ReserveAbort(
         connectionId = "",
@@ -171,7 +173,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def provisionForm = Action { implicit request =>
+  def provisionForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.provisionF.fill(
       Provision(
         connectionId = "",
@@ -194,7 +196,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def terminateForm = Action { implicit request =>
+  def terminateForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.terminateF.fill(
       Terminate(
         connectionId = "",
@@ -217,7 +219,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def releaseForm = Action { implicit request =>
+  def releaseForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.releaseF.fill(
       Release(
         connectionId = "",
@@ -240,7 +242,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def queryForm = Action { implicit request =>
+  def queryForm: Action[AnyContent] = Action { implicit request =>
     val defaultModifiedSince = DateTime.now.minusMonths(1).toDate
     val defaultForm = currentEndPoint.queryF.fill(
       Query(
@@ -267,7 +269,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def queryMessageForm = Action { implicit request =>
+  def queryMessageForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = currentEndPoint.queryMessageF.fill(
       QueryMessage(
         QueryMessageMode.ResultAsync,
@@ -284,7 +286,7 @@ class ApplicationController @Inject() (
     Ok(views.html.queryMessage(defaultForm))
   }
 
-  def queryMessage = Action.async { implicit request =>
+  def queryMessage: Action[AnyContent] = Action.async { implicit request =>
     currentEndPoint.queryMessageF
       .bindFromRequest()
       .fold(
@@ -293,7 +295,7 @@ class ApplicationController @Inject() (
       )
   }
 
-  def validateProvider = Action.async(parse.json) { implicit request =>
+  def validateProvider: Action[JsValue] = Action.async(parse.json) { implicit request =>
     val wsdlValid =
       for {
         nsaId <- (request.body \ "nsa-id").asOpt[String]
@@ -303,7 +305,7 @@ class ApplicationController @Inject() (
 
         wsdlRequest.get().map { wsdlResponse =>
           val response =
-            if (wsdlResponse.status == 200) Json.obj("valid" -> true)
+            if wsdlResponse.status == 200 then Json.obj("valid" -> true)
             else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
           Ok(response)
         }
@@ -332,7 +334,7 @@ class ApplicationController @Inject() (
           s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}"
         )
 
-        if (response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11)) {
+        if response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11) then {
           val jsonResponse =
             JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
           Ok(jsonResponse)
@@ -352,7 +354,8 @@ class ApplicationController @Inject() (
     request.addHttpHeaders("SOAPAction" -> s""""$action"""")
 
   private def addOauth2Header(tokens: List[String])(request: WSRequest): WSRequest =
-    if (tokens.isEmpty) request
+    if tokens.isEmpty
+    then request
     else request.addHttpHeaders("Authorization" -> s"bearer ${tokens.head}")
 
   private def generateCorrelationId = UUID.randomUUID.toString
@@ -473,35 +476,38 @@ class ApplicationController @Inject() (
     )
 
     def reserveAbortF: Form[ReserveAbort] = Form(
-      "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply)
+      "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(Tuple.fromProductTyped)
     )
 
     def reserveCommitF: Form[ReserveCommit] = Form(
-      "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply)
+      "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(Tuple.fromProductTyped)
     )
 
     def provisionF: Form[Provision] = Form(
-      "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply)
+      "provision" -> genericOperationMapping(Provision.apply)(Tuple.fromProductTyped)
     )
 
     def terminateF: Form[Terminate] = Form(
-      "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply)
+      "terminate" -> genericOperationMapping(Terminate.apply)(Tuple.fromProductTyped)
     )
 
     def releaseF: Form[Release] = Form(
-      "release" -> genericOperationMapping(Release.apply)(Release.unapply)
+      "release" -> genericOperationMapping(Release.apply)(Tuple.fromProductTyped)
     )
 
-    def portMapping = mapping("stpId" -> nonEmptyText)(Port.apply)(Port.unapply)
+    def portMapping: Mapping[Port] =
+      mapping("stpId" -> nonEmptyText)(Port.apply)(p => Some(p.stpId))
 
     private def genericOperationMapping[R](
         apply: (String, String, Option[URI], String, Provider) => R
-    )(unapply: R => Option[(String, String, Option[URI], String, Provider)]) =
-      mapping("connectionId" -> nonEmptyText, "correlationId" -> nonEmptyText)(
-        (connectionId, correlationId) =>
-          apply(connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)
+    )(unapply: R => (String, String, Option[URI], String, Provider)) =
+      mapping(
+        "connectionId" -> nonEmptyText,
+        "correlationId" -> nonEmptyText
+      )((connectionId, correlationId) =>
+        apply(connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)
       ) { go =>
-        val tuple = unapply(go).get
+        val tuple = unapply(go)
         Some((tuple._1, tuple._2))
       }
 

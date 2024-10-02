@@ -27,6 +27,7 @@ import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
+import scala.xml.Elem
 
 case class ReserveModify(
     connectionId: String,
@@ -42,11 +43,11 @@ case class ReserveModify(
     provider: Provider
 ) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
 
-  import NsiRequest._
+  import NsiRequest.*
 
   override def soapActionSuffix = "reserve"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserve>
       <connectionId>{connectionId}</connectionId>
       <criteria version={version.toString}>

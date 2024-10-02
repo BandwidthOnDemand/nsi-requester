@@ -36,7 +36,7 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
       end: Option[Date] = None,
       bandwidth: Option[Long] = None,
       version: Int = 1
-  ) = {
+  ): ReserveModify = {
     val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
     ReserveModify(
       connectionId = connectionId,

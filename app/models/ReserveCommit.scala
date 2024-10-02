@@ -23,6 +23,7 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class ReserveCommit(
     connectionId: String,
@@ -34,7 +35,7 @@ case class ReserveCommit(
 
   override def soapActionSuffix = "reserveCommit"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserveCommit>
       <connectionId>{connectionId}</connectionId>
     </type:reserveCommit>

@@ -23,6 +23,7 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class Release(
     connectionId: String,
@@ -34,7 +35,7 @@ case class Release(
 
   override def soapActionSuffix = "release"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:release>
       <connectionId>{connectionId}</connectionId>
     </type:release>

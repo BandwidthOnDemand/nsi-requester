@@ -24,13 +24,14 @@ package models
 
 import java.net.URI
 import scala.xml.NodeSeq.Empty
+import scala.xml.Node
 
 object QueryMessageMode extends Enumeration {
   type QueryMessageMode = Value
   val NotificationSync, NotificationAsync, ResultSync, ResultAsync = Value
 }
 
-import QueryMessageMode._
+import QueryMessageMode.*
 
 case class QueryMessage(
     operation: QueryMessageMode,
@@ -43,14 +44,14 @@ case class QueryMessage(
     provider: Provider
 ) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
-  override def soapActionSuffix = operation match {
+  override def soapActionSuffix: String = operation match {
     case NotificationSync  => "queryNotificationSync"
     case NotificationAsync => "queryNotification"
     case ResultSync        => "queryResultSync"
     case ResultAsync       => "queryResult"
   }
 
-  override def nsiV2Body =
+  override def nsiV2Body: Node =
     operation match {
       case NotificationAsync =>
         <type:queryNotification>
