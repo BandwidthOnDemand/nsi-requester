@@ -29,13 +29,14 @@ case class ReserveCommit(
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    provider: Provider
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
   override def soapActionSuffix = "reserveCommit"
 
   override def nsiV2Body =
     <type:reserveCommit>
-      <connectionId>{ connectionId }</connectionId>
+      <connectionId>{connectionId}</connectionId>
     </type:reserveCommit>
 
 }

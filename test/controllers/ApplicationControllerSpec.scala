@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.test._
-import play.api.libs.json.{ Json, JsObject }
+import play.api.libs.json.{Json, JsObject}
 import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])

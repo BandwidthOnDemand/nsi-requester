@@ -7,7 +7,16 @@ class QueryMessageSpec extends support.Specification with org.specs2.matcher.Xml
 
   import QueryMessageMode._
 
-  val queryNotifiation = QueryMessage(NotificationAsync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
+  val queryNotifiation = QueryMessage(
+    NotificationAsync,
+    "connectionId",
+    Some(2),
+    Some(10),
+    "correlationId",
+    None,
+    "nsaRequester",
+    Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
+  )
 
   "QueryNotifications" should {
 

@@ -9,11 +9,16 @@ import support.WithViewContext
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
 class RequesterSessionSpec extends support.Specification {
 
-  val someFakeProviders: Map[String, _] = ConfigFactory.parseString("""
+  val someFakeProviders: Map[String, _] = ConfigFactory
+    .parseString("""
     requester.nsi.providers = [
       { id = "testid", url = "http://localhost:9999", portPrefix = "urn:ogf:network:" },
       { id = "urn:ogf:network:nsa:some-network", url = "http://localhost:8888", portPrefix = "urn:ogf:network" }
-    ]""").root().unwrapped().asScala.toMap
+    ]""")
+    .root()
+    .unwrapped()
+    .asScala
+    .toMap
 
   "The configuration" should new WithViewContext(builder => builder.configure(someFakeProviders)) {
     val subject = inject[RequesterSession]
@@ -25,7 +30,9 @@ class RequesterSessionSpec extends support.Specification {
     }
 
     "have an endpoint for the session settings" in {
-      val endPoint = subject.currentEndPoint(FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network"))
+      val endPoint = subject.currentEndPoint(
+        FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network")
+      )
 
       endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")
       endPoint.provider.providerUrl must equalTo(uri("http://localhost:8888"))

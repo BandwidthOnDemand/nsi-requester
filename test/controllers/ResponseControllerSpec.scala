@@ -27,7 +27,9 @@ class ResponseControllerSpec extends Specification {
       val result = subject.reply()(FakeXmlRequest(body))
 
       contentAsString(result) must contain("http://schemas.ogf.org/nsi/2013/12")
-      contentAsString(result) must contain("<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>")
+      contentAsString(result) must contain(
+        "<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>"
+      )
       status(result) must equalTo(200)
     }
 
@@ -57,7 +59,7 @@ class ResponseControllerSpec extends Specification {
     "respond with a BadRequest when correlationId has not the correct form" in {
       val body =
         <header>
-          <correlationId>{ "123-abc" }</correlationId>
+          <correlationId>{"123-abc"}</correlationId>
         </header>
 
       val result = subject.reply()(FakeXmlRequest(body))

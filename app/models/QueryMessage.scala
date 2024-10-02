@@ -33,14 +33,15 @@ object QueryMessageMode extends Enumeration {
 import QueryMessageMode._
 
 case class QueryMessage(
-  operation: QueryMessageMode,
-  connectionId: String,
-  startId: Option[Long],
-  endId: Option[Long],
-  correlationId: String,
-  replyTo: Option[URI],
-  requesterNsa: String,
-  provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    operation: QueryMessageMode,
+    connectionId: String,
+    startId: Option[Long],
+    endId: Option[Long],
+    correlationId: String,
+    replyTo: Option[URI],
+    requesterNsa: String,
+    provider: Provider
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
   override def soapActionSuffix = operation match {
     case NotificationSync  => "queryNotificationSync"
@@ -53,36 +54,40 @@ case class QueryMessage(
     operation match {
       case NotificationAsync =>
         <type:queryNotification>
-           { queryBody }
+           {queryBody}
          </type:queryNotification>
       case NotificationSync =>
         <type:queryNotificationSync>
-           { queryBody }
+           {queryBody}
         </type:queryNotificationSync>
       case ResultAsync =>
         <type:queryResult>
-           { queryBody }
+           {queryBody}
         </type:queryResult>
       case ResultSync =>
         <type:queryResultSync>
-           { queryBody }
+           {queryBody}
         </type:queryResultSync>
-  }
+    }
 
   private def queryBody = List(
-    <connectionId>{ connectionId }</connectionId>,
+    <connectionId>{connectionId}</connectionId>,
     { startIdTag },
     { endIdTag }
   )
 
   private def startIdTag = operation match {
-    case NotificationSync | NotificationAsync => startId.map(id => <startNotificationId>{ id }</startNotificationId>).getOrElse(Empty)
-    case ResultSync | ResultAsync             => startId.map(id => <startResultId>{ id }</startResultId>).getOrElse(Empty)
+    case NotificationSync | NotificationAsync =>
+      startId.map(id => <startNotificationId>{id}</startNotificationId>).getOrElse(Empty)
+    case ResultSync | ResultAsync =>
+      startId.map(id => <startResultId>{id}</startResultId>).getOrElse(Empty)
   }
 
   private def endIdTag = operation match {
-    case NotificationSync | NotificationAsync => endId.map(id => <endNotificationId>{ id }</endNotificationId>).getOrElse(Empty)
-    case ResultSync | ResultAsync             => endId.map(id => <endResultId>{ id }</endResultId>).getOrElse(Empty)
+    case NotificationSync | NotificationAsync =>
+      endId.map(id => <endNotificationId>{id}</endNotificationId>).getOrElse(Empty)
+    case ResultSync | ResultAsync =>
+      endId.map(id => <endResultId>{id}</endResultId>).getOrElse(Empty)
   }
 
 }

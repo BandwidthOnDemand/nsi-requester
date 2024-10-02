@@ -45,7 +45,8 @@ case class Query(
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    provider: Provider
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
 
   override def soapActionSuffix = operation match {
     case Summary     => "querySummary"
@@ -56,32 +57,33 @@ case class Query(
   override def nsiV2Body = operation match {
     case Summary =>
       <type:querySummary>
-        { connectionIdTags }
-        { globalReservationIdTags }
-        { ifModifiedSinceTag }
+        {connectionIdTags}
+        {globalReservationIdTags}
+        {ifModifiedSinceTag}
       </type:querySummary>
     case SummarySync =>
       <type:querySummarySync>
-        { connectionIdTags }
-        { globalReservationIdTags }
+        {connectionIdTags}
+        {globalReservationIdTags}
       </type:querySummarySync>
     case Recursive =>
       <type:queryRecursive>
-        { connectionIdTags }
-        { globalReservationIdTags }
+        {connectionIdTags}
+        {globalReservationIdTags}
       </type:queryRecursive>
     case _ =>
       sys.error(s"Unsupported NSI v2 query type '$operation'")
   }
 
   private def connectionIdTags =
-    connectionIds.map(id => <connectionId>{ id }</connectionId>)
+    connectionIds.map(id => <connectionId>{id}</connectionId>)
 
   private def globalReservationIdTags =
-    globalReservationIds.map(id => <globalReservationId>{ id }</globalReservationId>)
+    globalReservationIds.map(id => <globalReservationId>{id}</globalReservationId>)
 
   private def ifModifiedSinceTag = ifModifiedSince match {
-    case Some(date) => <ifModifiedSince>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</ifModifiedSince>
+    case Some(date) =>
+      <ifModifiedSince>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</ifModifiedSince>
     case None => Empty
   }
 

@@ -11,15 +11,16 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
       val res = DefaultModify().copy(correlationId = "FD5C4151-F980-410A-8565-5E8EDCE880F1")
 
       val envelope = res.toNsiEnvelope()
-      envelope must \("Header") \("nsiHeader") \("correlationId") \> "urn:uuid:FD5C4151-F980-410A-8565-5E8EDCE880F1"
-      envelope must \("Header") \("nsiHeader") \("ConnectionTrace") \("Connection")
+      envelope must \("Header") \ ("nsiHeader") \ ("correlationId") \>
+        "urn:uuid:FD5C4151-F980-410A-8565-5E8EDCE880F1"
+      envelope must \("Header") \ ("nsiHeader") \ ("ConnectionTrace") \ ("Connection")
     }
 
     "not have a source and destination STP id" in {
       val res = DefaultModify()
 
-      res.toNsiEnvelope() must not \\("sourceSTP")
-      res.toNsiEnvelope() must not \\("destSTP")
+      res.toNsiEnvelope() must not \\ ("sourceSTP")
+      res.toNsiEnvelope() must not \\ ("destSTP")
     }
 
     "have a soap action" in {
@@ -29,7 +30,13 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
     }
   }
 
-  def DefaultModify(connectionId: String = "1234", start: Option[Date] = None, end: Option[Date] = None, bandwidth: Option[Long] = None, version: Int = 1) = {
+  def DefaultModify(
+      connectionId: String = "1234",
+      start: Option[Date] = None,
+      end: Option[Date] = None,
+      bandwidth: Option[Long] = None,
+      version: Int = 1
+  ) = {
     val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
     ReserveModify(
       connectionId = connectionId,
@@ -42,7 +49,8 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
       correlationId = "FD5C4151-F980-410A-8565-5E8EDCE880F1",
       replyTo = Some(uri("http://localhost")),
       requesterNsa = "requesterNsa",
-      provider = provider)
+      provider = provider
+    )
   }
 
 }

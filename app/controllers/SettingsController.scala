@@ -31,9 +31,12 @@ import play.api.mvc._
 import support.BuildInfo
 
 @javax.inject.Singleton
-class SettingsController @javax.inject.Inject()(val configuration: Configuration, val environment: Environment)(implicit requesterSession: RequesterSession)
-  extends InjectedController with ViewContextSupport
-{
+class SettingsController @javax.inject.Inject() (
+    val configuration: Configuration,
+    val environment: Environment
+)(implicit requesterSession: RequesterSession)
+    extends InjectedController
+    with ViewContextSupport {
   import RequesterSession._, requesterSession._
 
   def settingsForm = Action { implicit request =>
@@ -43,24 +46,30 @@ class SettingsController @javax.inject.Inject()(val configuration: Configuration
   }
 
   def settings = Action { implicit request =>
-    settingsF.bindFromRequest().fold[Result](
-      formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
-      {
-        case endPoint =>{
-          Redirect(routes.ApplicationController.reserveForm)
-            .flashing("success" -> "Settings changed for this session")
-            .withSession(
-              AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
-              ProviderNsaSessionField -> endPoint.provider.nsaId)
+    settingsF
+      .bindFromRequest()
+      .fold[Result](
+        formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
+        {
+          case endPoint => {
+            Redirect(routes.ApplicationController.reserveForm)
+              .flashing("success" -> "Settings changed for this session")
+              .withSession(
+                AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
+                ProviderNsaSessionField -> endPoint.provider.nsaId
+              )
+          }
         }
-      })
+      )
   }
 
   private lazy val VersionString = s"${BuildInfo.version} (${BuildInfo.gitHeadCommitSha})"
 
   private[controllers] val settingsF: Form[EndPoint] = Form(
     mapping(
-      "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider => Some(provider.nsaId)),
+      "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider =>
+        Some(provider.nsaId)
+      ),
       "accessTokens" -> list(text)
     )(EndPoint.apply)(EndPoint.unapply)
   )

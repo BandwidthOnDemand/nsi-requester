@@ -10,11 +10,19 @@ class ReserveAbortSpec extends support.Specification {
     "have a SOAP action" in {
       val res = DefaultReserveAbort()
 
-      res.soapAction must equalTo("http://schemas.ogf.org/nsi/2013/12/connection/service/reserveAbort")
+      res.soapAction must equalTo(
+        "http://schemas.ogf.org/nsi/2013/12/connection/service/reserveAbort"
+      )
     }
   }
 
   object DefaultReserveAbort {
-    def apply() = ReserveAbort("connectionId", "correlationId", Some(uri("http://localhost/reply")), "requesterNsa", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
+    def apply() = ReserveAbort(
+      "connectionId",
+      "correlationId",
+      Some(uri("http://localhost/reply")),
+      "requesterNsa",
+      Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
+    )
   }
 }

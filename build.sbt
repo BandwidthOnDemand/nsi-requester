@@ -6,7 +6,15 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.13.14"
 
-scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-Xlint", "-Ywarn-unused", "-Ywarn-value-discard", "-release:21")
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked",
+  "-Xlint",
+  "-Ywarn-unused",
+  "-Ywarn-value-discard",
+  "-release:21"
+)
 
 val gitHeadCommitSha = settingKey[String]("git HEAD SHA")
 gitHeadCommitSha := scala.sys.process.Process("git rev-parse --short HEAD").lineStream.head

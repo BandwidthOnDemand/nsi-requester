@@ -21,7 +21,9 @@ class SettingsControllerSpec extends support.Specification {
 
       status(result) must equalTo(303)
 
-      session(result).get(RequesterSession.ProviderNsaSessionField) must beSome("urn:ogf:network:surfnet.nl:1990:nsa:bod-dev")
+      session(result).get(RequesterSession.ProviderNsaSessionField) must beSome(
+        "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
+      )
       flash(result).get("success") must beSome
     }
 
@@ -42,7 +44,10 @@ class SettingsControllerSpec extends support.Specification {
     val subject = inject[SettingsController]
 
     "contain the stored tokens that were previously set in session" in {
-      val endpoint = EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"), List("token1"))
+      val endpoint = EndPoint(
+        Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"),
+        List("token1")
+      )
       val settingsForm = subject.settingsF.fill(endpoint)
 
       val result = views.html.settings(settingsForm, "version")

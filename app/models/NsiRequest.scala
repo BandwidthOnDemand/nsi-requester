@@ -26,7 +26,14 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import java.net.URI
 
-abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requesterNsa: String, provider: Provider, protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion, addsTrace: Boolean = false) {
+abstract class NsiRequest(
+    correlationId: String,
+    replyTo: Option[URI],
+    requesterNsa: String,
+    provider: Provider,
+    protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion,
+    addsTrace: Boolean = false
+) {
   import NsiRequest._
 
   def soapActionPrefix: String = NsiV2SoapActionPrefix
@@ -39,56 +46,59 @@ abstract class NsiRequest(correlationId: String, replyTo: Option[URI], requester
   def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node =
     wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)
 
-
   private[models] def nsas = {
-    <requesterNSA>{ requesterNsa }</requesterNSA>
-    <providerNSA>{ provider.nsaId }</providerNSA>
+    <requesterNSA>{requesterNsa}</requesterNSA>
+    <providerNSA>{provider.nsaId}</providerNSA>
   }
 
   private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String]) =
     <head:nsiHeader>
-      <protocolVersion>{ protocolVersion }</protocolVersion>
-      <correlationId>{ "urn:uuid:" + correlationId }</correlationId>
-      <requesterNSA>{ requesterNsa }</requesterNSA>
-      <providerNSA>{ provider.nsaId }</providerNSA>
-      { replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{ replyTo }</replyTo>) }
-      { if (remoteUser.isDefined || !accessTokens.isEmpty) {
-          <sessionSecurityAttr>
-            { if (remoteUser.isDefined)
-                <saml:Attribute Name="user">
-                  <saml:AttributeValue xsi:type="xs:string">{ remoteUser.get }</saml:AttributeValue>
+      <protocolVersion>{protocolVersion}</protocolVersion>
+      <correlationId>{"urn:uuid:" + correlationId}</correlationId>
+      <requesterNSA>{requesterNsa}</requesterNSA>
+      <providerNSA>{provider.nsaId}</providerNSA>
+      {replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{replyTo}</replyTo>)}
+      {
+      if (remoteUser.isDefined || !accessTokens.isEmpty) {
+        <sessionSecurityAttr>
+            {
+          if (remoteUser.isDefined)
+            <saml:Attribute Name="user">
+                  <saml:AttributeValue xsi:type="xs:string">{remoteUser.get}</saml:AttributeValue>
                 </saml:Attribute>
-            }
-            { accessTokens.map { token =>
-                <saml:Attribute Name="token">
-                  <saml:AttributeValue xsi:type="xs:string">{ token }</saml:AttributeValue>
-                </saml:Attribute>
-              }
-            }
-          </sessionSecurityAttr>
         }
+            {
+          accessTokens.map { token =>
+            <saml:Attribute Name="token">
+                  <saml:AttributeValue xsi:type="xs:string">{token}</saml:AttributeValue>
+                </saml:Attribute>
+          }
+        }
+          </sessionSecurityAttr>
       }
-      { if (addsTrace)
-          <gns:ConnectionTrace>
+    }
+      {
+      if (addsTrace)
+        <gns:ConnectionTrace>
             <Connection index="0">{requesterNsa + ":noId"}</Connection>
           </gns:ConnectionTrace>
-      }
+    }
     </head:nsiHeader>
 
   private def wrapNsiV2Envelope(header: Node, body: Node) = {
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-      xmlns:head={ NsiV2FrameworkHeadersNamespace }
-      xmlns:type={ NsiV2ConnectionTypesNamespace }
+      xmlns:head={NsiV2FrameworkHeadersNamespace}
+      xmlns:type={NsiV2ConnectionTypesNamespace}
       xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
       xmlns:gns="http://nordu.net/namespaces/2013/12/gnsbod"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <soapenv:Header>
-        { header }
+        {header}
       </soapenv:Header>
       <soapenv:Body>
-        { body }
+        {body}
       </soapenv:Body>
     </soapenv:Envelope>
   }

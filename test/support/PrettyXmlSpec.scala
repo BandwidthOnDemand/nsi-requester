@@ -12,8 +12,7 @@ class PrettyXmlSpec extends Specification {
     "pretty print xml" in {
       val xml = <test><pretty><print/></pretty></test>
 
-      xml.prettify must equalTo(
-          """<test>
+      xml.prettify must equalTo("""<test>
             |    <pretty>
             |        <print/>
             |    </pretty>
@@ -23,8 +22,7 @@ class PrettyXmlSpec extends Specification {
     "pretty print xml node seq" in {
       val xml = <test><pretty><print1/></pretty><pretty><print2/></pretty></test> \\ "pretty"
 
-      xml.prettify must equalTo(
-          """<pretty>
+      xml.prettify must equalTo("""<pretty>
             |    <print1/>
             |</pretty>
             |<pretty>

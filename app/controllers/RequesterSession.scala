@@ -22,7 +22,7 @@
  */
 package controllers
 
-import com.typesafe.config.{ ConfigList, ConfigObject, ConfigValue }
+import com.typesafe.config.{ConfigList, ConfigObject, ConfigValue}
 import java.net.URI
 import models._
 import play.api.Configuration
@@ -36,10 +36,12 @@ object RequesterSession {
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
 }
 @javax.inject.Singleton
-class RequesterSession @javax.inject.Inject()(configuration: Configuration) {
+class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
   import RequesterSession._
 
-  val RequesterNsa = configuration.getOptional[String]("requester.nsi.requesterNsa").getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
+  val RequesterNsa = configuration
+    .getOptional[String]("requester.nsi.requesterNsa")
+    .getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
   def currentPortPrefix(implicit request: Request[AnyContent]): String = currentProvider.portPrefix
 
@@ -48,14 +50,18 @@ class RequesterSession @javax.inject.Inject()(configuration: Configuration) {
 
   def currentEndPoint(implicit request: Request[AnyContent]): EndPoint = {
     request.session.get("accessTokens") match {
-      case None => EndPoint(currentProvider, List())
+      case None                 => EndPoint(currentProvider, List())
       case Some(commaSeparated) => EndPoint(currentProvider, commaSeparated.split(",").toList)
     }
   }
 
-  def ReplyToUrl(implicit request: Request[AnyContent]) = URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
+  def ReplyToUrl(implicit request: Request[AnyContent]) =
+    URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 
-  private def isUsingSsl(implicit request: Request[AnyContent]) = request.headers.get("X-Forwarded-Proto") == Some("https") || configuration.getOptional[Boolean]("requester.ssl") == Some(true)
+  private def isUsingSsl(implicit request: Request[AnyContent]) = (
+    request.headers.get("X-Forwarded-Proto") == Some("https")
+      || configuration.getOptional[Boolean]("requester.ssl") == Some(true)
+  )
 
   // is not a lazy val, because some tests will break (object will only be initialized once during tests
   def allProviders: Seq[Provider] = {
@@ -64,13 +70,16 @@ class RequesterSession @javax.inject.Inject()(configuration: Configuration) {
         Provider(
           providerObject.get("id").unwrapped().asInstanceOf[String],
           URI.create(providerObject.get("url").unwrapped().asInstanceOf[String]),
-          providerObject.get("portPrefix").unwrapped().asInstanceOf[String],
+          providerObject.get("portPrefix").unwrapped().asInstanceOf[String]
         )
       case _ =>
         sys.error(s"bad provider configuration $value")
     }
 
-    configuration.getOptional[ConfigList]("requester.nsi.providers").map(x => x.iterator.asScala.map(toProvider).toSeq).getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
+    configuration
+      .getOptional[ConfigList]("requester.nsi.providers")
+      .map(x => x.iterator.asScala.map(toProvider).toSeq)
+      .getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
   }
 
   def findProvider(nsaId: String) = allProviders.find(_.nsaId == nsaId)

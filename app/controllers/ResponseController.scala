@@ -34,7 +34,10 @@ import scala.xml.NodeSeq
 import support.JsonResponse
 
 @javax.inject.Singleton
-class ResponseController @javax.inject.Inject()(requesterSession: RequesterSession)(implicit mat: Materializer) extends InjectedController with Soap11Controller {
+class ResponseController @javax.inject.Inject() (requesterSession: RequesterSession)(implicit
+    mat: Materializer
+) extends InjectedController
+    with Soap11Controller {
   private val logger = Logger(classOf[ResponseController])
 
   private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single
@@ -57,21 +60,24 @@ class ResponseController @javax.inject.Inject()(requesterSession: RequesterSessi
       }
     }
 
-    providerNsa.flatMap(requesterSession.findProvider).fold(badRequest("Could not find provider nsa")) { provider =>
-      correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
-        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope()).as(ContentTypeSoap11)
+    providerNsa
+      .flatMap(requesterSession.findProvider)
+      .fold(badRequest("Could not find provider nsa")) { provider =>
+        correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
+          Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope())
+            .as(ContentTypeSoap11)
+        }
       }
-    }
   }
 
   private def badRequest(message: String) =
-    BadRequest((<badRequest>{ message }</badRequest>).asInstanceOf[NodeSeq])
+    BadRequest((<badRequest>{message}</badRequest>).asInstanceOf[NodeSeq])
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>
       correlationId.text match {
         case CorrelationId(id) => Some(id)
-        case _ => None
+        case _                 => None
       }
     }
 

@@ -23,10 +23,10 @@
 package controllers
 
 import java.util.UUID
-import play.api.data.{ Form, FormError, Mapping }
+import play.api.data.{Form, FormError, Mapping}
 import play.api.data.Forms._
 import play.api.data.format.Formats._
-import play.api.libs.ws.{ WSClient, WSRequest }
+import play.api.libs.ws.{WSClient, WSRequest}
 import play.api.libs.json._
 import play.api._
 import play.api.mvc._
@@ -41,18 +41,23 @@ import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
 @javax.inject.Singleton
-class ApplicationController @Inject()(val configuration: Configuration, val environment: Environment, requesterSession: RequesterSession, ws: WSClient)(implicit ec: ExecutionContext)
-  extends InjectedController with Soap11Controller with ViewContextSupport
-{
+class ApplicationController @Inject() (
+    val configuration: Configuration,
+    val environment: Environment,
+    requesterSession: RequesterSession,
+    ws: WSClient
+)(implicit ec: ExecutionContext)
+    extends InjectedController
+    with Soap11Controller
+    with ViewContextSupport {
   import requesterSession._
 
   private val logger = Logger(classOf[Application])
 
   implicit object FormErrorWrites extends Writes[FormError] {
     def writes(error: FormError) = Json.toJson(
-      Map(
-        "id" -> Json.toJson(error.key.replace('.', '_')),
-        "message" -> Json.toJson(error.message)))
+      Map("id" -> Json.toJson(error.key.replace('.', '_')), "message" -> Json.toJson(error.message))
+    )
   }
 
   def index = Action {
@@ -76,16 +81,20 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         bandwidth = 100,
         replyTo = Some(ReplyToUrl),
         requesterNsa = RequesterNsa,
-        provider = currentEndPoint.provider)
+        provider = currentEndPoint.provider
+      )
     )
 
     Ok(views.html.reserve(defaultForm))
   }
 
   def reserve = Action.async { implicit request =>
-    currentEndPoint.reserveF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      reservation => sendEnvelope(currentEndPoint, reservation))
+    currentEndPoint.reserveF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        reservation => sendEnvelope(currentEndPoint, reservation)
+      )
   }
 
   def reserveModifyForm = Action { implicit request =>
@@ -100,112 +109,191 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         correlationId = generateCorrelationId,
         replyTo = Some(ReplyToUrl),
         requesterNsa = RequesterNsa,
-        provider = currentEndPoint.provider)
+        provider = currentEndPoint.provider
+      )
     )
 
     Ok(views.html.reserveModify(defaultForm))
   }
 
   def reserveModify = Action.async { implicit request =>
-    currentEndPoint.modifyF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      modify => sendEnvelope(currentEndPoint, modify))
+    currentEndPoint.modifyF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        modify => sendEnvelope(currentEndPoint, modify)
+      )
   }
 
   def reserveCommitForm = Action { implicit request =>
     val defaultForm = currentEndPoint.reserveCommitF.fill(
-      ReserveCommit(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      ReserveCommit(
+        connectionId = "",
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.reserveCommit(defaultForm))
   }
 
   def reserveCommit = Action.async { implicit request =>
-    currentEndPoint.reserveCommitF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case reserveCommit => sendEnvelope(currentEndPoint, reserveCommit) })
+    currentEndPoint.reserveCommitF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case reserveCommit => sendEnvelope(currentEndPoint, reserveCommit) }
+      )
   }
 
   def reserveAbortForm = Action { implicit request =>
     val defaultForm = currentEndPoint.reserveAbortF.fill(
-      ReserveAbort(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      ReserveAbort(
+        connectionId = "",
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.reserveAbort(defaultForm))
   }
 
   def reserveAbort = Action.async { implicit request =>
-    currentEndPoint.reserveAbortF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case reserveAbort => sendEnvelope(currentEndPoint, reserveAbort) })
+    currentEndPoint.reserveAbortF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case reserveAbort => sendEnvelope(currentEndPoint, reserveAbort) }
+      )
   }
 
   def provisionForm = Action { implicit request =>
     val defaultForm = currentEndPoint.provisionF.fill(
-      Provision(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      Provision(
+        connectionId = "",
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.provision(defaultForm))
   }
 
   def provision = Action.async { implicit request =>
-    currentEndPoint.provisionF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case provision => sendEnvelope(currentEndPoint, provision) })
+    currentEndPoint.provisionF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case provision => sendEnvelope(currentEndPoint, provision) }
+      )
   }
 
   def terminateForm = Action { implicit request =>
     val defaultForm = currentEndPoint.terminateF.fill(
-      Terminate(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      Terminate(
+        connectionId = "",
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.terminate(defaultForm))
   }
 
   def terminate = Action.async { implicit request =>
-    currentEndPoint.terminateF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case terminate => sendEnvelope(currentEndPoint, terminate) })
+    currentEndPoint.terminateF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case terminate => sendEnvelope(currentEndPoint, terminate) }
+      )
   }
 
   def releaseForm = Action { implicit request =>
     val defaultForm = currentEndPoint.releaseF.fill(
-      Release(connectionId = "", correlationId = generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      Release(
+        connectionId = "",
+        correlationId = generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.release(defaultForm))
   }
 
   def release = Action.async { implicit request =>
-    currentEndPoint.releaseF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case release => sendEnvelope(currentEndPoint, release) })
+    currentEndPoint.releaseF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case release => sendEnvelope(currentEndPoint, release) }
+      )
   }
 
   def queryForm = Action { implicit request =>
     val defaultModifiedSince = DateTime.now.minusMonths(1).toDate
     val defaultForm = currentEndPoint.queryF.fill(
-      Query(QueryOperation.Summary, Nil, Nil, Some(defaultModifiedSince), generateCorrelationId, replyTo = Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      Query(
+        QueryOperation.Summary,
+        Nil,
+        Nil,
+        Some(defaultModifiedSince),
+        generateCorrelationId,
+        replyTo = Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.query(defaultForm))
   }
 
   def query = Action.async { implicit request =>
-    currentEndPoint.queryF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case query => sendEnvelope(currentEndPoint, query) })
+    currentEndPoint.queryF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case query => sendEnvelope(currentEndPoint, query) }
+      )
   }
 
   def queryMessageForm = Action { implicit request =>
     val defaultForm = currentEndPoint.queryMessageF.fill(
-      QueryMessage(QueryMessageMode.ResultAsync, "", None, None, generateCorrelationId, Some(ReplyToUrl), requesterNsa = RequesterNsa, provider = currentEndPoint.provider))
+      QueryMessage(
+        QueryMessageMode.ResultAsync,
+        "",
+        None,
+        None,
+        generateCorrelationId,
+        Some(ReplyToUrl),
+        requesterNsa = RequesterNsa,
+        provider = currentEndPoint.provider
+      )
+    )
 
     Ok(views.html.queryMessage(defaultForm))
   }
 
   def queryMessage = Action.async { implicit request =>
-    currentEndPoint.queryMessageF.bindFromRequest().fold(
-      formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-      { case queryMessage => sendEnvelope(currentEndPoint, queryMessage) })
+    currentEndPoint.queryMessageF
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
+        { case queryMessage => sendEnvelope(currentEndPoint, queryMessage) }
+      )
   }
 
   def validateProvider = Action.async(parse.json) { implicit request =>
-
     val wsdlValid =
       for {
         nsaId <- (request.body \ "nsa-id").asOpt[String]
@@ -214,7 +302,9 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         val wsdlRequest = ws.url(s"${provider.providerUrl}?wsdl").withFollowRedirects(false)
 
         wsdlRequest.get().map { wsdlResponse =>
-          val response = if (wsdlResponse.status == 200) Json.obj("valid" -> true) else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
+          val response =
+            if (wsdlResponse.status == 200) Json.obj("valid" -> true)
+            else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
           Ok(response)
         }
       }
@@ -222,42 +312,55 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
     wsdlValid.getOrElse(Future.successful(BadRequest))
   }
 
-  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit r: Request[AnyContent]): Future[Result] = {
+  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit
+      r: Request[AnyContent]
+  ): Future[Result] = {
     val remoteUser = r.headers.get("X-REMOTE-USER")
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
 
-    val addHeaders = addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction)
-    val wsRequest = addHeaders(ws.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false))
+    val addHeaders =
+      addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction)
+    val wsRequest = addHeaders(
+      ws.url(endPoint.provider.providerUrl.toASCIIString()).withFollowRedirects(false)
+    )
 
-    wsRequest.post(soapRequest).map { response =>
-      logger.debug(s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}")
+    wsRequest
+      .post(soapRequest)
+      .map { response =>
+        logger.debug(
+          s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}"
+        )
 
-      if (response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11)) {
-        val jsonResponse = JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
-        Ok(jsonResponse)
-      } else {
-        val message = s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"
-        BadRequest(JsonResponse.failure(soapRequest, requestTime, message))
+        if (response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11)) {
+          val jsonResponse =
+            JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
+          Ok(jsonResponse)
+        } else {
+          val message =
+            s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"
+          BadRequest(JsonResponse.failure(soapRequest, requestTime, message))
+        }
       }
-    }.recover {
-      case e =>
+      .recover { case e =>
         logger.info("Could not send soap request", e)
         BadRequest(Json.obj("message" -> e.getMessage))
-    }
+      }
   }
 
   private def addSoapActionHeader(action: String)(request: WSRequest): WSRequest =
     request.addHttpHeaders("SOAPAction" -> s""""$action"""")
 
   private def addOauth2Header(tokens: List[String])(request: WSRequest): WSRequest =
-    if (tokens.isEmpty) request else request.addHttpHeaders("Authorization" -> s"bearer ${tokens.head}")
+    if (tokens.isEmpty) request
+    else request.addHttpHeaders("Authorization" -> s"bearer ${tokens.head}")
 
   private def generateCorrelationId = UUID.randomUUID.toString
 
   private implicit class Mappings(endPoint: EndPoint)(implicit request: Request[AnyContent]) {
 
-    private def listWithoutEmptyStrings: Mapping[List[String]] = list(text).transform(_.filterNot(_.isEmpty), identity)
+    private def listWithoutEmptyStrings: Mapping[List[String]] =
+      list(text).transform(_.filterNot(_.isEmpty), identity)
 
     def reserveF: Form[Reserve] = Form(
       "reservation" -> mapping(
@@ -273,11 +376,61 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         "correlationId" -> nonEmptyText,
         "globalReservationId" -> optional(text),
         "unprotected" -> boolean,
-        "pathComputationAlgorithm" -> optional(nonEmptyText))
-        ((desc, start, end, serviceType, source, dest, ero, bandwidth, version, correlationId, globalReservationId, unProtected, pathComputationAlgorithm) =>
-          Reserve(desc, start, end, serviceType, source, dest, ero, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider, globalReservationId, unProtected, pathComputationAlgorithm))
-        (reserve =>
-          Some((reserve.description, reserve.startDate, reserve.endDate, reserve.serviceType, reserve.source, reserve.destination, reserve.ero, reserve.bandwidth, reserve.version, reserve.correlationId, reserve.globalReservationId, reserve.unprotected, reserve.pathComputationAlgorithm))))
+        "pathComputationAlgorithm" -> optional(nonEmptyText)
+      )(
+        (
+            desc,
+            start,
+            end,
+            serviceType,
+            source,
+            dest,
+            ero,
+            bandwidth,
+            version,
+            correlationId,
+            globalReservationId,
+            unProtected,
+            pathComputationAlgorithm
+        ) =>
+          Reserve(
+            desc,
+            start,
+            end,
+            serviceType,
+            source,
+            dest,
+            ero,
+            bandwidth,
+            version,
+            correlationId,
+            Some(ReplyToUrl),
+            RequesterNsa,
+            endPoint.provider,
+            globalReservationId,
+            unProtected,
+            pathComputationAlgorithm
+          )
+      )(reserve =>
+        Some(
+          (
+            reserve.description,
+            reserve.startDate,
+            reserve.endDate,
+            reserve.serviceType,
+            reserve.source,
+            reserve.destination,
+            reserve.ero,
+            reserve.bandwidth,
+            reserve.version,
+            reserve.correlationId,
+            reserve.globalReservationId,
+            reserve.unprotected,
+            reserve.pathComputationAlgorithm
+          )
+        )
+      )
+    )
 
     def modifyF: Form[ReserveModify] = Form(
       "reservation" -> mapping(
@@ -288,34 +441,69 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         "indefiniteEnd" -> boolean,
         "bandwidth" -> optional(longNumber(0, 100000)),
         "version" -> number(min = 0),
-        "correlationId" -> nonEmptyText)((connectionId, start, startNow, end, indefiniteEnd, bandwidth, version, correlationId) =>
-          ReserveModify(connectionId, start, startNow, end, indefiniteEnd, bandwidth, version, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider))(modify =>
-          Some((modify.connectionId, modify.startDate, modify.startNow, modify.endDate, modify.indefiniteEnd, modify.bandwidth, modify.version, modify.correlationId))))
+        "correlationId" -> nonEmptyText
+      )((connectionId, start, startNow, end, indefiniteEnd, bandwidth, version, correlationId) =>
+        ReserveModify(
+          connectionId,
+          start,
+          startNow,
+          end,
+          indefiniteEnd,
+          bandwidth,
+          version,
+          correlationId,
+          Some(ReplyToUrl),
+          RequesterNsa,
+          endPoint.provider
+        )
+      )(modify =>
+        Some(
+          (
+            modify.connectionId,
+            modify.startDate,
+            modify.startNow,
+            modify.endDate,
+            modify.indefiniteEnd,
+            modify.bandwidth,
+            modify.version,
+            modify.correlationId
+          )
+        )
+      )
+    )
 
     def reserveAbortF: Form[ReserveAbort] = Form(
-      "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply))
+      "reserveAbort" -> genericOperationMapping(ReserveAbort.apply)(ReserveAbort.unapply)
+    )
 
     def reserveCommitF: Form[ReserveCommit] = Form(
-      "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply))
+      "reserveCommit" -> genericOperationMapping(ReserveCommit.apply)(ReserveCommit.unapply)
+    )
 
     def provisionF: Form[Provision] = Form(
-      "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply))
+      "provision" -> genericOperationMapping(Provision.apply)(Provision.unapply)
+    )
 
     def terminateF: Form[Terminate] = Form(
-      "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply))
+      "terminate" -> genericOperationMapping(Terminate.apply)(Terminate.unapply)
+    )
 
     def releaseF: Form[Release] = Form(
-      "release" -> genericOperationMapping(Release.apply)(Release.unapply))
+      "release" -> genericOperationMapping(Release.apply)(Release.unapply)
+    )
 
     def portMapping = mapping("stpId" -> nonEmptyText)(Port.apply)(Port.unapply)
 
-    private def genericOperationMapping[R](apply: (String, String, Option[URI], String, Provider) => R)(unapply: R => Option[(String, String, Option[URI], String, Provider)]) =
-      mapping(
-        "connectionId" -> nonEmptyText,
-        "correlationId" -> nonEmptyText)((connectionId, correlationId) => apply(connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ go =>
-          val tuple = unapply(go).get
-          Some((tuple._1, tuple._2))
-        }
+    private def genericOperationMapping[R](
+        apply: (String, String, Option[URI], String, Provider) => R
+    )(unapply: R => Option[(String, String, Option[URI], String, Provider)]) =
+      mapping("connectionId" -> nonEmptyText, "correlationId" -> nonEmptyText)(
+        (connectionId, correlationId) =>
+          apply(connectionId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)
+      ) { go =>
+        val tuple = unapply(go).get
+        Some((tuple._1, tuple._2))
+      }
 
     def queryF: Form[Query] = Form(
       "query" -> mapping(
@@ -323,10 +511,30 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         "connectionIds" -> listWithoutEmptyStrings,
         "globalReservationIds" -> listWithoutEmptyStrings,
         "ifModifiedSince" -> optional(date("yyyy-MM-dd HH:mm")),
-        "correlationId" -> nonEmptyText)((operation, connectionIds, globalReservationIds, ifModifiedSince, correlationId) => Query(operation, connectionIds, globalReservationIds, ifModifiedSince, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ query =>
-          Some((query.operation, query.connectionIds, query.globalReservationIds, query.ifModifiedSince, query.correlationId))
-        }
-      )
+        "correlationId" -> nonEmptyText
+      )((operation, connectionIds, globalReservationIds, ifModifiedSince, correlationId) =>
+        Query(
+          operation,
+          connectionIds,
+          globalReservationIds,
+          ifModifiedSince,
+          correlationId,
+          Some(ReplyToUrl),
+          RequesterNsa,
+          endPoint.provider
+        )
+      ) { query =>
+        Some(
+          (
+            query.operation,
+            query.connectionIds,
+            query.globalReservationIds,
+            query.ifModifiedSince,
+            query.correlationId
+          )
+        )
+      }
+    )
 
     def queryMessageF: Form[QueryMessage] = Form(
       "queryMessage" -> mapping(
@@ -334,9 +542,29 @@ class ApplicationController @Inject()(val configuration: Configuration, val envi
         "connectionId" -> nonEmptyText,
         "startId" -> optional(of[Long]),
         "endId" -> optional(of[Long]),
-        "correlationId" -> nonEmptyText)((operation, connectionId, startId, endId, correlationId) => QueryMessage(operation, connectionId, startId, endId, correlationId, Some(ReplyToUrl), RequesterNsa, endPoint.provider)){ queryMessage =>
-          Some((queryMessage.operation, queryMessage.connectionId, queryMessage.startId, queryMessage.endId, queryMessage.correlationId))
-        }
-      )
+        "correlationId" -> nonEmptyText
+      )((operation, connectionId, startId, endId, correlationId) =>
+        QueryMessage(
+          operation,
+          connectionId,
+          startId,
+          endId,
+          correlationId,
+          Some(ReplyToUrl),
+          RequesterNsa,
+          endPoint.provider
+        )
+      ) { queryMessage =>
+        Some(
+          (
+            queryMessage.operation,
+            queryMessage.connectionId,
+            queryMessage.startId,
+            queryMessage.endId,
+            queryMessage.correlationId
+          )
+        )
+      }
+    )
   }
 }

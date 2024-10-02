@@ -17,6 +17,12 @@ class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMat
   }
 
   object DefaultTerminate {
-    def apply() = Terminate("123-abc", "asdf-1234", Some(uri("http://localhost")), "requesterNsa", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
+    def apply() = Terminate(
+      "123-abc",
+      "asdf-1234",
+      Some(uri("http://localhost")),
+      "requesterNsa",
+      Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
+    )
   }
 }

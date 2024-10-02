@@ -56,62 +56,67 @@ case class Reserve(
 
   override def nsiV2Body =
     <type:reserve>
-      { globalReservationIdField }
-      { descriptionField }
-      <criteria version={ version.toString }>
+      {globalReservationIdField}
+      {descriptionField}
+      <criteria version={version.toString}>
         <schedule>
-          { startTimeField }
-          { endTimeField }
+          {startTimeField}
+          {endTimeField}
         </schedule>
-        <serviceType>{ serviceType }</serviceType>
-        { service }
+        <serviceType>{serviceType}</serviceType>
+        {service}
       </criteria>
     </type:reserve>
 
   private def startTimeField = startDate match {
-    case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
-    case None       => Empty
+    case Some(date) =>
+      <startTime>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</startTime>
+    case None => Empty
   }
 
   private def globalReservationIdField = globalReservationId match {
-    case Some(g) => <globalReservationId>{ g }</globalReservationId>
+    case Some(g) => <globalReservationId>{g}</globalReservationId>
     case None    => <globalReservationId/>
   }
 
   private def descriptionField = description match {
-    case Some(d) => <description>{ d }</description>
+    case Some(d) => <description>{d}</description>
     case None    => Empty
   }
 
   private def endTimeField =
-    <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(endDate)) }</endTime>
+    <endTime>{ISODateTimeFormat.dateTime().print(new DateTime(endDate))}</endTime>
 
   private def eroPresent: Boolean = ero.exists(_.nonEmpty)
 
   private def service =
-    <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>
-      <capacity>{ bandwidth }</capacity>
+    <p2p:p2ps xmlns:p2p={NsiV2Point2PointNamespace}>
+      <capacity>{bandwidth}</capacity>
       <directionality>Bidirectional</directionality>
       <symmetricPath>true</symmetricPath>
-      <sourceSTP>{ source.stpId }</sourceSTP>
-      <destSTP>{ destination.stpId }</destSTP>
+      <sourceSTP>{source.stpId}</sourceSTP>
+      <destSTP>{destination.stpId}</destSTP>
       {
-        if (eroPresent)
-      <ero>
+      if (eroPresent)
+        <ero>
         {
           var order = -1;
-          for (member <- ero; if member.nonEmpty) yield <orderedSTP order={ order += 1; order.toString }><stp>{ member }</stp></orderedSTP>
+          for (member <- ero; if member.nonEmpty) yield <orderedSTP order={
+            order += 1; order.toString
+          }><stp>{member}</stp></orderedSTP>
         }
       </ero>
-      }
+    }
       {
-        if (unprotected)
-          <parameter type="protection">UNPROTECTED</parameter>
-        else
-          <parameter type="protection">PROTECTED</parameter>
-      }
+      if (unprotected)
+        <parameter type="protection">UNPROTECTED</parameter>
+      else
+        <parameter type="protection">PROTECTED</parameter>
+    }
       {
-        pathComputationAlgorithm.map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>).orNull
-      }
+      pathComputationAlgorithm
+        .map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>)
+        .orNull
+    }
     </p2p:p2ps>
 }

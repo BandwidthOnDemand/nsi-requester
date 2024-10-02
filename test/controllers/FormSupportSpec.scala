@@ -14,7 +14,8 @@ class FormSupportSpec extends Specification {
   "QueryNotificationOperationFormat" should {
 
     "parse Sync operation" in {
-      val operation = queryMessageModeFormat.bind("operation", Map("operation" -> "NotificationSync"))
+      val operation =
+        queryMessageModeFormat.bind("operation", Map("operation" -> "NotificationSync"))
 
       operation must beRight(QueryMessageMode.NotificationSync)
     }
