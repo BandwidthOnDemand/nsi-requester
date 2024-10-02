@@ -34,7 +34,7 @@ import scala.xml.NodeSeq
 import support.JsonResponse
 
 @javax.inject.Singleton
-class ResponseController @javax.inject.Inject()(requesterSession: RequesterSession) extends InjectedController with Soap11Controller {
+class ResponseController @javax.inject.Inject()(requesterSession: RequesterSession)(implicit mat: Materializer) extends InjectedController with Soap11Controller {
   private val logger = Logger(classOf[ResponseController])
 
   private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single
@@ -81,11 +81,9 @@ class ResponseController @javax.inject.Inject()(requesterSession: RequesterSessi
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
     (xml \\ "providerNSA").headOption.map(_.text)
 
-  def websocket(id: String) = WebSocket.accept[JsValue, JsValue] { _ =>
-    val source = Source.queue[JsValue](100).mapMaterializedValue { queue =>
-      channels += (id -> queue)
-    }
-
+  def websocket(id: String) = WebSocket.accept[JsValue, JsValue] { request =>
+    val (queue, source) = Source.queue[JsValue](100).preMaterialize()
+    channels += (id -> queue)
     Flow.fromSinkAndSource(Sink.ignore, source)
   }
 }
