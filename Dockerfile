@@ -20,9 +20,10 @@ ENV PORT=9000
 ENV ADDRESS="0.0.0.0"
 ENV CONFIG=/config-overrides.conf
 #ENV EXTRA="-J-Xms512m -J-Xmx512m -J-server -J-verbose:gc -J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-Xloggc:./nsi-requester/logs/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M -J-XX:+UseParallelGC -J-XX:+UseParallelOldGC"
-ENV EXTRA="-J-Xms512m -J-Xmx512m -J-server -J-verbose:gc -J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-XX:+UseParallelGC -J-XX:+UseParallelOldGC"
+ENV EXTRA="-XX:MaxRAMPercentage=75 -J-Xlog:gc:file=./logs/gc.log:time,level,tags:filecount=5,filesize=10M -J-XshowSettings:vm"
 
 WORKDIR /nsi-requester
+RUN mkdir -p logs
 COPY --from=build /usr/local/src/nsi-requester/target/universal/*.tgz nsi-requester.tgz
 RUN tar xvzf nsi-requester.tgz --strip-components=1 && rm nsi-requester.tgz
 
