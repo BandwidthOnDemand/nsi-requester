@@ -6,12 +6,12 @@ import play.api.test.*
 import play.api.test.Helpers.*
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ResponseControllerSpec extends Specification {
+class ResponseControllerSpec extends Specification:
 
   "The response controllers" should {
 
-    "respond with an NSI Ok" in new WithApplication with Injecting {
-      override def running() = {
+    "respond with an NSI Ok" in new WithApplication with Injecting:
+      override def running() =
         val subject = inject[ResponseController]
         val body =
           <Envelope>
@@ -31,12 +31,11 @@ class ResponseControllerSpec extends Specification {
           "<protocolVersion>application/vnd.ogf.nsi.cs.v2.requester+soap</protocolVersion>"
         )
         status(result) must equalTo(200)
-      }
-    }
+      end running
 
     "respond with a BadRequest when the provider NSA is unknown" in new WithApplication
-      with Injecting {
-      override def running() = {
+      with Injecting:
+      override def running() =
         val subject = inject[ResponseController]
         val body =
           <header>
@@ -47,12 +46,10 @@ class ResponseControllerSpec extends Specification {
         val result = subject.reply()(FakeXmlRequest(body))
 
         status(result) must equalTo(400)
-      }
-    }
 
     "respond with a BadRequest when the correlationId is missing" in new WithApplication
-      with Injecting {
-      override def running() = {
+      with Injecting:
+      override def running() =
         val subject = inject[ResponseController]
         val body =
           <header>
@@ -62,12 +59,10 @@ class ResponseControllerSpec extends Specification {
         val result = subject.reply()(FakeXmlRequest(body))
 
         status(result) must equalTo(400)
-      }
-    }
 
     "respond with a BadRequest when correlationId has not the correct form" in new WithApplication
-      with Injecting {
-      override def running() = {
+      with Injecting:
+      override def running() =
         val subject = inject[ResponseController]
         val body =
           <header>
@@ -77,13 +72,9 @@ class ResponseControllerSpec extends Specification {
         val result = subject.reply()(FakeXmlRequest(body))
 
         status(result) must equalTo(400)
-      }
-    }
   }
 
-  object FakeXmlRequest {
+  object FakeXmlRequest:
     def apply(body: scala.xml.Elem): FakeRequest[scala.xml.Elem] =
       FakeRequest("POST", "/", FakeHeaders(), body)
-  }
-
-}
+end ResponseControllerSpec

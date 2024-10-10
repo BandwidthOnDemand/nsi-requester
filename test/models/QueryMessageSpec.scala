@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   import QueryMessageMode.*
 
@@ -36,4 +36,4 @@ class QueryMessageSpec extends support.Specification with org.specs2.matcher.Xml
     }
 
   }
-}
+end QueryMessageSpec

@@ -31,7 +31,7 @@ case class Terminate(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
 
   override def soapActionSuffix = "terminate"
 
@@ -39,4 +39,3 @@ case class Terminate(
     <type:terminate>
       <connectionId>{connectionId}</connectionId>
     </type:terminate>
-}

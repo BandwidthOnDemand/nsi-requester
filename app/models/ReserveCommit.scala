@@ -31,7 +31,7 @@ case class ReserveCommit(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
 
   override def soapActionSuffix = "reserveCommit"
 
@@ -39,5 +39,3 @@ case class ReserveCommit(
     <type:reserveCommit>
       <connectionId>{connectionId}</connectionId>
     </type:reserveCommit>
-
-}

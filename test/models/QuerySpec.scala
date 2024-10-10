@@ -3,7 +3,7 @@ package models
 import QueryOperation.*
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI queries" should {
 
@@ -41,7 +41,7 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
     }
   }
 
-  object DefaultQuery {
+  object DefaultQuery:
 
     def apply(
         connectionIds: List[String] = Nil,
@@ -58,5 +58,4 @@ class QuerySpec extends support.Specification with org.specs2.matcher.XmlMatcher
         requesterNsa = "requesterNsa",
         provider = Provider("nsa:surfnet.nl", uri("http://localhost"), "urn:ogf:network:")
       )
-  }
-}
+end QuerySpec

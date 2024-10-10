@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI terminate" should {
 
@@ -16,7 +16,7 @@ class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMat
 
   }
 
-  object DefaultTerminate {
+  object DefaultTerminate:
     def apply(): Terminate = Terminate(
       "123-abc",
       "asdf-1234",
@@ -24,5 +24,4 @@ class TerminateSpec extends support.Specification with org.specs2.matcher.XmlMat
       "requesterNsa",
       Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
     )
-  }
-}
+end TerminateSpec

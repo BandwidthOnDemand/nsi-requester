@@ -23,6 +23,7 @@
 package models
 
 import scala.xml.Elem
+
 case class Ack(correlationId: String, requesterNsa: String, providerNsa: Provider)
     extends NsiRequest(
       correlationId,
@@ -30,11 +31,8 @@ case class Ack(correlationId: String, requesterNsa: String, providerNsa: Provide
       requesterNsa,
       providerNsa,
       protocolVersion = NsiRequest.NsiV2RequesterProtocolVersion
-    ) {
+    ):
 
   override def soapActionSuffix = ""
 
-  override def nsiV2Body: Elem =
-    <type:acknowledgment />
-
-}
+  override def nsiV2Body: Elem = <type:acknowledgment />

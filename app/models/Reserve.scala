@@ -29,9 +29,8 @@ import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
 import scala.xml.Elem
 
-object Reserve {
+object Reserve:
   val PathComputationAlgorithms: Seq[String] = Seq("Chain", "Sequential", "Tree")
-}
 case class Reserve(
     description: Option[String],
     startDate: Option[Date],
@@ -49,7 +48,7 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false,
     pathComputationAlgorithm: Option[String] = None
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true):
 
   import NsiRequest.*
 
@@ -69,21 +68,18 @@ case class Reserve(
       </criteria>
     </type:reserve>
 
-  private def startTimeField = startDate match {
+  private def startTimeField = startDate match
     case Some(date) =>
       <startTime>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</startTime>
     case None => Empty
-  }
 
-  private def globalReservationIdField = globalReservationId match {
+  private def globalReservationIdField = globalReservationId match
     case Some(g) => <globalReservationId>{g}</globalReservationId>
     case None    => <globalReservationId/>
-  }
 
-  private def descriptionField = description match {
+  private def descriptionField = description match
     case Some(d) => <description>{d}</description>
     case None    => Empty
-  }
 
   private def endTimeField =
     <endTime>{ISODateTimeFormat.dateTime().print(new DateTime(endDate))}</endTime>
@@ -101,10 +97,10 @@ case class Reserve(
         if eroPresent
         then
           <ero>{
-            for {
+            for
               (member, order) <- ero.filter(_.nonEmpty).zipWithIndex
               if member.nonEmpty
-            } yield <orderedSTP order={order.toString}><stp>{member}</stp></orderedSTP>
+            yield <orderedSTP order={order.toString}><stp>{member}</stp></orderedSTP>
           }</ero>
         else Empty
       }
@@ -119,4 +115,4 @@ case class Reserve(
           .getOrElse(Empty)
       }
     </p2p:p2ps>
-}
+end Reserve

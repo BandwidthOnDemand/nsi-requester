@@ -32,12 +32,10 @@ import play.server.api.*
  *
  *     -Dplay.http.sslengineprovider=support.CustomSSLEngineProvider
  */
-class CustomSSLEngineProvider extends SSLEngineProvider {
-  override def createSSLEngine(): SSLEngine = {
+class CustomSSLEngineProvider extends SSLEngineProvider:
+  override def createSSLEngine(): SSLEngine =
     val sslEngine = SSLContext.getDefault.createSSLEngine
     sslEngine.setNeedClientAuth(true)
     sslEngine
-  }
 
   override def sslContext: SSLContext = SSLContext.getDefault
-}

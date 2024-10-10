@@ -30,7 +30,7 @@ import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import support.PrettyXml.*
 import play.api.libs.json.JsObject
 
-object JsonResponse {
+object JsonResponse:
 
   def success(
       request: NodeSeq,
@@ -54,4 +54,4 @@ object JsonResponse {
       "xml" -> data,
       "time" -> time.toString("HH:mm:ss,SSS")
     )
-}
+end JsonResponse

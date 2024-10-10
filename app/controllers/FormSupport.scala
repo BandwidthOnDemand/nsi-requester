@@ -35,7 +35,7 @@ import play.api.data.format.Formats.stringFormat
 import play.api.data.format.Formatter
 import scala.util.Try
 
-object FormSupport {
+object FormSupport:
 
   private val periodFormatter = new PeriodFormatterBuilder()
     .printZeroAlways()
@@ -52,16 +52,15 @@ object FormSupport {
     .verifying(
       "URI must be HTTP or HTTPS",
       uri =>
-        Option(uri.getScheme).getOrElse("").toLowerCase() match {
+        Option(uri.getScheme).getOrElse("").toLowerCase() match
           case "http" | "https" => true
           case _                => false
-        }
     )
 
-  implicit def periodFormat: Formatter[Period] = new Formatter[Period] {
+  implicit def periodFormat: Formatter[Period] = new Formatter[Period]:
     override val format = Some(("Period ('days:hours:minutes')", Nil))
 
-    def bind(key: String, data: Map[String, String]) = {
+    def bind(key: String, data: Map[String, String]) =
       stringFormat.bind(key, data).flatMap { s =>
         scala.util.control.Exception
           .allCatch[Period]
@@ -69,13 +68,11 @@ object FormSupport {
           .left
           .map(_ => Seq(FormError(key, "error.period", Nil)))
       }
-    }
 
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
-  }
 
   implicit def queryMessageModeFormat: Formatter[QueryMessageMode] =
-    new Formatter[QueryMessageMode] {
+    new Formatter[QueryMessageMode]:
       override val format = Some(
         (s"Allowed values: ${QueryMessageMode.values.mkString(", ")}", Nil)
       )
@@ -90,9 +87,8 @@ object FormSupport {
         }
 
       def unbind(key: String, value: QueryMessageMode) = Map(key -> value.toString)
-    }
 
-  implicit def queryOperationFormat: Formatter[QueryOperation] = new Formatter[QueryOperation] {
+  implicit def queryOperationFormat: Formatter[QueryOperation] = new Formatter[QueryOperation]:
     override val format = Some((s"Allowed values: ${QueryOperation.values.mkString(", ")}", Nil))
 
     def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryOperation] =
@@ -105,5 +101,4 @@ object FormSupport {
       }
 
     def unbind(key: String, value: QueryOperation) = Map(key -> value.toString)
-  }
-}
+end FormSupport

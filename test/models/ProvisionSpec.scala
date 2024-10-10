@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI provision" should {
 
@@ -23,7 +23,7 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
     }
   }
 
-  object DefaultProvision {
+  object DefaultProvision:
     def apply(): Provision = Provision(
       "123-abc",
       "asdf-098",
@@ -31,6 +31,4 @@ class ProvisionSpec extends support.Specification with org.specs2.matcher.XmlMat
       "requesterNsa",
       Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
     )
-  }
-
-}
+end ProvisionSpec

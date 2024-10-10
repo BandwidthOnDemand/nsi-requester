@@ -3,7 +3,7 @@ package support
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class PrettyXmlSpec extends Specification {
+class PrettyXmlSpec extends Specification:
 
   import PrettyXml.*
 
@@ -30,4 +30,4 @@ class PrettyXmlSpec extends Specification {
             |</pretty>""".stripMargin)
     }
   }
-}
+end PrettyXmlSpec

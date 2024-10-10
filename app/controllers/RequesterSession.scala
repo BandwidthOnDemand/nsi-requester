@@ -30,13 +30,12 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import scala.jdk.CollectionConverters.*
 
-object RequesterSession {
+object RequesterSession:
   val ProviderNsaSessionField = "nsaId"
   val AccessTokensSessionField = "accessTokens"
   val ServiceType = "http://services.ogf.org/nsi/2013/12/descriptions/EVTS.A-GOLE"
-}
 @javax.inject.Singleton
-class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
+class RequesterSession @javax.inject.Inject() (configuration: Configuration):
   import RequesterSession.*
 
   val RequesterNsa: String = configuration
@@ -48,12 +47,10 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
   def currentProvider(implicit request: Request[AnyContent]): Provider =
     request.session.get(ProviderNsaSessionField) flatMap findProvider getOrElse allProviders.head
 
-  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint = {
-    request.session.get("accessTokens") match {
+  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint =
+    request.session.get("accessTokens") match
       case None                 => EndPoint(currentProvider, List())
       case Some(commaSeparated) => EndPoint(currentProvider, commaSeparated.split(",").toList)
-    }
-  }
 
   def ReplyToUrl(implicit request: Request[AnyContent]): URI =
     URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
@@ -64,8 +61,8 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
   )
 
   // is not a lazy val, because some tests will break (object will only be initialized once during tests
-  def allProviders: Seq[Provider] = {
-    def toProvider(value: ConfigValue): Provider = value match {
+  def allProviders: Seq[Provider] =
+    def toProvider(value: ConfigValue): Provider = value match
       case providerObject: ConfigObject =>
         Provider(
           providerObject.get("id").unwrapped().asInstanceOf[String],
@@ -74,13 +71,11 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration) {
         )
       case _ =>
         sys.error(s"bad provider configuration $value")
-    }
 
     configuration
       .getOptional[ConfigList]("requester.nsi.providers")
       .map(x => x.iterator.asScala.map(toProvider).toSeq)
       .getOrElse(sys.error("No NSI providers where configured (requester.ns.providers)"))
-  }
 
   def findProvider(nsaId: String): Option[Provider] = allProviders.find(_.nsaId == nsaId)
-}
+end RequesterSession

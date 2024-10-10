@@ -29,12 +29,11 @@ import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
 import scala.xml.Node
 
-object QueryOperation extends Enumeration {
+object QueryOperation extends Enumeration:
   type QueryOperation = Value
   val Summary, SummarySync, Recursive = Value
 
   def operationsV2: List[Value] = List(Summary, SummarySync, Recursive)
-}
 
 import QueryOperation.*
 
@@ -47,15 +46,14 @@ case class Query(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
 
-  override def soapActionSuffix: String = operation match {
+  override def soapActionSuffix: String = operation match
     case Summary     => "querySummary"
     case SummarySync => "querySummarySync"
     case Recursive   => "queryRecursive"
-  }
 
-  override def nsiV2Body: Node = operation match {
+  override def nsiV2Body: Node = operation match
     case Summary =>
       <type:querySummary>
         {connectionIdTags}
@@ -74,7 +72,6 @@ case class Query(
       </type:queryRecursive>
     case _ =>
       sys.error(s"Unsupported NSI v2 query type '$operation'")
-  }
 
   private def connectionIdTags =
     connectionIds.map(id => <connectionId>{id}</connectionId>)
@@ -82,10 +79,8 @@ case class Query(
   private def globalReservationIdTags =
     globalReservationIds.map(id => <globalReservationId>{id}</globalReservationId>)
 
-  private def ifModifiedSinceTag = ifModifiedSince match {
+  private def ifModifiedSinceTag = ifModifiedSince match
     case Some(date) =>
       <ifModifiedSince>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</ifModifiedSince>
     case None => Empty
-  }
-
-}
+end Query

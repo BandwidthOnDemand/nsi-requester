@@ -3,7 +3,7 @@ package models
 import java.util.Date
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveModifySpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReserveModifySpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI reserve modify" should {
 
@@ -36,7 +36,7 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
       end: Option[Date] = None,
       bandwidth: Option[Long] = None,
       version: Int = 1
-  ): ReserveModify = {
+  ): ReserveModify =
     val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
     ReserveModify(
       connectionId = connectionId,
@@ -51,6 +51,5 @@ class ReserveModifySpec extends support.Specification with org.specs2.matcher.Xm
       requesterNsa = "requesterNsa",
       provider = provider
     )
-  }
-
-}
+  end DefaultModify
+end ReserveModifySpec

@@ -7,7 +7,7 @@ import models.QueryOperation
 import play.api.data.FormError
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class FormSupportSpec extends Specification {
+class FormSupportSpec extends Specification:
 
   import FormSupport.*
 
@@ -35,4 +35,4 @@ class FormSupportSpec extends Specification {
       operation must beRight(QueryOperation.Summary)
     }
   }
-}
+end FormSupportSpec

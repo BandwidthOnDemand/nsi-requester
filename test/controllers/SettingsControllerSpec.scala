@@ -6,7 +6,7 @@ import play.api.test.*
 import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class SettingsControllerSpec extends support.Specification {
+class SettingsControllerSpec extends support.Specification:
 
   "The SettingsController" should {
 
@@ -14,8 +14,8 @@ class SettingsControllerSpec extends support.Specification {
       "provider.id" -> "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
     )
 
-    "store settings in the session" in new WithViewContext {
-      override def running() = {
+    "store settings in the session" in new WithViewContext:
+      override def running() =
         val subject = inject[SettingsController]
 
         val result = subject.settings()(FakeRequest().withFormUrlEncodedBody(basicSettings*))
@@ -26,11 +26,9 @@ class SettingsControllerSpec extends support.Specification {
           "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
         )
         flash(result).get("success") must beSome
-      }
-    }
 
-    "store the access token in session" in new WithViewContext {
-      override def running() = {
+    "store the access token in session" in new WithViewContext:
+      override def running() =
         val subject = inject[SettingsController]
 
         val data = basicSettings ++ Seq(
@@ -40,14 +38,12 @@ class SettingsControllerSpec extends support.Specification {
         val result = subject.settings()(FakeRequest().withFormUrlEncodedBody(data*))
 
         session(result).get(RequesterSession.AccessTokensSessionField) must beSome("secretToken")
-      }
-    }
 
   }
 
   "The settings view" should {
-    "contain the stored tokens that were previously set in session" in new WithViewContext {
-      override def running() = {
+    "contain the stored tokens that were previously set in session" in new WithViewContext:
+      override def running() =
         implicit val request: RequestHeader = FakeRequest()
         val subject = inject[SettingsController]
 
@@ -60,7 +56,5 @@ class SettingsControllerSpec extends support.Specification {
         val result = views.html.settings(settingsForm, "version")
 
         contentAsString(result) must contain("""name="accessTokens[0]" value="token1"""")
-      }
-    }
   }
-}
+end SettingsControllerSpec

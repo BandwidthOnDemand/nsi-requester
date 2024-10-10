@@ -26,20 +26,16 @@ import scala.xml.Node
 import scala.xml.NodeSeq
 import scala.xml.PrettyPrinter
 
-object PrettyXml {
+object PrettyXml:
 
-  implicit class nodeSeqToString(xml: NodeSeq) {
+  implicit class nodeSeqToString(xml: NodeSeq):
 
     val pp = new PrettyPrinter(80, 4)
 
-    def prettify: String = xml match {
+    def prettify: String = xml match
       case x: Node => pp.format(x);
       case x: NodeSeq =>
         x.foldLeft("") { (str, node) =>
           val sep = if str.isEmpty then "" else "\n"
           str + sep + node.prettify
         }
-    }
-  }
-
-}

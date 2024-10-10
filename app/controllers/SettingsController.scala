@@ -37,7 +37,7 @@ class SettingsController @javax.inject.Inject() (
     val environment: Environment
 )(implicit requesterSession: RequesterSession)
     extends BaseController
-    with ViewContextSupport {
+    with ViewContextSupport:
   import RequesterSession.*, requesterSession.*
 
   def settingsForm: Action[AnyContent] = Action { implicit request =>
@@ -51,15 +51,13 @@ class SettingsController @javax.inject.Inject() (
       .bindFromRequest()
       .fold[Result](
         formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
-        {
-          case endPoint => {
-            Redirect(routes.ApplicationController.reserveForm)
-              .flashing("success" -> "Settings changed for this session")
-              .withSession(
-                AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
-                ProviderNsaSessionField -> endPoint.provider.nsaId
-              )
-          }
+        { case endPoint =>
+          Redirect(routes.ApplicationController.reserveForm)
+            .flashing("success" -> "Settings changed for this session")
+            .withSession(
+              AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
+              ProviderNsaSessionField -> endPoint.provider.nsaId
+            )
         }
       )
   }
@@ -74,4 +72,4 @@ class SettingsController @javax.inject.Inject() (
       "accessTokens" -> list(text)
     )(EndPoint.apply)(ep => Some(Tuple.fromProductTyped(ep)))
   )
-}
+end SettingsController

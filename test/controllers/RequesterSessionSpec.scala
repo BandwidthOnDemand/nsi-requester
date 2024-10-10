@@ -7,7 +7,7 @@ import scala.jdk.CollectionConverters.*
 import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class RequesterSessionSpec extends support.Specification {
+class RequesterSessionSpec extends support.Specification:
 
   val someFakeProviders: Map[String, ?] = ConfigFactory
     .parseString("""
@@ -23,20 +23,18 @@ class RequesterSessionSpec extends support.Specification {
   "The configuration" should {
     "have an end point with a default provider" in new WithViewContext(builder =>
       builder.configure(someFakeProviders)
-    ) {
-      override def running() = {
+    ):
+      override def running() =
         val subject = inject[RequesterSession]
 
         val endPoint = subject.currentEndPoint(FakeRequest())
 
         endPoint.provider.providerUrl must equalTo(uri("http://localhost:9999"))
-      }
-    }
 
     "have an endpoint for the session settings" in new WithViewContext(builder =>
       builder.configure(someFakeProviders)
-    ) {
-      override def running() = {
+    ):
+      override def running() =
         val subject = inject[RequesterSession]
 
         val endPoint = subject.currentEndPoint(
@@ -45,20 +43,15 @@ class RequesterSessionSpec extends support.Specification {
 
         endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")
         endPoint.provider.providerUrl must equalTo(uri("http://localhost:8888"))
-      }
-    }
 
     "load the configured providers" in new WithViewContext(builder =>
       builder.configure(someFakeProviders)
-    ) {
-      override def running() = {
+    ):
+      override def running() =
         val subject = inject[RequesterSession]
 
         val provider = subject.findProvider("testid")
 
         provider must beSome(Provider("testid", uri("http://localhost:9999"), "urn:ogf:network:"))
-      }
-    }
   }
-
-}
+end RequesterSessionSpec

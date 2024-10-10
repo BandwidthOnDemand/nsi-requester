@@ -31,7 +31,7 @@ case class ReserveAbort(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
 
   override def soapActionSuffix = "reserveAbort"
 
@@ -39,5 +39,3 @@ case class ReserveAbort(
     <type:reserveAbort>
       <connectionId>{connectionId}</connectionId>
     </type:reserveAbort>
-
-}

@@ -51,16 +51,15 @@ class ApplicationController @Inject() (
 )(implicit ec: ExecutionContext)
     extends BaseController
     with Soap11Controller
-    with ViewContextSupport {
+    with ViewContextSupport:
   import requesterSession.*
 
   private val logger = Logger(classOf[Application])
 
-  implicit object FormErrorWrites extends Writes[FormError] {
+  implicit object FormErrorWrites extends Writes[FormError]:
     def writes(error: FormError): JsValue = Json.toJson(
       Map("id" -> Json.toJson(error.key.replace('.', '_')), "message" -> Json.toJson(error.message))
     )
-  }
 
   def index: Action[AnyContent] = Action {
     Redirect(routes.ApplicationController.reserveForm)
@@ -297,10 +296,10 @@ class ApplicationController @Inject() (
 
   def validateProvider: Action[JsValue] = Action.async(parse.json) { implicit request =>
     val wsdlValid =
-      for {
+      for
         nsaId <- (request.body \ "nsa-id").asOpt[String]
         provider <- findProvider(nsaId)
-      } yield {
+      yield
         val wsdlRequest = ws.url(s"${provider.providerUrl}?wsdl").withFollowRedirects(false)
 
         wsdlRequest.get().map { wsdlResponse =>
@@ -309,14 +308,13 @@ class ApplicationController @Inject() (
             else Json.obj("valid" -> false, "message" -> wsdlResponse.status)
           Ok(response)
         }
-      }
 
     wsdlValid.getOrElse(Future.successful(BadRequest))
   }
 
   private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit
       r: Request[AnyContent]
-  ): Future[Result] = {
+  ): Future[Result] =
     val remoteUser = r.headers.get("X-REMOTE-USER")
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
@@ -334,21 +332,20 @@ class ApplicationController @Inject() (
           s"Provider (${endPoint.provider.providerUrl}) response: ${response.status}, ${response.statusText}"
         )
 
-        if response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11) then {
+        if response.header(CONTENT_TYPE).exists(_ contains ContentTypeSoap11) then
           val jsonResponse =
             JsonResponse.success(soapRequest, requestTime, response.xml, DateTime.now())
           Ok(jsonResponse)
-        } else {
+        else
           val message =
             s"Failed: ${response.status} (${response.statusText}), ${response.header(CONTENT_TYPE).getOrElse("No content type header found")}"
           BadRequest(JsonResponse.failure(soapRequest, requestTime, message))
-        }
       }
       .recover { case e =>
         logger.info("Could not send soap request", e)
         BadRequest(Json.obj("message" -> e.getMessage))
       }
-  }
+  end sendEnvelope
 
   private def addSoapActionHeader(action: String)(request: WSRequest): WSRequest =
     request.addHttpHeaders("SOAPAction" -> s""""$action"""")
@@ -360,7 +357,7 @@ class ApplicationController @Inject() (
 
   private def generateCorrelationId = UUID.randomUUID.toString
 
-  private implicit class Mappings(endPoint: EndPoint)(implicit request: Request[AnyContent]) {
+  private implicit class Mappings(endPoint: EndPoint)(implicit request: Request[AnyContent]):
 
     private def listWithoutEmptyStrings: Mapping[List[String]] =
       list(text).transform(_.filterNot(_.isEmpty), identity)
@@ -572,5 +569,5 @@ class ApplicationController @Inject() (
         )
       }
     )
-  }
-}
+  end Mappings
+end ApplicationController

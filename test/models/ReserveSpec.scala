@@ -3,7 +3,7 @@ package models
 import java.util.Date
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI reserve" should {
 
@@ -61,14 +61,14 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
     }
   }
 
-  object DefaultReservation {
+  object DefaultReservation:
     def apply(
         description: Option[String] = None,
         start: Option[Date] = Some(new Date()),
         end: Date = new Date(),
         globalReservationId: Option[String] = Some("urn:surfnet:123456"),
         ero: List[String] = Nil
-    ): Reserve = {
+    ): Reserve =
       val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
       Reserve(
         description,
@@ -86,7 +86,6 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
         provider,
         globalReservationId
       )
-    }
-  }
-
-}
+    end apply
+  end DefaultReservation
+end ReserveSpec

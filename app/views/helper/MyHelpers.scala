@@ -25,8 +25,6 @@ package views.helper
 import views.html.helper.FieldConstructor
 import views.html.fragments.twitterBootstrap2FieldConstructor
 
-object MyHelpers {
+object MyHelpers:
 
   implicit val myFields: FieldConstructor = FieldConstructor(twitterBootstrap2FieldConstructor.f)
-
-}

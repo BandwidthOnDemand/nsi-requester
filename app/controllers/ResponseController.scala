@@ -40,7 +40,7 @@ class ResponseController @javax.inject.Inject() (
 )(implicit
     mat: Materializer
 ) extends BaseController
-    with Soap11Controller {
+    with Soap11Controller:
   private val logger = Logger(classOf[ResponseController])
 
   private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single
@@ -78,10 +78,9 @@ class ResponseController @javax.inject.Inject() (
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>
-      correlationId.text match {
+      correlationId.text match
         case CorrelationId(id) => Some(id)
         case _                 => None
-      }
     }
 
   private def parseRequesterNsa(xml: NodeSeq): Option[String] =
@@ -95,4 +94,4 @@ class ResponseController @javax.inject.Inject() (
     channels += (id -> queue)
     Flow.fromSinkAndSource(Sink.ignore, source)
   }
-}
+end ResponseController

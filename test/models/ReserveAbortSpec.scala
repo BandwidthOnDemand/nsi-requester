@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveAbortSpec extends support.Specification {
+class ReserveAbortSpec extends support.Specification:
 
   "NSI v2 reserveAbort" should {
 
@@ -16,7 +16,7 @@ class ReserveAbortSpec extends support.Specification {
     }
   }
 
-  object DefaultReserveAbort {
+  object DefaultReserveAbort:
     def apply(): ReserveAbort = ReserveAbort(
       "connectionId",
       "correlationId",
@@ -24,5 +24,4 @@ class ReserveAbortSpec extends support.Specification {
       "requesterNsa",
       Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
     )
-  }
-}
+end ReserveAbortSpec

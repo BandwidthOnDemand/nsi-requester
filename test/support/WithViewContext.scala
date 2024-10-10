@@ -11,14 +11,12 @@ import views.Context
 
 abstract class WithViewContext(app: Application = GuiceApplicationBuilder().build())
     extends WithApplication(app)
-    with Injecting {
-  def this(builder: GuiceApplicationBuilder => GuiceApplicationBuilder) = {
+    with Injecting:
+  def this(builder: GuiceApplicationBuilder => GuiceApplicationBuilder) =
     this(builder(GuiceApplicationBuilder()).build())
-  }
 
   implicit def messagesApi: MessagesApi = inject[MessagesApi]
 
   implicit def viewContext(using request: RequestHeader): Context =
     new Context()(app.configuration, app.environment, request.flash, messagesApi.preferred(request))
   implicit def requesterSession: RequesterSession = inject[RequesterSession]
-}

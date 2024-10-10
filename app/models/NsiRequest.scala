@@ -33,7 +33,7 @@ abstract class NsiRequest(
     provider: Provider,
     protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion,
     addsTrace: Boolean = false
-) {
+):
   import NsiRequest.*
 
   def soapActionPrefix: String = NsiV2SoapActionPrefix
@@ -46,10 +46,9 @@ abstract class NsiRequest(
   def toNsiEnvelope(remoteUser: Option[String] = None, accessTokens: List[String] = Nil): Node =
     wrapNsiV2Envelope(nsiV2Header(remoteUser, accessTokens), nsiV2Body)
 
-  private[models] def nsas = {
+  private[models] def nsas =
     <requesterNSA>{requesterNsa}</requesterNSA>
     <providerNSA>{provider.nsaId}</providerNSA>
-  }
 
   private def nsiV2Header(remoteUser: Option[String], accessTokens: List[String]) =
     <head:nsiHeader>
@@ -60,7 +59,7 @@ abstract class NsiRequest(
       {replyTo.fold(NodeSeq.Empty)(replyTo => <replyTo>{replyTo}</replyTo>)}
       {
         if remoteUser.isEmpty && accessTokens.isEmpty then NodeSeq.Empty
-        else {
+        else
           <sessionSecurityAttr>
             {
               remoteUser.fold(NodeSeq.Empty) { user =>
@@ -77,7 +76,6 @@ abstract class NsiRequest(
               }
             }
           </sessionSecurityAttr>
-        }
       }
       {
         if addsTrace
@@ -88,7 +86,7 @@ abstract class NsiRequest(
       }
     </head:nsiHeader>
 
-  private def wrapNsiV2Envelope(header: Node, body: Node) = {
+  private def wrapNsiV2Envelope(header: Node, body: Node) =
     <soapenv:Envelope
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
       xmlns:head={NsiV2FrameworkHeadersNamespace}
@@ -104,10 +102,9 @@ abstract class NsiRequest(
         {body}
       </soapenv:Body>
     </soapenv:Envelope>
-  }
-}
+end NsiRequest
 
-object NsiRequest {
+object NsiRequest:
   val NsiV2ProviderProtocolVersion = "application/vnd.ogf.nsi.cs.v2.provider+soap"
   val NsiV2RequesterProtocolVersion = "application/vnd.ogf.nsi.cs.v2.requester+soap"
 
@@ -117,4 +114,3 @@ object NsiRequest {
   val NsiV2FrameworkHeadersNamespace: String = s"$NsiV2NamespacePrefix/framework/headers"
   val NsiV2Point2PointNamespace: String = s"$NsiV2NamespacePrefix/services/point2point"
   val NsiV2SoapActionPrefix: String = s"$NsiV2NamespacePrefix/connection/service"
-}
