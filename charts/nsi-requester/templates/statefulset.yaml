@@ -45,7 +45,7 @@ spec:
             - {{ printf "-Djavax.net.ssl.trustStore=%s/nsi-requester-truststore.jks" .Values.config.mountPath | quote }}
             - {{ printf "-Djavax.net.ssl.keyStore=%s/nsi-requester-keystore.jks" .Values.config.mountPath | quote }}
             - "-XX:MaxRAMPercentage=75.0"
-            - "-J-Xlog:gc:file=/nsi-safnari/logs/gc.log:time,level,tags:filecount=5,filesize=10M"
+            - "-J-Xlog:gc:file=/nsi-requester/logs/gc.log:time,level,tags:filecount=5,filesize=10M"
             - "-J-XshowSettings:vm"
           env:
             - name: NSI_REQUESTER_APPLICATION_SECRET
