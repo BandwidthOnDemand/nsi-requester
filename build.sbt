@@ -2,6 +2,8 @@ organization := "nl.surfnet.bod"
 name := "nsi-requester"
 version := "2.0-SNAPSHOT"
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "3.3.4"
@@ -21,14 +23,9 @@ enablePlugins(BuildInfoPlugin)
 buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, gitHeadCommitSha)
 buildInfoPackage := "support"
 
-val akkaVersion = "2.6.21"
-
-resolvers += "Akka library repository".at("https://repo.akka.io/maven")
-
 libraryDependencies ++= Seq(
   guice,
   ws,
-  "com.typesafe.akka" %% "akka-stream" % akkaVersion,
   "org.scala-stm" %% "scala-stm" % "0.11.1",
   "joda-time" % "joda-time" % "2.12.0",
   specs2 % "test",
