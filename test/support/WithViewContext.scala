@@ -15,8 +15,13 @@ abstract class WithViewContext(app: Application = GuiceApplicationBuilder().buil
   def this(builder: GuiceApplicationBuilder => GuiceApplicationBuilder) =
     this(builder(GuiceApplicationBuilder()).build())
 
-  implicit def messagesApi: MessagesApi = inject[MessagesApi]
+  given MessagesApi = inject[MessagesApi]
 
-  implicit def viewContext(using request: RequestHeader): Context =
-    new Context()(app.configuration, app.environment, request.flash, messagesApi.preferred(request))
-  implicit def requesterSession: RequesterSession = inject[RequesterSession]
+  given viewContext(using request: RequestHeader): Context =
+    new Context()(
+      app.configuration,
+      app.environment,
+      request.flash,
+      implicitly[MessagesApi].preferred(request)
+    )
+  given RequesterSession = inject[RequesterSession]

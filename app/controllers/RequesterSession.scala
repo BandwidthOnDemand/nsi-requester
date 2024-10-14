@@ -42,20 +42,20 @@ class RequesterSession @javax.inject.Inject() (configuration: Configuration):
     .getOptional[String]("requester.nsi.requesterNsa")
     .getOrElse(sys.error("Requester NSA is not configured (requester.nsi.requesterNsa)"))
 
-  def currentPortPrefix(implicit request: Request[AnyContent]): String = currentProvider.portPrefix
+  def currentPortPrefix(using request: Request[AnyContent]): String = currentProvider.portPrefix
 
-  def currentProvider(implicit request: Request[AnyContent]): Provider =
+  def currentProvider(using request: Request[AnyContent]): Provider =
     request.session.get(ProviderNsaSessionField) flatMap findProvider getOrElse allProviders.head
 
-  def currentEndPoint(implicit request: Request[AnyContent]): EndPoint =
+  def currentEndPoint(using request: Request[AnyContent]): EndPoint =
     request.session.get("accessTokens") match
       case None                 => EndPoint(currentProvider, List())
       case Some(commaSeparated) => EndPoint(currentProvider, commaSeparated.split(",").toList)
 
-  def ReplyToUrl(implicit request: Request[AnyContent]): URI =
+  def ReplyToUrl(using request: Request[AnyContent]): URI =
     URI.create(routes.ResponseController.reply.absoluteURL(isUsingSsl))
 
-  private def isUsingSsl(implicit request: Request[AnyContent]) = (
+  private def isUsingSsl(using request: Request[AnyContent]) = (
     request.headers.get("X-Forwarded-Proto") == Some("https")
       || configuration.getOptional[Boolean]("requester.ssl") == Some(true)
   )

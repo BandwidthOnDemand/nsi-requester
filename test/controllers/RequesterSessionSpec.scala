@@ -27,7 +27,7 @@ class RequesterSessionSpec extends support.Specification:
       override def running() =
         val subject = inject[RequesterSession]
 
-        val endPoint = subject.currentEndPoint(FakeRequest())
+        val endPoint = subject.currentEndPoint(using FakeRequest())
 
         endPoint.provider.providerUrl must equalTo(uri("http://localhost:9999"))
 
@@ -36,10 +36,9 @@ class RequesterSessionSpec extends support.Specification:
     ):
       override def running() =
         val subject = inject[RequesterSession]
+        val request = FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network")
 
-        val endPoint = subject.currentEndPoint(
-          FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network")
-        )
+        val endPoint = subject.currentEndPoint(using request)
 
         endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")
         endPoint.provider.providerUrl must equalTo(uri("http://localhost:8888"))

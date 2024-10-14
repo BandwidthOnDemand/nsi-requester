@@ -35,7 +35,7 @@ class SettingsController @javax.inject.Inject() (
     val controllerComponents: ControllerComponents,
     val configuration: Configuration,
     val environment: Environment
-)(implicit requesterSession: RequesterSession)
+)(using requesterSession: RequesterSession)
     extends BaseController
     with ViewContextSupport:
   import RequesterSession.*, requesterSession.*

@@ -57,7 +57,7 @@ object FormSupport:
           case _                => false
     )
 
-  implicit def periodFormat: Formatter[Period] = new Formatter[Period]:
+  given Formatter[Period] with
     override val format = Some(("Period ('days:hours:minutes')", Nil))
 
     def bind(key: String, data: Map[String, String]) =
@@ -71,24 +71,23 @@ object FormSupport:
 
     def unbind(key: String, value: Period) = Map(key -> periodFormatter.print(value))
 
-  implicit def queryMessageModeFormat: Formatter[QueryMessageMode] =
-    new Formatter[QueryMessageMode]:
-      override val format = Some(
-        (s"Allowed values: ${QueryMessageMode.values.mkString(", ")}", Nil)
-      )
+  given queryMessageModeFormat: Formatter[QueryMessageMode] with
+    override val format = Some(
+      (s"Allowed values: ${QueryMessageMode.values.mkString(", ")}", Nil)
+    )
 
-      def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryMessageMode] =
-        stringFormat.bind(key, data).flatMap { s =>
-          scala.util.control.Exception
-            .allCatch[QueryMessageMode]
-            .either(QueryMessageMode.withName(s))
-            .left
-            .map(_ => Seq(FormError(key, "error.queryMessageMode", Nil)))
-        }
+    def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryMessageMode] =
+      stringFormat.bind(key, data).flatMap { s =>
+        scala.util.control.Exception
+          .allCatch[QueryMessageMode]
+          .either(QueryMessageMode.withName(s))
+          .left
+          .map(_ => Seq(FormError(key, "error.queryMessageMode", Nil)))
+      }
 
-      def unbind(key: String, value: QueryMessageMode) = Map(key -> value.toString)
+    def unbind(key: String, value: QueryMessageMode) = Map(key -> value.toString)
 
-  implicit def queryOperationFormat: Formatter[QueryOperation] = new Formatter[QueryOperation]:
+  given queryOperationFormat: Formatter[QueryOperation] with
     override val format = Some((s"Allowed values: ${QueryOperation.values.mkString(", ")}", Nil))
 
     def bind(key: String, data: Map[String, String]): Either[Seq[FormError], QueryOperation] =

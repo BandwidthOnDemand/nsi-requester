@@ -44,7 +44,7 @@ class SettingsControllerSpec extends support.Specification:
   "The settings view" should {
     "contain the stored tokens that were previously set in session" in new WithViewContext:
       override def running() =
-        implicit val request: RequestHeader = FakeRequest()
+        given RequestHeader = FakeRequest()
         val subject = inject[SettingsController]
 
         val endpoint = EndPoint(

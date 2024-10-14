@@ -33,7 +33,7 @@ import play.api.*
 import play.api.mvc.*
 import support.JsonResponse
 import models.*
-import FormSupport.*
+import FormSupport.given
 import java.net.URI
 import play.api.Logger
 import scala.concurrent.Future
@@ -48,7 +48,7 @@ class ApplicationController @Inject() (
     val environment: Environment,
     requesterSession: RequesterSession,
     ws: WSClient
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends BaseController
     with Soap11Controller
     with ViewContextSupport:
@@ -56,7 +56,7 @@ class ApplicationController @Inject() (
 
   private val logger = Logger(classOf[Application])
 
-  implicit object FormErrorWrites extends Writes[FormError]:
+  given Writes[FormError] with
     def writes(error: FormError): JsValue = Json.toJson(
       Map("id" -> Json.toJson(error.key.replace('.', '_')), "message" -> Json.toJson(error.message))
     )
@@ -312,10 +312,10 @@ class ApplicationController @Inject() (
     wsdlValid.getOrElse(Future.successful(BadRequest))
   }
 
-  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(implicit
-      r: Request[AnyContent]
+  private def sendEnvelope(endPoint: EndPoint, nsiRequest: NsiRequest)(using
+      request: Request[AnyContent]
   ): Future[Result] =
-    val remoteUser = r.headers.get("X-REMOTE-USER")
+    val remoteUser = request.headers.get("X-REMOTE-USER")
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
 
@@ -357,7 +357,7 @@ class ApplicationController @Inject() (
 
   private def generateCorrelationId = UUID.randomUUID.toString
 
-  private implicit class Mappings(endPoint: EndPoint)(implicit request: Request[AnyContent]):
+  extension (endPoint: EndPoint)(using Request[AnyContent])
 
     private def listWithoutEmptyStrings: Mapping[List[String]] =
       list(text).transform(_.filterNot(_.isEmpty), identity)
@@ -569,5 +569,6 @@ class ApplicationController @Inject() (
         )
       }
     )
-  end Mappings
+  end extension
+
 end ApplicationController

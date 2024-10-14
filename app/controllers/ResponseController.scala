@@ -37,9 +37,8 @@ import support.JsonResponse
 class ResponseController @javax.inject.Inject() (
     val controllerComponents: ControllerComponents,
     requesterSession: RequesterSession
-)(implicit
-    mat: Materializer
-) extends BaseController
+)(using Materializer)
+    extends BaseController
     with Soap11Controller:
   private val logger = Logger(classOf[ResponseController])
 

@@ -12,7 +12,7 @@ class FormErrorWritesSpec extends support.Specification:
     "write json for FormError" in new WithViewContext:
       override def running() =
         val subject = inject[controllers.ApplicationController]
-        import subject.FormErrorWrites
+        import subject.given
 
         val error = FormError("reserve.connectionId", "required")
 
@@ -24,7 +24,7 @@ class FormErrorWritesSpec extends support.Specification:
     "write json for a seq of FormError" in new WithViewContext:
       override def running() =
         val subject = inject[controllers.ApplicationController]
-        import subject.FormErrorWrites
+        import subject.given
 
         val errors =
           Seq(

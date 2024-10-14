@@ -9,5 +9,5 @@ trait ViewContextSupport extends play.api.i18n.I18nSupport:
   def configuration: Configuration
   def environment: Environment
 
-  implicit def viewContext(implicit request: RequestHeader): views.Context =
+  given viewContext(using request: RequestHeader): views.Context =
     new views.Context()(configuration, environment, request.flash, implicitly[Messages])

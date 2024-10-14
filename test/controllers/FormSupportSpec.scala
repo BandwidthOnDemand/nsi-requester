@@ -9,7 +9,7 @@ import play.api.data.FormError
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
 class FormSupportSpec extends Specification:
 
-  import FormSupport.*
+  import FormSupport.given
 
   "QueryNotificationOperationFormat" should {
 
