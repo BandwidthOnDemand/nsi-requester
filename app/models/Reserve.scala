@@ -48,7 +48,7 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false,
     pathComputationAlgorithm: Option[String] = None
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true):
+) extends NsiRequest(addsTrace = true):
 
   import NsiRequest.*
 

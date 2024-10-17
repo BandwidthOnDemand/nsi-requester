@@ -41,7 +41,7 @@ case class QueryMessage(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
+) extends NsiRequest():
 
   override def soapActionSuffix: String = operation match
     case NotificationSync  => "queryNotificationSync"

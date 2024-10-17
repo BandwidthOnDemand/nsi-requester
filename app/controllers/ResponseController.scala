@@ -25,7 +25,7 @@ package controllers
 import javax.inject.Singleton
 import models.Ack
 import org.apache.pekko.stream.*
-import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.*
 import org.joda.time.DateTime
 import play.api.*
 import play.api.http.ContentTypes
@@ -45,9 +45,14 @@ class ResponseController @javax.inject.Inject() (
     with Soap11Controller:
   private val logger = Logger(classOf[ResponseController])
 
-  private val channels: TMap.View[String, BoundedSourceQueue[JsValue]] = TMap().single
+  type Channel = (Sink[JsValue, ?], Source[JsValue, ?])
 
-  private val CorrelationId = "urn:uuid:(.*)".r
+  private val channels: TMap.View[String, Channel] = TMap().single
+
+  def register(id: String): Channel = channels.getOrElseUpdate(
+    id,
+    MergeHub.source[JsValue].toMat(BroadcastHub.sink)(Keep.both).run()
+  )
 
   def reply: Action[NodeSeq] = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
@@ -61,7 +66,7 @@ class ResponseController @javax.inject.Inject() (
       }
 
       clients foreach { client =>
-        client.offer(JsonResponse.response(request.body, DateTime.now()))
+        Source.single(JsonResponse.response(request.body, DateTime.now())).runWith(client._1)
       }
     }
 
@@ -75,8 +80,9 @@ class ResponseController @javax.inject.Inject() (
       }
   }
 
-  private def badRequest(message: String) =
-    BadRequest((<badRequest>{message}</badRequest>).asInstanceOf[NodeSeq])
+  private def badRequest(message: String) = BadRequest(<badRequest>{message}</badRequest>)
+
+  private val CorrelationId = "urn:uuid:(.*)".r
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>
@@ -92,8 +98,7 @@ class ResponseController @javax.inject.Inject() (
     (xml \\ "providerNSA").headOption.map(_.text)
 
   def eventSource(id: String): Action[AnyContent] = Action { implicit request =>
-    val (queue, source) = Source.queue[JsValue](100).preMaterialize()
-    channels += (id -> queue)
+    val (_, source) = register(id)
     Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM)
   }
 end ResponseController

@@ -27,10 +27,6 @@ import scala.xml.NodeSeq
 import java.net.URI
 
 abstract class NsiRequest(
-    correlationId: String,
-    replyTo: Option[URI],
-    requesterNsa: String,
-    provider: Provider,
     protocolVersion: String = NsiRequest.NsiV2ProviderProtocolVersion,
     addsTrace: Boolean = false
 ):
@@ -38,6 +34,11 @@ abstract class NsiRequest(
 
   def soapActionPrefix: String = NsiV2SoapActionPrefix
   def soapActionSuffix: String
+
+  def correlationId: String
+  def replyTo: Option[URI]
+  def requesterNsa: String
+  def provider: Provider
 
   def nsiV2Body: Node
 

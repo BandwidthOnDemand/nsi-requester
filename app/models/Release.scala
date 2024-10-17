@@ -31,7 +31,7 @@ case class Release(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider):
+) extends NsiRequest():
 
   override def soapActionSuffix = "release"
 

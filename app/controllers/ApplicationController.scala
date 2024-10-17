@@ -47,6 +47,7 @@ class ApplicationController @Inject() (
     val configuration: Configuration,
     val environment: Environment,
     requesterSession: RequesterSession,
+    responseController: ResponseController,
     ws: WSClient
 )(using ec: ExecutionContext)
     extends BaseController
@@ -145,7 +146,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case reserveCommit => sendEnvelope(currentEndPoint, reserveCommit) }
+        reserveCommit => sendEnvelope(currentEndPoint, reserveCommit)
       )
   }
 
@@ -168,7 +169,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case reserveAbort => sendEnvelope(currentEndPoint, reserveAbort) }
+        reserveAbort => sendEnvelope(currentEndPoint, reserveAbort)
       )
   }
 
@@ -191,7 +192,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case provision => sendEnvelope(currentEndPoint, provision) }
+        provision => sendEnvelope(currentEndPoint, provision)
       )
   }
 
@@ -214,7 +215,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case terminate => sendEnvelope(currentEndPoint, terminate) }
+        terminate => sendEnvelope(currentEndPoint, terminate)
       )
   }
 
@@ -237,7 +238,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case release => sendEnvelope(currentEndPoint, release) }
+        release => sendEnvelope(currentEndPoint, release)
       )
   }
 
@@ -264,7 +265,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case query => sendEnvelope(currentEndPoint, query) }
+        query => sendEnvelope(currentEndPoint, query)
       )
   }
 
@@ -290,7 +291,7 @@ class ApplicationController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(Json.toJson(formWithErrors.errors))),
-        { case queryMessage => sendEnvelope(currentEndPoint, queryMessage) }
+        queryMessage => sendEnvelope(currentEndPoint, queryMessage)
       )
   }
 
@@ -318,6 +319,8 @@ class ApplicationController @Inject() (
     val remoteUser = request.headers.get("X-REMOTE-USER")
     val soapRequest = nsiRequest.toNsiEnvelope(remoteUser, endPoint.accessTokens)
     val requestTime = DateTime.now()
+
+    responseController.register(nsiRequest.correlationId)
 
     val addHeaders =
       addOauth2Header(endPoint.accessTokens) _ andThen addSoapActionHeader(nsiRequest.soapAction)

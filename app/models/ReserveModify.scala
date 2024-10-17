@@ -41,7 +41,7 @@ case class ReserveModify(
     replyTo: Option[URI],
     requesterNsa: String,
     provider: Provider
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true):
+) extends NsiRequest(addsTrace = true):
 
   import NsiRequest.*
 
