@@ -29,7 +29,7 @@ POST   /validateProvider    @controllers.ApplicationController.validateProvider
 GET    /settings            @controllers.SettingsController.settingsForm
 POST   /settings            @controllers.SettingsController.settings
 
-GET    /websocket/:id       @controllers.ResponseController.websocket(id)
+GET    /events/:id          @controllers.ResponseController.eventSource(id)
 POST   /reply               @controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path

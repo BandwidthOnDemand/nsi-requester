@@ -22,11 +22,14 @@
  */
 package controllers
 
+import javax.inject.Singleton
 import models.Ack
 import org.apache.pekko.stream.*
-import org.apache.pekko.stream.scaladsl.*
+import org.apache.pekko.stream.scaladsl.Source
 import org.joda.time.DateTime
 import play.api.*
+import play.api.http.ContentTypes
+import play.api.libs.EventSource
 import play.api.libs.json.*
 import play.api.mvc.*
 import scala.concurrent.stm.TMap
@@ -88,9 +91,9 @@ class ResponseController @javax.inject.Inject() (
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
     (xml \\ "providerNSA").headOption.map(_.text)
 
-  def websocket(id: String): WebSocket = WebSocket.accept[JsValue, JsValue] { request =>
+  def eventSource(id: String): Action[AnyContent] = Action { implicit request =>
     val (queue, source) = Source.queue[JsValue](100).preMaterialize()
     channels += (id -> queue)
-    Flow.fromSinkAndSource(Sink.ignore, source)
+    Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM)
   }
 end ResponseController

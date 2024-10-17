@@ -1,5 +1,5 @@
 $(function() {
-   let websocket;
+   let eventSource;
 
    var initExtraFields = function() {
 
@@ -104,12 +104,11 @@ $(function() {
       }
 
       function hideQueryForm(correlationId) {
-         if (websocket) websocket.close();
+         if (eventSource) eventSource.close();
 
-         websocket = new WebSocket(`/websocket/${correlationId}`)
-         websocket.addEventListener('message', (message) => {
+         eventSource = new EventSource(`/events/${correlationId}`)
+         eventSource.addEventListener('message', (message) => {
              let data = JSON.parse(message.data);
-             console.log(data);
              addXmlBlock('Response', data.response.xml, data.response.time);
          });
 
