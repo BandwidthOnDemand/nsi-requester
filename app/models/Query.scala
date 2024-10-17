@@ -27,16 +27,15 @@ import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import scala.xml.NodeSeq.Empty
+import scala.xml.Node
 
-object QueryOperation extends Enumeration {
+object QueryOperation extends Enumeration:
   type QueryOperation = Value
-  val Summary, SummarySync, Details, Recursive = Value
+  val Summary, SummarySync, Recursive = Value
 
-  def operationsV1 = List(Summary, Details)
-  def operationsV2 = List(Summary, SummarySync, Recursive)
-}
+  def operationsV2: List[Value] = List(Summary, SummarySync, Recursive)
 
-import QueryOperation._
+import QueryOperation.*
 
 case class Query(
     operation: QueryOperation = Summary,
@@ -46,44 +45,42 @@ case class Query(
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    provider: Provider
+) extends NsiRequest():
 
-  override def soapActionSuffix = operation match {
+  override def soapActionSuffix: String = operation match
     case Summary     => "querySummary"
     case SummarySync => "querySummarySync"
     case Recursive   => "queryRecursive"
-  }
 
-  override def nsiV2Body = operation match {
+  override def nsiV2Body: Node = operation match
     case Summary =>
       <type:querySummary>
-        { connectionIdTags }
-        { globalReservationIdTags }
-        { ifModifiedSinceTag }
+        {connectionIdTags}
+        {globalReservationIdTags}
+        {ifModifiedSinceTag}
       </type:querySummary>
     case SummarySync =>
       <type:querySummarySync>
-        { connectionIdTags }
-        { globalReservationIdTags }
+        {connectionIdTags}
+        {globalReservationIdTags}
       </type:querySummarySync>
     case Recursive =>
       <type:queryRecursive>
-        { connectionIdTags }
-        { globalReservationIdTags }
+        {connectionIdTags}
+        {globalReservationIdTags}
       </type:queryRecursive>
     case _ =>
       sys.error(s"Unsupported NSI v2 query type '$operation'")
-  }
 
   private def connectionIdTags =
-    connectionIds.map(id => <connectionId>{ id }</connectionId>)
+    connectionIds.map(id => <connectionId>{id}</connectionId>)
 
   private def globalReservationIdTags =
-    globalReservationIds.map(id => <globalReservationId>{ id }</globalReservationId>)
+    globalReservationIds.map(id => <globalReservationId>{id}</globalReservationId>)
 
-  private def ifModifiedSinceTag = ifModifiedSince match {
-    case Some(date) => <ifModifiedSince>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</ifModifiedSince>
+  private def ifModifiedSinceTag = ifModifiedSince match
+    case Some(date) =>
+      <ifModifiedSince>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</ifModifiedSince>
     case None => Empty
-  }
-
-}
+end Query

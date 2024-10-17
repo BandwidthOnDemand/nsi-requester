@@ -1,17 +1,18 @@
-@(releaseForm: Form[Release])(implicit flash: Flash)
+@(releaseForm: Form[Release])(implicit context: views.Context)
 
+@import context._
 @import helper._
-@import views.helper.MyHelpers._
+@import views.helper.MyHelpers.given
 
 @nsirequest(s"Make a NSI Release Request", "release") {
 
     <section id="formS">
         <h1>Make a NSI Release Request</h1>
         <div class="content">
-             @form(action = routes.Application.release, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.release, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>Release attributes</h3></div>
-                @inputText(releaseForm("release.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(releaseForm("release.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => releaseForm("release." + name))
 

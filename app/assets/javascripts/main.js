@@ -1,4 +1,5 @@
 $(function() {
+   let eventSource;
 
    var initExtraFields = function() {
 
@@ -48,6 +49,12 @@ $(function() {
             success: function(data) {
                addXmlBlock("Request", data.request.xml, data.request.time);
                addXmlBlock("Response", data.response.xml, data.response.time);
+
+               eventSource = new EventSource(`/events/${correlationId}`);
+               eventSource.addEventListener('message', (message) => {
+                  let data = JSON.parse(message.data);
+                  addXmlBlock('Response', data.response.xml, data.response.time);
+               });
             },
             error: function(err) {
                showQueryForm();
@@ -103,13 +110,17 @@ $(function() {
       }
 
       function hideQueryForm(correlationId) {
-         $('<iframe></iframe>').attr('src', 'comet/'+correlationId).insertAfter(responseS);
+         if (eventSource) eventSource.close();
+         eventSource = null;
+
          queryS.css("display", "none");
          responseS.css("display", "block");
       }
 
       function showQueryForm() {
-         $('iframe').remove();
+         if (eventSource) eventSource.close();
+         eventSource = null;
+
          queryS.css("display", "block");
          responseS.css("display", "none");
       }

@@ -7,14 +7,15 @@ import models.QueryOperation
 import play.api.data.FormError
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class FormSupportSpec extends Specification {
+class FormSupportSpec extends Specification:
 
-  import FormSupport._
+  import FormSupport.given
 
   "QueryNotificationOperationFormat" should {
 
     "parse Sync operation" in {
-      val operation = queryMessageModeFormat.bind("operation", Map("operation" -> "NotificationSync"))
+      val operation =
+        queryMessageModeFormat.bind("operation", Map("operation" -> "NotificationSync"))
 
       operation must beRight(QueryMessageMode.NotificationSync)
     }
@@ -34,4 +35,4 @@ class FormSupportSpec extends Specification {
       operation must beRight(QueryOperation.Summary)
     }
   }
-}
+end FormSupportSpec

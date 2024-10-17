@@ -1,15 +1,12 @@
 package controllers
 
-import play.api.test.WithApplication
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.data.Form
-import models._
-import play.api.test.WithApplication
-import play.api.mvc.Flash
+import models.*
+import play.api.mvc.*
+import play.api.test.*
+import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class SettingsControllerSpec extends support.Specification {
+class SettingsControllerSpec extends support.Specification:
 
   "The SettingsController" should {
 
@@ -17,37 +14,47 @@ class SettingsControllerSpec extends support.Specification {
       "provider.id" -> "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
     )
 
-    "store settings in the session" in new WithApplication {
+    "store settings in the session" in new WithViewContext:
+      override def running() =
+        val subject = inject[SettingsController]
 
-      val result = SettingsController.settings()(FakeRequest().withFormUrlEncodedBody(basicSettings: _*))
+        val result = subject.settings()(FakeRequest().withFormUrlEncodedBody(basicSettings*))
 
-      status(result) must equalTo(303)
+        status(result) must equalTo(303)
 
-      session(result).get(RequesterSession.ProviderNsaSessionField) must beSome("urn:ogf:network:surfnet.nl:1990:nsa:bod-dev")
-      flash(result).get("success") must beSome
-    }
+        session(result).get(RequesterSession.ProviderNsaSessionField) must beSome(
+          "urn:ogf:network:surfnet.nl:1990:nsa:bod-dev"
+        )
+        flash(result).get("success") must beSome
 
-    "store the access token in session" in new WithApplication {
+    "store the access token in session" in new WithViewContext:
+      override def running() =
+        val subject = inject[SettingsController]
 
-      val data = basicSettings ++ Seq(
-        "accessTokens[0]" -> "secretToken"
-      )
+        val data = basicSettings ++ Seq(
+          "accessTokens[0]" -> "secretToken"
+        )
 
-      val result = SettingsController.settings()(FakeRequest().withFormUrlEncodedBody(data: _*))
+        val result = subject.settings()(FakeRequest().withFormUrlEncodedBody(data*))
 
-      session(result).get(RequesterSession.AccessTokensSessionField) must beSome("secretToken")
-    }
+        session(result).get(RequesterSession.AccessTokensSessionField) must beSome("secretToken")
 
   }
 
   "The settings view" should {
-    "contain the stored tokens that were previously set in session" in new WithApplication {
-      val endpoint = EndPoint(Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"), List("token1"))
-      val settingsForm = SettingsController.settingsF.fill(endpoint)
+    "contain the stored tokens that were previously set in session" in new WithViewContext:
+      override def running() =
+        given RequestHeader = FakeRequest()
+        val subject = inject[SettingsController]
 
-      val result = views.html.settings(settingsForm, "version")(Flash())
+        val endpoint = EndPoint(
+          Provider("urn:provider", uri("http://localhost"), "urn:ogf:network:"),
+          List("token1")
+        )
+        val settingsForm = subject.settingsF.fill(endpoint)
 
-      contentAsString(result) must contain("""name="accessTokens[0]" value="token1"""")
-    }
+        val result = views.html.settings(settingsForm, "version")
+
+        contentAsString(result) must contain("""name="accessTokens[0]" value="token1"""")
   }
-}
+end SettingsControllerSpec

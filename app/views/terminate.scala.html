@@ -1,18 +1,19 @@
-@(terminateForm: Form[Terminate])(implicit flash: Flash)
+@(terminateForm: Form[Terminate])(implicit context: views.Context)
 
+@import context._
 @import helper._
-@import views.helper.MyHelpers._
+@import views.helper.MyHelpers.given
 
 @nsirequest(s"Make a NSI Terminate Request", "terminate") {
 
     <section id="formS">
         <h1>Make a NSI Terminate Request</h1>
         <div class="content">
-             @form(action = routes.Application.terminate, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.terminate, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>Terminate attributes</h3></div>
 
-                @inputText(terminateForm("terminate.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(terminateForm("terminate.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => terminateForm("terminate." + name))
 

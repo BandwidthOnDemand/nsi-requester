@@ -20,3 +20,8 @@ bin
 /.cache-tests
 .java-version
 charts/nsi-requester/config
+/project/.bloop/
+/project/metals.sbt
+/.metals/
+/.bsp/
+/.bloop/

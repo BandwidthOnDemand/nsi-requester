@@ -1,14 +1,14 @@
 # NSI requester
 
-Detailed instructions can be found at: http://bandwidthondemand.github.io/nsi-requester/
+Detailed instructions can be found at: https://bandwidthondemand.github.io/nsi-requester/
 
-Building a production instance: http://bandwidthondemand.github.io/nsi-requester/build
+Building a production instance: https://bandwidthondemand.github.io/nsi-requester/build
 
-Installing software dependencies: http://bandwidthondemand.github.io/nsi-requester/thirdparty
+Installing software dependencies: https://bandwidthondemand.github.io/nsi-requester/thirdparty
 
-How to front the nsi-requester with a reverse proxy: http://bandwidthondemand.github.io/nsi-requester/deployment
+How to front the nsi-requester with a reverse proxy: https://bandwidthondemand.github.io/nsi-requester/deployment
 
-Start the application by `play run` or `sbt run`.  
+Start the application by `play run` or `sbt run`.
 You need either Play! or sbt installed. Both available through [Homebrew][homebrew].
 
     brew install play
