@@ -1,6 +1,4 @@
-@(error: Throwable, response: Option[String])(implicit flash: Flash)
-
-@import helper._
+@(error: Throwable, response: Option[String])(implicit context: views.Context)
 
 @main("Error Occurred", "response") {
     <section>

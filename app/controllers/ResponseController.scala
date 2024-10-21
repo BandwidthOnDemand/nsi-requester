@@ -22,60 +22,73 @@
  */
 package controllers
 
-import play.api._
-import play.api.mvc._
-import play.api.libs._
-import play.api.libs.json.Json.stringify
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Concurrent.Channel
-import play.api.libs.concurrent.Execution.Implicits._
-import views.html.defaultpages.badRequest
-import org.joda.time.DateTime
-import scala.concurrent.stm.TMap
-import support.JsonResponse
-import scala.xml.NodeSeq
+import javax.inject.Singleton
 import models.Ack
-import models.Provider
-import models.NsiRequest
+import org.apache.pekko.stream.*
+import org.apache.pekko.stream.scaladsl.*
+import org.joda.time.DateTime
+import play.api.*
+import play.api.http.ContentTypes
+import play.api.libs.EventSource
+import play.api.libs.json.*
+import play.api.mvc.*
+import scala.concurrent.stm.TMap
+import scala.xml.NodeSeq
+import support.JsonResponse
 
-object ResponseController extends Controller with Soap11Controller {
+@javax.inject.Singleton
+class ResponseController @javax.inject.Inject() (
+    val controllerComponents: ControllerComponents,
+    requesterSession: RequesterSession
+)(using Materializer)
+    extends BaseController
+    with Soap11Controller:
+  private val logger = Logger(classOf[ResponseController])
 
-  private val channels: TMap.View[String, Channel[String]] = TMap().single
+  type Channel = (Sink[JsValue, ?], Source[JsValue, ?])
 
-  private val CorrelationId = "urn:uuid:(.*)".r
+  private val channels: TMap.View[String, Channel] = TMap().single
 
-  def reply = Action(parse.xml) { request =>
+  def register(id: String): Channel = channels.getOrElseUpdate(
+    id,
+    MergeHub.source[JsValue].toMat(BroadcastHub.sink)(Keep.both).run()
+  )
+
+  def reply: Action[NodeSeq] = Action(parse.xml) { request =>
     val correlationId = parseCorrelationId(request.body)
     val providerNsa = parseProviderNsa(request.body)
     val requesterNsa = parseRequesterNsa(request.body)
 
     correlationId.foreach { id =>
       val clients = channels.get(id).map(Seq(_)).getOrElse {
-        Logger.info(s"Could not find correlation id $id, sending reply to all clients")
+        logger.info(s"Could not find correlation id $id, sending reply to all clients")
         channels.values
       }
 
       clients foreach { client =>
-        client.push(stringify(JsonResponse.response(request.body, DateTime.now())))
+        Source.single(JsonResponse.response(request.body, DateTime.now())).runWith(client._1)
       }
     }
 
-    providerNsa.flatMap(RequesterSession.findProvider).fold(badRequest("Could not find provider nsa")) { provider =>
-      correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
-        Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope()).as(ContentTypeSoap11)
+    providerNsa
+      .flatMap(requesterSession.findProvider)
+      .fold(badRequest("Could not find provider nsa")) { provider =>
+        correlationId.fold(badRequest("Could not find CorrelationId")) { id =>
+          Ok(Ack(id, requesterNsa.getOrElse("not.found.in.request"), provider).toNsiEnvelope())
+            .as(ContentTypeSoap11)
+        }
       }
-    }
   }
 
-  private def badRequest(message: String) =
-    BadRequest((<badRequest>{ message }</badRequest>).asInstanceOf[NodeSeq])
+  private def badRequest(message: String) = BadRequest(<badRequest>{message}</badRequest>)
+
+  private val CorrelationId = "urn:uuid:(.*)".r
 
   private def parseCorrelationId(xml: NodeSeq): Option[String] =
     (xml \\ "correlationId").theSeq.headOption.flatMap { correlationId =>
-      correlationId.text match {
+      correlationId.text match
         case CorrelationId(id) => Some(id)
-        case _ => None
-      }
+        case _                 => None
     }
 
   private def parseRequesterNsa(xml: NodeSeq): Option[String] =
@@ -84,12 +97,8 @@ object ResponseController extends Controller with Soap11Controller {
   private def parseProviderNsa(xml: NodeSeq): Option[String] =
     (xml \\ "providerNSA").headOption.map(_.text)
 
-  def comet(id: String) = Action {
-    val (enumerator, channel) = Concurrent.broadcast[String]
-
-    channels += (id -> channel)
-
-    Ok.chunked(enumerator &> Comet(callback = "parent.message"))
+  def eventSource(id: String): Action[AnyContent] = Action { implicit request =>
+    val (_, source) = register(id)
+    Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM)
   }
-
-}
+end ResponseController

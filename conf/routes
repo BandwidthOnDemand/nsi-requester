@@ -3,34 +3,34 @@
 # ~~~~
 
 # Home page
-GET    /                    controllers.Application.index
-GET    /reserve             controllers.Application.index
-GET    /reserve/initial     controllers.Application.reserveForm
-POST   /reserve/initial     controllers.Application.reserve
-GET    /reserve/modify      controllers.Application.reserveModifyForm
-POST   /reserve/modify      controllers.Application.reserveModify
-GET    /reserveCommit       controllers.Application.reserveCommitForm
-POST   /reserveCommit       controllers.Application.reserveCommit
-GET    /reserveAbort        controllers.Application.reserveAbortForm
-POST   /reserveAbort        controllers.Application.reserveAbort
-GET    /provision           controllers.Application.provisionForm
-POST   /provision           controllers.Application.provision
-GET    /terminate           controllers.Application.terminateForm
-POST   /terminate           controllers.Application.terminate
-GET    /release             controllers.Application.releaseForm
-POST   /release             controllers.Application.release
-GET    /query               controllers.Application.queryForm
-POST   /query               controllers.Application.query
-GET    /queryMessage        controllers.Application.queryMessageForm
-POST   /queryMessage        controllers.Application.queryMessage
+GET    /                    @controllers.ApplicationController.index
+GET    /reserve             @controllers.ApplicationController.index
+GET    /reserve/initial     @controllers.ApplicationController.reserveForm
+POST   /reserve/initial     @controllers.ApplicationController.reserve
+GET    /reserve/modify      @controllers.ApplicationController.reserveModifyForm
+POST   /reserve/modify      @controllers.ApplicationController.reserveModify
+GET    /reserveCommit       @controllers.ApplicationController.reserveCommitForm
+POST   /reserveCommit       @controllers.ApplicationController.reserveCommit
+GET    /reserveAbort        @controllers.ApplicationController.reserveAbortForm
+POST   /reserveAbort        @controllers.ApplicationController.reserveAbort
+GET    /provision           @controllers.ApplicationController.provisionForm
+POST   /provision           @controllers.ApplicationController.provision
+GET    /terminate           @controllers.ApplicationController.terminateForm
+POST   /terminate           @controllers.ApplicationController.terminate
+GET    /release             @controllers.ApplicationController.releaseForm
+POST   /release             @controllers.ApplicationController.release
+GET    /query               @controllers.ApplicationController.queryForm
+POST   /query               @controllers.ApplicationController.query
+GET    /queryMessage        @controllers.ApplicationController.queryMessageForm
+POST   /queryMessage        @controllers.ApplicationController.queryMessage
 
-POST   /validateProvider    controllers.Application.validateProvider
+POST   /validateProvider    @controllers.ApplicationController.validateProvider
 
-GET    /settings            controllers.SettingsController.settingsForm
-POST   /settings            controllers.SettingsController.settings
+GET    /settings            @controllers.SettingsController.settingsForm
+POST   /settings            @controllers.SettingsController.settings
 
-GET    /comet/:id           controllers.ResponseController.comet(id)
-POST   /reply               controllers.ResponseController.reply
+GET    /events/:id          @controllers.ResponseController.eventSource(id)
+POST   /reply               @controllers.ResponseController.reply
 
 # Map static resources from the /public folder to the /assets URL path
 GET    /assets/*file        controllers.Assets.at(path="/public", file)

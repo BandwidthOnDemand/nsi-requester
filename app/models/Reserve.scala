@@ -26,12 +26,11 @@ import java.net.URI
 import java.util.Date
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import org.joda.time.Period
 import scala.xml.NodeSeq.Empty
+import scala.xml.Elem
 
-object Reserve {
-  val PathComputationAlgorithms = Seq("Chain", "Sequential", "Tree")
-}
+object Reserve:
+  val PathComputationAlgorithms: Seq[String] = Seq("Chain", "Sequential", "Tree")
 case class Reserve(
     description: Option[String],
     startDate: Option[Date],
@@ -49,92 +48,71 @@ case class Reserve(
     globalReservationId: Option[String] = None,
     unprotected: Boolean = false,
     pathComputationAlgorithm: Option[String] = None
-) extends NsiRequest(correlationId, replyTo, requesterNsa, provider, addsTrace = true) {
+) extends NsiRequest(addsTrace = true):
 
-  import NsiRequest._
+  import NsiRequest.*
 
   override def soapActionSuffix = "reserve"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserve>
-      { globalReservationIdField }
-      { descriptionField }
-      <criteria version={ version.toString }>
+      {globalReservationIdField}
+      {descriptionField}
+      <criteria version={version.toString}>
         <schedule>
-          { startTimeField }
-          { endTimeField }
+          {startTimeField}
+          {endTimeField}
         </schedule>
-        <serviceType>{ serviceType }</serviceType>
-        { service }
+        <serviceType>{serviceType}</serviceType>
+        {service}
       </criteria>
     </type:reserve>
 
-  private def startTimeField = startDate match {
-    case Some(date) => <startTime>{ ISODateTimeFormat.dateTime().print(new DateTime(date)) }</startTime>
-    case None       => Empty
-  }
+  private def startTimeField = startDate match
+    case Some(date) =>
+      <startTime>{ISODateTimeFormat.dateTime().print(new DateTime(date))}</startTime>
+    case None => Empty
 
-  private def globalReservationIdField = globalReservationId match {
-    case Some(g) => <globalReservationId>{ g }</globalReservationId>
+  private def globalReservationIdField = globalReservationId match
+    case Some(g) => <globalReservationId>{g}</globalReservationId>
     case None    => <globalReservationId/>
-  }
 
-  private def descriptionField = description match {
-    case Some(d) => <description>{ d }</description>
+  private def descriptionField = description match
+    case Some(d) => <description>{d}</description>
     case None    => Empty
-  }
 
   private def endTimeField =
-    <endTime>{ ISODateTimeFormat.dateTime().print(new DateTime(endDate)) }</endTime>
+    <endTime>{ISODateTimeFormat.dateTime().print(new DateTime(endDate))}</endTime>
 
-  private def eroPresent: Boolean = {
-    var found = false;
-    ero.withFilter(x => x.nonEmpty).foreach(x => found = true)
-    found
-  }
+  private def eroPresent: Boolean = ero.exists(_.nonEmpty)
 
   private def service =
-    <p2p:p2ps xmlns:p2p={ NsiV2Point2PointNamespace }>
-      <capacity>{ bandwidth }</capacity>
+    <p2p:p2ps xmlns:p2p={NsiV2Point2PointNamespace}>
+      <capacity>{bandwidth}</capacity>
       <directionality>Bidirectional</directionality>
       <symmetricPath>true</symmetricPath>
-      <sourceSTP>{ source.stpId }</sourceSTP>
-      <destSTP>{ destination.stpId }</destSTP>
+      <sourceSTP>{source.stpId}</sourceSTP>
+      <destSTP>{destination.stpId}</destSTP>
       {
-        if (eroPresent)
-      <ero>
-        {
-          var order = -1;
-          for (member <- ero; if member.nonEmpty) yield <orderedSTP order={ order += 1; order.toString }><stp>{ member }</stp></orderedSTP>
-        }
-      </ero>
+        if eroPresent
+        then
+          <ero>{
+            for
+              (member, order) <- ero.filter(_.nonEmpty).zipWithIndex
+              if member.nonEmpty
+            yield <orderedSTP order={order.toString}><stp>{member}</stp></orderedSTP>
+          }</ero>
+        else Empty
       }
       {
-        if (unprotected)
-          <parameter type="protection">UNPROTECTED</parameter>
-        else
-          <parameter type="protection">PROTECTED</parameter>
+        <parameter type="protection">{
+          if unprotected then "UNPROTECTED" else "PROTECTED"
+        }</parameter>
       }
       {
-        pathComputationAlgorithm.map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>).orNull
+        pathComputationAlgorithm
+          .map(x => <parameter type="pathComputationAlgorithm">{x.toUpperCase}</parameter>)
+          .getOrElse(Empty)
       }
     </p2p:p2ps>
-
-  private def possibleUnprotected =
-    if (unprotected)
-      <serviceAttributes>
-        <guaranteed>
-          <saml:Attribute
-            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="sNCP">
-            <saml:AttributeValue
-              xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-              Unprotected
-            </saml:AttributeValue>
-          </saml:Attribute>
-        </guaranteed>
-      </serviceAttributes>
-    else
-      Empty
-}
+end Reserve

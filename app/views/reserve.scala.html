@@ -1,7 +1,8 @@
-@(requestForm: Form[Reserve])(implicit flash: Flash)
+@(requestForm: Form[Reserve])(implicit context: views.Context)
 
+@import context._
 @import helper._
-@import views.helper.MyHelpers._
+@import views.helper.MyHelpers.given
 
 @nsirequest(s"Make a NSI Reserve Request", "reserve") {
 
@@ -9,40 +10,40 @@
         <h1>Make a NSI Reserve Request</h1>
 
         <div class="content">
-            @form(action = routes.Application.reserve, 'class -> "form form-horizontal") {
+            @form(action = routes.ApplicationController.reserve, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>Reserve attributes <span class="timezone">Times in @java.util.TimeZone.getDefault.getDisplayName</span></h3></div>
 
-                @inputText(requestForm("reservation.version"), '_label -> "Version")
-                @inputText(requestForm("reservation.globalReservationId"), '_label -> "Global Reservation Id", 'class -> "input-xlarge")
-                @inputText(requestForm("reservation.description"), '_label -> "Description")
-                @inputText(requestForm("reservation.startDate"), '_label -> "Start Date")
-                @inputText(requestForm("reservation.endDate"), '_label -> "End Date")
-                @inputText(requestForm("reservation.serviceType"), '_label -> "Service Type", 'class -> "input-xlarge")
+                @inputText(requestForm("reservation.version"), Symbol("_label") -> "Version")
+                @inputText(requestForm("reservation.globalReservationId"), Symbol("_label") -> "Global Reservation Id", Symbol("class") -> "input-xlarge")
+                @inputText(requestForm("reservation.description"), Symbol("_label") -> "Description")
+                @inputText(requestForm("reservation.startDate"), Symbol("_label") -> "Start Date")
+                @inputText(requestForm("reservation.endDate"), Symbol("_label") -> "End Date")
+                @inputText(requestForm("reservation.serviceType"), Symbol("_label") -> "Service Type", Symbol("class") -> "input-xlarge")
 
                 @inputPort(field => requestForm("reservation.source." + field), "source")
                 @inputPort(field => requestForm("reservation.destination." + field), "destination")
 
-                @inputText(requestForm("reservation.bandwidth"), '_label -> "Bandwidth")
+                @inputText(requestForm("reservation.bandwidth"), Symbol("_label") -> "Bandwidth")
 
                 <fieldset id="ero" style="position: relative">
                     <a href="#" id="plus-ero" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
                     @repeat(requestForm("reservation.ero"), min = 1) { eroField =>
-                    @inputText(eroField, '_label -> "ERO", 'class -> "input-xlarge")
+                    @inputText(eroField, Symbol("_label") -> "ERO", Symbol("class") -> "input-xlarge")
                     }
                 </fieldset>
 
                 <div id="template-ero" class="template">
-                    @inputText(requestForm("reservation.ero[x]"), '_label -> "", 'class -> "input-xlarge")
+                    @inputText(requestForm("reservation.ero[x]"), Symbol("_label") -> "", Symbol("class") -> "input-xlarge")
                 </div>
 
-                @checkbox(requestForm("reservation.unprotected"), '_label -> "Unprotected Path", '_showConstraints -> false)
+                @checkbox(requestForm("reservation.unprotected"), Symbol("_label") -> "Unprotected Path", Symbol("_showConstraints") -> false)
 
                 @select(
                    requestForm("reservation.pathComputationAlgorithm"),
                    options = ("" -> "Default") :: Reserve.PathComputationAlgorithms.map(x => (x.toUpperCase, x)).toList,
-                   '_label -> "Path computation algorithm",
-                   '_showConstraints -> false
+                   Symbol("_label") -> "Path computation algorithm",
+                   Symbol("_showConstraints") -> false
                 )
 
                 @fragments.nsiCommonFields(name => requestForm("reservation." + name))
@@ -72,5 +73,5 @@
 }
 
 @inputPort(field: String => Field, name: String) = {
-  @inputText(field("stpId"), '_label -> s"${name.capitalize} STP id", 'class -> "input-xlarge")
+  @inputText(field("stpId"), Symbol("_label") -> s"${name.capitalize} STP id", Symbol("class") -> "input-xlarge")
 }

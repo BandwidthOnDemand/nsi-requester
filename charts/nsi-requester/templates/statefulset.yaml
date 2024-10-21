@@ -44,14 +44,9 @@ spec:
             - "-Djavax.net.ssl.keyStorePassword=secret"
             - {{ printf "-Djavax.net.ssl.trustStore=%s/nsi-requester-truststore.jks" .Values.config.mountPath | quote }}
             - {{ printf "-Djavax.net.ssl.keyStore=%s/nsi-requester-keystore.jks" .Values.config.mountPath | quote }}
-            - "-J-Xms512m"
-            - "-J-Xmx512m"
-            - "-J-server"
-            - "-J-verbose:gc"
-            - "-J-XX:+PrintGCDetails"
-            - "-J-XX:+PrintGCDateStamps"
-            - "-J-XX:+UseParallelGC"
-            - "-J-XX:+UseParallelOldGC"
+            - "-XX:MaxRAMPercentage=75.0"
+            - "-J-Xlog:gc:file=/nsi-requester/logs/gc.log:time,level,tags:filecount=5,filesize=10M"
+            - "-J-XshowSettings:vm"
           env:
             - name: NSI_REQUESTER_APPLICATION_SECRET
               valueFrom:

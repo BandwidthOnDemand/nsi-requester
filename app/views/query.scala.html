@@ -1,38 +1,39 @@
-@(queryForm: Form[Query])(implicit flash: Flash)
+@(queryForm: Form[Query])(implicit context: views.Context)
 
+@import context._
 @import helper._
-@import views.helper.MyHelpers._
+@import views.helper.MyHelpers.given
 
 @nsirequest(s"Make a NSI Query Request", "query") {
 
     <section id="formS">
         <h1>Make a NSI Query Request</h1>
         <div class="content">
-             @form(action = routes.Application.query, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.query, Symbol("class") -> "form form-horizontal") {
                 <div class="message"><h3>Query attributes</h3></div>
 
                 @select(
                    queryForm("query.operation"),
                    options = options(QueryOperation.operationsV2.map(_.toString).toList),
-                   '_label -> "Operation",
-                   '_showConstraints -> false
+                   Symbol("_label") -> "Operation",
+                   Symbol("_showConstraints") -> false
                 )
 
                 <fieldset id="connectionIds" style="position: relative">
                     <a href="#" id="plus-connection" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
                     @repeat(queryForm("query.connectionIds"), min = 1) { connectionId =>
-                        @inputText(connectionId, '_label -> "Connection Id", 'class -> "input-xlarge")
+                        @inputText(connectionId, Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
                     }
                 </fieldset>
 
                 <fieldset id="globalReservationIds" style="position: relative">
                     <a href="#" id="plus-reservation" style="float: right; position: absolute; left: 510px; top: 5px;"><i class="icon-plus-sign"></i></a>
                     @repeat(queryForm("query.globalReservationIds"), min = 1) { globalReservationId =>
-                        @inputText(globalReservationId, '_label -> "Global Reservation Id", 'class -> "input-xlarge")
+                        @inputText(globalReservationId, Symbol("_label") -> "Global Reservation Id", Symbol("class") -> "input-xlarge")
                     }
                 </fieldset>
 
-                @inputText(queryForm("query.ifModifiedSince"), '_label -> "If Modfied Since")
+                @inputText(queryForm("query.ifModifiedSince"), Symbol("_label") -> "If Modfied Since")
 
                 @fragments.nsiCommonFields(name => queryForm("query." + name))
 
@@ -43,10 +44,10 @@
         </div>
 
         <div id="template-connection" class="template">
-            @inputText(queryForm("query.connectionIds[x]"), '_label -> "", 'class -> "input-xlarge")
+            @inputText(queryForm("query.connectionIds[x]"), Symbol("_label") -> "", Symbol("class") -> "input-xlarge")
         </div>
         <div id="template-reservation" class="template">
-            @inputText(queryForm("query.globalReservationIds[x]"), '_label -> "", 'class -> "input-xlarge")
+            @inputText(queryForm("query.globalReservationIds[x]"), Symbol("_label") -> "", Symbol("class") -> "input-xlarge")
         </div>
 
         <script>

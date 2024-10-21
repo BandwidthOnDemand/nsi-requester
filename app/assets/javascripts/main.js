@@ -1,4 +1,5 @@
 $(function() {
+   let eventSource;
 
    var initExtraFields = function() {
 
@@ -28,12 +29,6 @@ $(function() {
           xmlTemplate = $("#xml-template"),
           form = queryS.find("form"),
           responseContent = $("#responseS > div.content");
-
-      window.message = function(data) {
-        var json = $.parseJSON(data);
-        addXmlBlock("Callback response", json.response.xml, json.response.time);
-        increaseResponses();
-      }
 
       form.submit(function(event) {
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
@@ -103,13 +98,23 @@ $(function() {
       }
 
       function hideQueryForm(correlationId) {
-         $('<iframe></iframe>').attr('src', 'comet/'+correlationId).insertAfter(responseS);
+         if (eventSource) eventSource.close();
+
+          eventSource = new EventSource(`/events/${correlationId}`);
+          eventSource.addEventListener('message', (message) => {
+              let data = JSON.parse(message.data);
+              addXmlBlock('Callback Response', data.response.xml, data.response.time);
+              increaseResponses();
+          });
+
          queryS.css("display", "none");
          responseS.css("display", "block");
       }
 
       function showQueryForm() {
-         $('iframe').remove();
+         if (eventSource) eventSource.close();
+         eventSource = null;
+
          queryS.css("display", "block");
          responseS.css("display", "none");
       }

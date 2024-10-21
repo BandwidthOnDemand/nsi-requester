@@ -1,12 +1,9 @@
 package models
 
 import java.util.Date
-import org.joda.time.DateTime
-import org.joda.time.Period
-import scala.xml.Node
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI reserve" should {
 
@@ -14,12 +11,14 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
       val res = DefaultReservation().copy(correlationId = "FD5C4151-F980-410A-8565-5E8EDCE880F1")
 
       val envelope = res.toNsiEnvelope()
-      envelope must \("Header") \("nsiHeader") \("correlationId") \> "urn:uuid:FD5C4151-F980-410A-8565-5E8EDCE880F1"
-      envelope must \("Header") \("nsiHeader") \("ConnectionTrace") \("Connection")
+      envelope must \("Header") \ ("nsiHeader") \ ("correlationId") \>
+        "urn:uuid:FD5C4151-F980-410A-8565-5E8EDCE880F1"
+      envelope must \("Header") \ ("nsiHeader") \ ("ConnectionTrace") \ ("Connection")
     }
 
     "have a source and destination STP id" in {
-      val res = DefaultReservation().copy(source = Port("source"), destination = Port("destination"))
+      val res =
+        DefaultReservation().copy(source = Port("source"), destination = Port("destination"))
 
       res.toNsiEnvelope() must \\("sourceSTP") \> "source"
       res.toNsiEnvelope() must \\("destSTP") \> "destination"
@@ -34,28 +33,59 @@ class ReserveSpec extends support.Specification with org.specs2.matcher.XmlMatch
     "carry an oauth token in the soap headers" in {
       val res = DefaultReservation()
       val token = "foo"
-      res.toNsiEnvelope(None, List(token)) must \("Header") \("nsiHeader") \("sessionSecurityAttr") \\("AttributeValue") \>token
+      res.toNsiEnvelope(None, List(token)) must \("Header") \ ("nsiHeader") \
+        ("sessionSecurityAttr") \\ ("AttributeValue") \> token
     }
 
     "not carry an sessionsecurityAttr element in soap headers when no token and no remote user was specified" in {
       val res = DefaultReservation()
 
-      res.toNsiEnvelope() must not \\("sessionSecurityAttr")
+      res.toNsiEnvelope() must not \\ ("sessionSecurityAttr")
     }
 
     "carry an remote user in the soap headers" in {
       val res = DefaultReservation()
       val user = "Chris"
-      res.toNsiEnvelope(Some(user)) must \("Header") \("nsiHeader") \("sessionSecurityAttr") \\("AttributeValue") \>user
+      res.toNsiEnvelope(Some(user)) must \("Header") \ ("nsiHeader") \
+        ("sessionSecurityAttr") \\ ("AttributeValue") \> user
     }
 
+    "include ero" in {
+      val res = DefaultReservation(ero = List("ero-1", "", "ero-2"))
+      res.toNsiEnvelope() \\ ("ero") must beEqualToIgnoringSpace(
+        <ero xmlns:p2p="http://schemas.ogf.org/nsi/2013/12/services/point2point">
+          <orderedSTP order="0"><stp>ero-1</stp></orderedSTP>
+          <orderedSTP order="1"><stp>ero-2</stp></orderedSTP>
+        </ero>
+      )
+    }
   }
 
-  object DefaultReservation {
-    def apply(description: Option[String] = None, start: Option[Date] = Some(new Date()), end: Date = new Date(), globalReservationId: Option[String] = Some("urn:surfnet:123456")) = {
+  object DefaultReservation:
+    def apply(
+        description: Option[String] = None,
+        start: Option[Date] = Some(new Date()),
+        end: Date = new Date(),
+        globalReservationId: Option[String] = Some("urn:surfnet:123456"),
+        ero: List[String] = Nil
+    ): Reserve =
       val provider = Provider("urn:default-provider", uri("http://localhost"), "urn:ogf:network:")
-      Reserve(description, start, end, "connection", Port("source"), Port("dest"), Nil, 10, 1, "FD5C4151-F980-410A-8565-5E8EDCE880F1", Some(uri("http://localhost")), "requesterNsa", provider, globalReservationId)
-    }
-  }
-
-}
+      Reserve(
+        description,
+        start,
+        end,
+        "connection",
+        Port("source"),
+        Port("dest"),
+        ero,
+        10,
+        1,
+        "FD5C4151-F980-410A-8565-5E8EDCE880F1",
+        Some(uri("http://localhost")),
+        "requesterNsa",
+        provider,
+        globalReservationId
+      )
+    end apply
+  end DefaultReservation
+end ReserveSpec

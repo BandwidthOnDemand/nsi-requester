@@ -1,14 +1,22 @@
 package models
 
 import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class QueryMessageSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
-  import QueryMessageMode._
+  import QueryMessageMode.*
 
-  val queryNotifiation = QueryMessage(NotificationAsync, "connectionId", Some(2), Some(10), "correlationId", None, "nsaRequester", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
+  val queryNotifiation: QueryMessage = QueryMessage(
+    NotificationAsync,
+    "connectionId",
+    Some(2),
+    Some(10),
+    "correlationId",
+    None,
+    "nsaRequester",
+    Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
+  )
 
   "QueryNotifications" should {
 
@@ -28,4 +36,4 @@ class QueryMessageSpec extends support.Specification with org.specs2.matcher.Xml
     }
 
   }
-}
+end QueryMessageSpec

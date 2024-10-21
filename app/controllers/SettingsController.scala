@@ -22,41 +22,54 @@
  */
 package controllers
 
-import play.api.mvc._
+import models.*
+import play.api.Configuration
+import play.api.Environment
 import play.api.data.Form
-import play.api.data.Forms._
-import models._
-import RequesterSession._
+import play.api.data.Forms.*
+import play.api.mvc.*
 import support.BuildInfo
 
-object SettingsController extends Controller {
+@javax.inject.Singleton
+class SettingsController @javax.inject.Inject() (
+    val controllerComponents: ControllerComponents,
+    val configuration: Configuration,
+    val environment: Environment
+)(using requesterSession: RequesterSession)
+    extends BaseController
+    with ViewContextSupport:
+  import RequesterSession.*, requesterSession.*
 
-  def settingsForm = Action { implicit request =>
+  def settingsForm: Action[AnyContent] = Action { implicit request =>
     val defaultForm = settingsF.fill(currentEndPoint)
 
     Ok(views.html.settings(defaultForm, VersionString))
   }
 
-  def settings = Action { implicit request =>
-    settingsF.bindFromRequest.fold[Result](
-      formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
-      {
-        case endPoint =>{
-          Redirect(routes.Application.reserveForm)
+  def settings: Action[AnyContent] = Action { implicit request =>
+    settingsF
+      .bindFromRequest()
+      .fold[Result](
+        formWithErrors => BadRequest(views.html.settings(formWithErrors, VersionString)),
+        { case endPoint =>
+          Redirect(routes.ApplicationController.reserveForm)
             .flashing("success" -> "Settings changed for this session")
             .withSession(
               AccessTokensSessionField -> endPoint.accessTokens.mkString(","),
-              ProviderNsaSessionField -> endPoint.provider.nsaId)
+              ProviderNsaSessionField -> endPoint.provider.nsaId
+            )
         }
-      })
+      )
   }
 
   private lazy val VersionString = s"${BuildInfo.version} (${BuildInfo.gitHeadCommitSha})"
 
   private[controllers] val settingsF: Form[EndPoint] = Form(
     mapping(
-      "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider => Some(provider.nsaId)),
+      "provider" -> mapping("id" -> nonEmptyText)(id => findProvider(id).get)(provider =>
+        Some(provider.nsaId)
+      ),
       "accessTokens" -> list(text)
-    )(EndPoint.apply)(EndPoint.unapply)
+    )(EndPoint.apply)(ep => Some(Tuple.fromProductTyped(ep)))
   )
-}
+end SettingsController

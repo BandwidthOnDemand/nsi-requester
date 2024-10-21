@@ -1,17 +1,18 @@
-@(reserveCommitForm: Form[ReserveCommit])(implicit flash: Flash)
+@(reserveCommitForm: Form[ReserveCommit])(implicit context: views.Context)
 
+@import context._
 @import helper._
-@import views.helper.MyHelpers._
+@import views.helper.MyHelpers.given
 
 @nsirequest(s"Make a NSI ReserveCommit Request", "commit") {
 
     <section id="formS">
         <h1>Make a NSI ReserveCommit Request</h1>
         <div class="content">
-             @form(action = routes.Application.reserveCommit, 'class -> "form form-horizontal") {
+             @form(action = routes.ApplicationController.reserveCommit, Symbol("class") -> "form form-horizontal") {
 
                 <div class="message"><h3>ReserveCommit attributes</h3></div>
-                @inputText(reserveCommitForm("reserveCommit.connectionId"), '_label -> "Connection Id", 'class -> "input-xlarge")
+                @inputText(reserveCommitForm("reserveCommit.connectionId"), Symbol("_label") -> "Connection Id", Symbol("class") -> "input-xlarge")
 
                 @fragments.nsiCommonFields(name => reserveCommitForm("reserveCommit." + name))
 

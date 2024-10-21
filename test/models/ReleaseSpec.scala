@@ -3,7 +3,7 @@ package models
 import org.junit.runner.RunWith
 
 @RunWith(classOf[org.specs2.runner.JUnitRunner])
-class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatchers {
+class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatchers:
 
   "NSI release" should {
 
@@ -12,13 +12,17 @@ class ReleaseSpec extends support.Specification with org.specs2.matcher.XmlMatch
 
       envelope must \\("release")
       envelope must \\("connectionId") \> "12345"
-      envelope must not \\("ConnectionTrace")
+      envelope must not \\ ("ConnectionTrace")
     }
 
   }
 
-  object DefaultRelease {
-    def apply() = Release("123-abc", "asdf-1234", Some(uri("http://localhost")), "requesterNsa", Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:"))
-  }
-
-}
+  object DefaultRelease:
+    def apply(): Release = Release(
+      "123-abc",
+      "asdf-1234",
+      Some(uri("http://localhost")),
+      "requesterNsa",
+      Provider("providerNsa", uri("http://localhost"), "urn:ogf:network:")
+    )
+end ReleaseSpec

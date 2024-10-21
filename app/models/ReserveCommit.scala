@@ -23,19 +23,19 @@
 package models
 
 import java.net.URI
+import scala.xml.Elem
 
 case class ReserveCommit(
     connectionId: String,
     correlationId: String,
     replyTo: Option[URI],
     requesterNsa: String,
-    provider: Provider) extends NsiRequest(correlationId, replyTo, requesterNsa, provider) {
+    provider: Provider
+) extends NsiRequest():
 
   override def soapActionSuffix = "reserveCommit"
 
-  override def nsiV2Body =
+  override def nsiV2Body: Elem =
     <type:reserveCommit>
-      <connectionId>{ connectionId }</connectionId>
+      <connectionId>{connectionId}</connectionId>
     </type:reserveCommit>
-
-}

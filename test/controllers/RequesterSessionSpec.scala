@@ -1,40 +1,56 @@
 package controllers
 
-import play.api.test._
-import models._
 import com.typesafe.config.ConfigFactory
-import scala.collection.JavaConverters._
-import play.api.Play
+import models.*
+import play.api.test.*
+import scala.jdk.CollectionConverters.*
+import support.WithViewContext
 
 @org.junit.runner.RunWith(classOf[org.specs2.runner.JUnitRunner])
-class RequesterSessionSpec extends support.Specification {
+class RequesterSessionSpec extends support.Specification:
 
-  val someFakeProviders: Map[String, _] = ConfigFactory.parseString("""
+  val someFakeProviders: Map[String, ?] = ConfigFactory
+    .parseString("""
     requester.nsi.providers = [
       { id = "testid", url = "http://localhost:9999", portPrefix = "urn:ogf:network:" },
       { id = "urn:ogf:network:nsa:some-network", url = "http://localhost:8888", portPrefix = "urn:ogf:network" }
-    ]""").root().unwrapped().asScala.toMap
+    ]""")
+    .root()
+    .unwrapped()
+    .asScala
+    .toMap
 
   "The configuration" should {
+    "have an end point with a default provider" in new WithViewContext(builder =>
+      builder.configure(someFakeProviders)
+    ):
+      override def running() =
+        val subject = inject[RequesterSession]
 
-    "have an end point with a default provider" in new WithApplication(FakeApplication(additionalConfiguration = someFakeProviders)) {
-      val endPoint = RequesterSession.currentEndPoint(FakeRequest())
+        val endPoint = subject.currentEndPoint(using FakeRequest())
 
-      endPoint.provider.providerUrl must equalTo(uri("http://localhost:9999"))
-    }
+        endPoint.provider.providerUrl must equalTo(uri("http://localhost:9999"))
 
-    "have an endpoint for the session settings" in new WithApplication(FakeApplication(additionalConfiguration = someFakeProviders)) {
-      val endPoint = RequesterSession.currentEndPoint(FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network"))
+    "have an endpoint for the session settings" in new WithViewContext(builder =>
+      builder.configure(someFakeProviders)
+    ):
+      override def running() =
+        val subject = inject[RequesterSession]
+        val request = FakeRequest().withSession("nsaId" -> "urn:ogf:network:nsa:some-network")
 
-      endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")
-      endPoint.provider.providerUrl must equalTo(uri("http://localhost:8888"))
-    }
+        val endPoint = subject.currentEndPoint(using request)
 
-    "load the configured providers" in new WithApplication(FakeApplication(additionalConfiguration = someFakeProviders)) {
-      val provider = RequesterSession.findProvider("testid")
+        endPoint.provider.nsaId must equalTo("urn:ogf:network:nsa:some-network")
+        endPoint.provider.providerUrl must equalTo(uri("http://localhost:8888"))
 
-      provider must beSome(Provider("testid", uri("http://localhost:9999"), "urn:ogf:network:"))
-    }
+    "load the configured providers" in new WithViewContext(builder =>
+      builder.configure(someFakeProviders)
+    ):
+      override def running() =
+        val subject = inject[RequesterSession]
+
+        val provider = subject.findProvider("testid")
+
+        provider must beSome(Provider("testid", uri("http://localhost:9999"), "urn:ogf:network:"))
   }
-
-}
+end RequesterSessionSpec
