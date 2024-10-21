@@ -1,6 +1,6 @@
 organization := "nl.surfnet.bod"
 name := "nsi-requester"
-version := "2.0"
+version := "2.1-SNAPSHOT"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
