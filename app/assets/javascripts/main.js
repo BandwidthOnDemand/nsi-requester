@@ -49,12 +49,6 @@ $(function() {
             success: function(data) {
                addXmlBlock("Request", data.request.xml, data.request.time);
                addXmlBlock("Response", data.response.xml, data.response.time);
-
-               eventSource = new EventSource(`/events/${correlationId}`);
-               eventSource.addEventListener('message', (message) => {
-                  let data = JSON.parse(message.data);
-                  addXmlBlock('Response', data.response.xml, data.response.time);
-               });
             },
             error: function(err) {
                showQueryForm();
@@ -111,7 +105,12 @@ $(function() {
 
       function hideQueryForm(correlationId) {
          if (eventSource) eventSource.close();
-         eventSource = null;
+
+          eventSource = new EventSource(`/events/${correlationId}`);
+          eventSource.addEventListener('message', (message) => {
+              let data = JSON.parse(message.data);
+              addXmlBlock('Response', data.response.xml, data.response.time);
+          });
 
          queryS.css("display", "none");
          responseS.css("display", "block");
