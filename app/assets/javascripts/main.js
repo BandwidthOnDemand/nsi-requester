@@ -30,12 +30,6 @@ $(function() {
           form = queryS.find("form"),
           responseContent = $("#responseS > div.content");
 
-      window.message = function(data) {
-        var json = $.parseJSON(data);
-        addXmlBlock("Callback response", json.response.xml, json.response.time);
-        increaseResponses();
-      }
-
       form.submit(function(event) {
          var correlationId = $(event.target).find('input[id$="correlationId"]').val();
          hideQueryForm(correlationId);
@@ -109,7 +103,8 @@ $(function() {
           eventSource = new EventSource(`/events/${correlationId}`);
           eventSource.addEventListener('message', (message) => {
               let data = JSON.parse(message.data);
-              addXmlBlock('Response', data.response.xml, data.response.time);
+              addXmlBlock('Callback Response', data.response.xml, data.response.time);
+              increaseResponses();
           });
 
          queryS.css("display", "none");
