@@ -25,8 +25,9 @@ from git, so a tag builds `2.1.0` and any other commit builds `2.1.0+3-g1a2b3c4`
 is off because release tags carry no `v` prefix. The version reaches the application through
 sbt-buildinfo as `support.BuildInfo.version`, which the settings page displays.
 
-The `Dockerfile` copies `.git/` into the build stage, so no version needs to be passed in — but the
-checkout must be unshallow or dynver sees no tags, which is why
+The `Dockerfile` copies the whole tree, `.git` included, so no version needs to be passed in. Copy
+only part of it and git reports the rest as deleted, which makes dynver stamp every build dirty. The
+checkout must also be unshallow or dynver sees no tags, which is why
 `.github/workflows/publish.yml` uses `fetch-depth: 0`. The chart takes the same tag as both its
 version and its appVersion; see `.github/workflows/chart.yml`.
 
