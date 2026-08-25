@@ -53,7 +53,8 @@ jobs:
         run: |
           set -euo pipefail
           helm package "$CHART_DIR" --destination dist \
-            --version "${{ steps.cfg.outputs.version }}"
+            --version     "${{ steps.cfg.outputs.version }}" \
+            --app-version "${{ steps.cfg.outputs.version }}"
           ls -l dist
 
       - name: Log in to GHCR

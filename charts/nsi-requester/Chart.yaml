@@ -12,15 +12,14 @@ description: Helm chart to deploy nsi-requester to Kubernetes
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
 
-# Placeholder only. The chart version is the release git tag, injected by
-# .github/workflows/chart.yml:  helm package --version $TAG
-# Do not maintain this number by hand.
+# Placeholders only. The chart version and appVersion are both the release git
+# tag, injected by .github/workflows/chart.yml:
+#     helm package --version $TAG --app-version $TAG
+# Do not maintain these numbers by hand. 0.0.0 sorts below every release and
+# names an image tag that does not exist, so a mis-built chart fails loudly.
 version: 0.0.0
 
-# This chart packages a third-party application, so appVersion pins the upstream
-# container image tag and is NOT derived from the git tag. Maintain it by hand
-# and keep it matching a real tag of ghcr.io/bandwidthondemand/nsi-requester.
-appVersion: "1.1.1"
+appVersion: "0.0.0"
 
 annotations:
   org.opencontainers.image.source: https://github.com/BandwidthOnDemand/nsi-requester
