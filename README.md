@@ -18,6 +18,18 @@ You need either Play! or sbt installed. Both available through [Homebrew][homebr
 
 Move your browser to [http://localhost:9000](http://localhost:9000).
 
+## Versioning
+
+The release git tag is the only place a version is written by hand. sbt-dynver derives the version
+from git, so a tag builds `2.1.0` and any other commit builds `2.1.0+3-g1a2b3c4`. `dynverVTagPrefix`
+is off because release tags carry no `v` prefix. The version reaches the application through
+sbt-buildinfo as `support.BuildInfo.version`, which the settings page displays.
+
+The `Dockerfile` copies `.git/` into the build stage, so no version needs to be passed in — but the
+checkout must be unshallow or dynver sees no tags, which is why
+`.github/workflows/publish.yml` uses `fetch-depth: 0`. The chart takes the same tag as both its
+version and its appVersion; see `.github/workflows/chart.yml`.
+
 ## Eclipse
 For editing in Eclipse the [Scala IDE](http://scala-ide.org/) is very usefull.
 
